@@ -32,7 +32,7 @@ fn main() {
         DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "sim".into(),
-                resolution: (800.0, 608.0).into(),
+                resolution: (VIEWPORT_WIDTH, VIEWPORT_HEIGHT).into(),
                 resizable: false,
                 decorations: true,
                 ..default()

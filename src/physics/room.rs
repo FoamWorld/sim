@@ -1,4 +1,4 @@
-use crate::{constants::UNIT_PER_METER, message::Sign}; // wrong logic in fact, [todo]
+use crate::{constants::*, message::Sign};
 use avian2d::{math::Scalar, prelude::*};
 use bevy::prelude::*;
 
@@ -6,14 +6,14 @@ fn spawn_wall(commands: &mut Commands, transform: Transform, sprite: Sprite, col
     commands.spawn((sprite, transform, collider, RigidBody::Static));
 }
 
-const X_DIST: Scalar = 384.0;
-const Y_DIST: Scalar = 288.0;
+const X_DIST: Scalar = (VIEWPORT_WIDTH - GRID_SIZE) * 0.5;
+const Y_DIST: Scalar = (VIEWPORT_HEIGHT - GRID_SIZE) * 0.5;
 pub fn spawn_room(commands: &mut Commands) {
     let vertical_sprite = Sprite::from_color(
         bevy::color::palettes::basic::GRAY,
-        Vec2::new(UNIT_PER_METER, 608.0),
+        Vec2::new(GRID_SIZE, VIEWPORT_HEIGHT),
     );
-    let vertical_collider = Collider::rectangle(UNIT_PER_METER, 608.0);
+    let vertical_collider = Collider::rectangle(GRID_SIZE, VIEWPORT_HEIGHT);
     spawn_wall(
         commands,
         Transform::from_xyz(-X_DIST, 0.0, 0.0),
@@ -29,9 +29,9 @@ pub fn spawn_room(commands: &mut Commands) {
 
     let horizonal_sprite = Sprite::from_color(
         bevy::color::palettes::basic::GRAY,
-        Vec2::new(800.0, UNIT_PER_METER),
+        Vec2::new(VIEWPORT_WIDTH, GRID_SIZE),
     );
-    let horizonal_collider = Collider::rectangle(800.0, UNIT_PER_METER);
+    let horizonal_collider = Collider::rectangle(VIEWPORT_WIDTH, GRID_SIZE);
     spawn_wall(
         commands,
         Transform::from_xyz(0.0, -Y_DIST, 0.0),
