@@ -42,6 +42,7 @@ fn main() {
         PhysicsPlugins::default().with_length_unit(UNIT_PER_METER),
         MessagePlugin,
         AppStatePlugin,
+        PrimaryCameraPlugin,
     ));
     app.insert_resource(ClearColor(Color::srgb(0.9, 0.9, 0.9)));
     app.insert_resource(Gravity(Vector::ZERO));
@@ -52,7 +53,6 @@ fn main() {
 }
 
 fn setup(mut commands: Commands) {
-    commands.spawn((Camera2d::default(), PrimaryCamera));
     commands.spawn((
         Sprite {
             color: Color::srgb(1.0, 0.8, 0.1),
