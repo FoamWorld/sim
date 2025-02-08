@@ -1,0 +1,43 @@
+cargo-features = ["profile-rustflags"]
+
+[package]
+name = "sim"
+version = "0.1.0"
+edition = "2021"
+authors = ["Rratic"]
+license = "MIT"
+
+[features]
+default = [
+	# ref: https://docs.rs/bevy/latest/bevy/
+	# Default Features
+	"bevy/bevy_asset",
+	"bevy/bevy_render",
+	"bevy/bevy_sprite",
+	"bevy/bevy_state", # state machines
+	"bevy/bevy_text",
+	"bevy/bevy_ui",
+	"bevy/bevy_window",
+	"bevy/bevy_winit",
+	"bevy/multi_threaded", # not known whether it's worth it
+	"bevy/png",
+
+	# Optional Features
+	"bevy/dynamic_linking",
+]
+
+[profile.dev]
+debug = false
+rustflags = ["-Z", "share-generics=off"]
+
+[profile.release]
+# Compile the entire crate as one unit.
+# Slows compile times, marginal improvements.
+codegen-units = 1
+# Do a second optimization pass over the entire program, including dependencies.
+# Slows compile times, marginal improvements.
+lto = "thin"
+
+[dependencies]
+avian2d = "0.2"
+bevy = { version = "0.15", default-features = false }
