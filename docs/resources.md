@@ -3,5 +3,6 @@
 - `Quattrocento`
 
 ## Images
-### OpenGameArt (CC-BY-SA 3.0)
-- [sign](https://opengameart.org/content/sign-pack)
+### OpenGameArt
+- [Sign Pack](https://opengameart.org/content/sign-pack) (CC-BY-SA 3.0) -> `sign`
+- [Dungeon Tileset](https://opengameart.org/content/dungeon-tileset-1) (CC-BY 3.0) -> `character` (Modified)

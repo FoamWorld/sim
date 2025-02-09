@@ -1,4 +1,4 @@
-use crate::{assets::*, physics::room::*, ui::*};
+use crate::{assets::*, control::*, physics::room::*, ui::*};
 use avian2d::prelude::*;
 use bevy::{asset::*, prelude::*};
 
@@ -73,6 +73,16 @@ fn setup_game(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
 ) {
+    commands.spawn((
+        Sprite::from_image(asset_server.get_handle("textures/character.png").unwrap()),
+        Transform::from_xyz(0.0, 0.0, 1.0),
+        RigidBody::Dynamic,
+        Collider::rectangle(16.0, 32.0),
+        LockedAxes::ROTATION_LOCKED,
+        MovementSpeed(100.0),
+        Actor,
+    ));
+
     spawn_room(&mut commands);
 
     let texture_handle = asset_server.get_handle("textures/sign.png").unwrap();

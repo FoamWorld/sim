@@ -46,24 +46,7 @@ fn main() {
     ));
     app.insert_resource(ClearColor(Color::srgb(0.9, 0.9, 0.9)));
     app.insert_resource(Gravity(Vector::ZERO));
-    app.add_systems(Startup, setup)
-        .add_systems(Update, (inputs_move, inputs_wait));
+    app.add_systems(Update, (inputs_move, inputs_wait));
     app.add_systems(Startup, start_menu);
     app.run();
-}
-
-fn setup(mut commands: Commands) {
-    commands.spawn((
-        Sprite {
-            color: Color::srgb(1.0, 0.8, 0.1),
-            custom_size: Some(Vec2::splat(16.0)),
-            ..default()
-        },
-        Transform::from_xyz(0.0, 0.0, 1.0),
-        RigidBody::Dynamic,
-        Collider::circle(8.0),
-        LockedAxes::ROTATION_LOCKED,
-        MovementSpeed(100.0),
-        Actor,
-    ));
 }
