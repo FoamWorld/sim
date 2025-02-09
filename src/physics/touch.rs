@@ -1,14 +1,13 @@
+use crate::control::Actor;
 use avian2d::prelude::*;
 use bevy::prelude::*;
-
-use crate::{control::Actor, message::Sign};
 
 #[derive(Event)]
 pub struct TouchEvent(pub Entity);
 
 pub fn collision_detection(
     mut query_player: Query<Entity, (With<Actor>, With<RigidBody>)>,
-    mut query_pillow: Query<Entity, (With<RigidBody>, With<Sign>)>,
+    mut query_pillow: Query<Entity, (With<RigidBody>, With<RigidBodyDisabled>)>,
     mut collisions: ResMut<Collisions>,
     mut writer: EventWriter<TouchEvent>,
 ) {

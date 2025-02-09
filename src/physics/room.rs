@@ -51,6 +51,7 @@ pub fn spawn_sign(commands: &mut Commands, x: Scalar, y: Scalar, sprite: Sprite)
         sprite,
         Transform::from_xyz(x, y, 0.0),
         RigidBody::Static,
+        RigidBodyDisabled,
         Collider::rectangle(28.0, 26.0),
         Sign("This is a sign.".to_string()),
     ));
