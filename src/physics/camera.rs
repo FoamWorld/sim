@@ -14,7 +14,7 @@ impl Plugin for PrimaryCameraPlugin {
 }
 
 #[derive(Resource, Default)]
-pub struct CursorCoords(Option<Vec2>);
+pub struct CursorCoords(pub Option<Vec2>);
 
 pub fn translate_cursor_position(
     mut coords: ResMut<CursorCoords>,

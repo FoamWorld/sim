@@ -24,6 +24,9 @@ use physics::camera::*;
 mod state;
 use state::*;
 
+mod diagnostics;
+use diagnostics::*;
+
 #[bevy_main]
 fn main() {
     let mut app = App::new();
@@ -42,6 +45,7 @@ fn main() {
         PhysicsPlugins::default().with_length_unit(UNIT_PER_METER),
         MessagePlugin,
         AppStatePlugin,
+        DiagnosticsTextPlugin,
         PrimaryCameraPlugin,
     ));
     app.insert_resource(ClearColor(Color::srgb(0.9, 0.9, 0.9)));
