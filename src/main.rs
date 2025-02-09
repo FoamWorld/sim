@@ -27,6 +27,8 @@ use state::*;
 mod diagnostics;
 use diagnostics::*;
 
+mod game;
+
 #[bevy_main]
 fn main() {
     let mut app = App::new();
