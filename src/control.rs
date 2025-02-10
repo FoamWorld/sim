@@ -1,3 +1,4 @@
+use crate::state::*;
 use avian2d::{math::*, prelude::*};
 use bevy::prelude::*;
 use std::collections::HashMap;
@@ -12,12 +13,16 @@ pub enum ControlCode {
     MoveRight,
     MoveUp,
     MoveDown,
+    Use,
+    // Consume,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 enum InputDetectionType {
     Pressed(KeyCode),
-    PressedThisFrame(KeyCode),
+    JustPressed(KeyCode),
+    EitherPressed(KeyCode, KeyCode),
+    EitherJustPressed(KeyCode, KeyCode),
 }
 
 #[derive(Resource, Debug, PartialEq, Eq, Clone)]
@@ -28,31 +33,35 @@ impl Default for ControlSettings {
         let list = vec![
             (
                 ControlCode::Pause,
-                InputDetectionType::PressedThisFrame(KeyCode::Escape),
+                InputDetectionType::JustPressed(KeyCode::Escape),
             ),
             (
                 ControlCode::Debug,
-                InputDetectionType::PressedThisFrame(KeyCode::F3),
+                InputDetectionType::EitherJustPressed(KeyCode::F3, KeyCode::KeyH),
             ),
             (
                 ControlCode::Wait,
-                InputDetectionType::PressedThisFrame(KeyCode::Enter),
+                InputDetectionType::JustPressed(KeyCode::Enter),
             ),
             (
                 ControlCode::MoveLeft,
-                InputDetectionType::Pressed(KeyCode::KeyA),
+                InputDetectionType::EitherPressed(KeyCode::KeyA, KeyCode::ArrowLeft),
             ),
             (
                 ControlCode::MoveRight,
-                InputDetectionType::Pressed(KeyCode::KeyD),
+                InputDetectionType::EitherPressed(KeyCode::KeyD, KeyCode::ArrowRight),
             ),
             (
                 ControlCode::MoveUp,
-                InputDetectionType::Pressed(KeyCode::KeyW),
+                InputDetectionType::EitherPressed(KeyCode::KeyW, KeyCode::ArrowUp),
             ),
             (
                 ControlCode::MoveDown,
-                InputDetectionType::Pressed(KeyCode::KeyS),
+                InputDetectionType::EitherPressed(KeyCode::KeyS, KeyCode::ArrowDown),
+            ),
+            (
+                ControlCode::Use,
+                InputDetectionType::JustPressed(KeyCode::KeyT),
             ),
         ];
         let map: HashMap<_, _> = list.into_iter().collect();
@@ -66,7 +75,9 @@ impl ControlSettings {
         if let Some(key_code) = self.0.get(&control_code) {
             match *key_code {
                 InputDetectionType::Pressed(x) => input.pressed(x),
-                InputDetectionType::PressedThisFrame(x) => input.just_pressed(x),
+                InputDetectionType::JustPressed(x) => input.just_pressed(x),
+                InputDetectionType::EitherPressed(x, y) => input.any_pressed([x, y]),
+                InputDetectionType::EitherJustPressed(x, y) => input.any_just_pressed([x, y]),
             }
         } else {
             false
@@ -78,8 +89,11 @@ pub struct ControlPlugin;
 
 impl Plugin for ControlPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<ControlSettings>()
-            .add_systems(Update, (inputs_move, inputs_wait));
+        app.init_resource::<ControlSettings>().add_systems(
+            Update,
+            (inputs_move, inputs_wait, crate::game::inputs_use).run_if(in_state(AppState::InGame)),
+            // todo: add in_state(RunState::Running)
+        );
     }
 }
 
