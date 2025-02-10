@@ -40,8 +40,9 @@ fn toggle_pause(
     current_state: ResMut<State<RunState>>,
     mut next_state: ResMut<NextState<RunState>>,
     keys: Res<ButtonInput<KeyCode>>,
+    control_settings: Res<ControlSettings>,
 ) {
-    if keys.just_pressed(KeyCode::Escape) {
+    if control_settings.check(ControlCode::Pause, &keys) {
         let new_state = match current_state.get() {
             RunState::Paused => RunState::Running,
             RunState::Running => RunState::Paused,

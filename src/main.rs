@@ -5,7 +5,6 @@ use avian2d::{math::*, prelude::*};
 use bevy::prelude::*;
 
 mod ui;
-use ui::*;
 
 mod assets;
 
@@ -49,10 +48,9 @@ fn main() {
         AppStatePlugin,
         DiagnosticsTextPlugin,
         PrimaryCameraPlugin,
+        ControlPlugin,
     ));
     app.insert_resource(ClearColor(Color::srgb(0.9, 0.9, 0.9)));
     app.insert_resource(Gravity(Vector::ZERO));
-    app.add_systems(Update, (inputs_move, inputs_wait));
-    app.add_systems(Startup, start_menu);
     app.run();
 }

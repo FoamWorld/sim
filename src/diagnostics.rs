@@ -1,4 +1,4 @@
-use crate::physics::camera::*;
+use crate::{control::{ControlCode, ControlSettings}, physics::camera::*};
 use bevy::{
     diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
     prelude::*,
@@ -21,8 +21,9 @@ impl Plugin for DiagnosticsTextPlugin {
                 Update,
                 |current_state: ResMut<State<DiagnosticsState>>,
                  mut next_state: ResMut<NextState<DiagnosticsState>>,
-                 keys: Res<ButtonInput<KeyCode>>| {
-                    if keys.just_pressed(KeyCode::F3) {
+                 keys: Res<ButtonInput<KeyCode>>,
+                 control_settings: Res<ControlSettings>| {
+                    if control_settings.check(ControlCode::Debug, &keys) {
                         let new_state = match current_state.get() {
                             DiagnosticsState::Off => DiagnosticsState::On,
                             DiagnosticsState::On => DiagnosticsState::Off,
