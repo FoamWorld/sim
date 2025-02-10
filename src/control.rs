@@ -65,7 +65,7 @@ impl ControlSettings {
     pub fn check(&self, control_code: ControlCode, input: &Res<ButtonInput<KeyCode>>) -> bool {
         if let Some(key_code) = self.0.get(&control_code) {
             match *key_code {
-                InputDetectionType::Pressed(x) => input.any_pressed([x]),
+                InputDetectionType::Pressed(x) => input.pressed(x),
                 InputDetectionType::PressedThisFrame(x) => input.just_pressed(x),
             }
         } else {

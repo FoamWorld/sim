@@ -9,12 +9,12 @@ license = "MIT"
 
 [features]
 default = [
-	# ref: https://docs.rs/bevy/latest/bevy/
+	# ref: https://docs.rs/bevy/latest/bevy/#cargo-features
 	# Default Features
 	"bevy/bevy_asset",
 	"bevy/bevy_render",
 	"bevy/bevy_sprite",
-	"bevy/bevy_state", # state machines
+	"bevy/bevy_state",
 	"bevy/bevy_text",
 	"bevy/bevy_ui",
 	"bevy/bevy_window",

@@ -31,7 +31,6 @@ mod game;
 #[bevy_main]
 fn main() {
     let mut app = App::new();
-    // app.add_resource(Msaa { samples: 4 })
     app.add_plugins((
         DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
@@ -44,13 +43,12 @@ fn main() {
             ..default()
         }),
         PhysicsPlugins::default().with_length_unit(UNIT_PER_METER),
-        MessagePlugin,
         AppStatePlugin,
         DiagnosticsTextPlugin,
-        PrimaryCameraPlugin,
         ControlPlugin,
+        PrimaryCameraPlugin,
+        MessagePlugin,
     ));
-    app.insert_resource(ClearColor(Color::srgb(0.9, 0.9, 0.9)));
     app.insert_resource(Gravity(Vector::ZERO));
     app.run();
 }
