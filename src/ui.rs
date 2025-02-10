@@ -1,9 +1,24 @@
-use bevy::prelude::*;
+use bevy::{
+    prelude::*,
+    window::{PrimaryWindow, SystemCursorIcon},
+    winit::cursor::CursorIcon,
+};
 
 use crate::state::AppState;
 
 #[derive(Component)]
 pub struct WillDestroy;
+
+pub fn set_cursor(mut commands: Commands, q_window: Query<Entity, With<PrimaryWindow>>) {
+    let window = if let Ok(window) = q_window.get_single() {
+        window
+    } else {
+        return;
+    };
+    commands
+        .entity(window)
+        .insert(CursorIcon::System(SystemCursorIcon::Crosshair));
+}
 
 pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
     let mut background = commands.spawn((

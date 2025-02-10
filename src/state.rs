@@ -27,7 +27,7 @@ impl Plugin for AppStatePlugin {
             .add_systems(Update, check_textures.run_if(in_state(AppState::Loading)))
             .add_systems(OnEnter(AppState::Menu), start_menu)
             .add_systems(OnExit(AppState::Menu), finish_ui)
-            .add_systems(OnEnter(AppState::InGame), setup_game);
+            .add_systems(OnEnter(AppState::InGame), (setup_game, set_cursor));
 
         // RunState
         app.add_systems(OnEnter(RunState::Paused), enter_pause)
