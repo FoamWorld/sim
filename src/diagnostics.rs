@@ -1,4 +1,7 @@
-use crate::{control::{ControlCode, ControlSettings}, physics::camera::*};
+use crate::{
+    control::{ControlCode, ControlSettings},
+    physics::camera::*,
+};
 use bevy::{
     diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
     prelude::*,
@@ -16,25 +19,19 @@ impl Plugin for DiagnosticsTextPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(FrameTimeDiagnosticsPlugin);
         app.insert_state(DiagnosticsState::Off);
-        app.add_systems(Startup, setup_diagnostics_text)
+        app.add_systems(OnEnter(DiagnosticsState::On), setup_diagnostics_text)
             .add_systems(
-                Update,
-                |current_state: ResMut<State<DiagnosticsState>>,
-                 mut next_state: ResMut<NextState<DiagnosticsState>>,
-                 keys: Res<ButtonInput<KeyCode>>,
-                 control_settings: Res<ControlSettings>| {
-                    if control_settings.check(ControlCode::Debug, &keys) {
-                        let new_state = match current_state.get() {
-                            DiagnosticsState::Off => DiagnosticsState::On,
-                            DiagnosticsState::On => DiagnosticsState::Off,
-                        };
-                        next_state.set(new_state);
+                OnExit(DiagnosticsState::On),
+                |mut commands: Commands, query: Query<Entity, With<DiagnosticsText>>| {
+                    for entity in query.iter() {
+                        commands.entity(entity).despawn();
                     }
                 },
             )
             .add_systems(
                 Update,
                 (
+                    toggle_diagnostics_mode,
                     translate_cursor_position,
                     update_diagnostics_text.run_if(in_state(DiagnosticsState::On)),
                 ),
@@ -51,7 +48,7 @@ fn setup_diagnostics_text(mut commands: Commands, asset_server: Res<AssetServer>
         TextFont {
             // weight: 300
             font: asset_server.load("fonts/open-sans.regular.ttf"),
-            font_size: 30.0,
+            font_size: 20.0,
             ..default()
         },
         TextColor(Color::BLACK),
@@ -63,6 +60,21 @@ fn setup_diagnostics_text(mut commands: Commands, asset_server: Res<AssetServer>
         },
         DiagnosticsText,
     ));
+}
+
+fn toggle_diagnostics_mode(
+    current_state: ResMut<State<DiagnosticsState>>,
+    mut next_state: ResMut<NextState<DiagnosticsState>>,
+    keys: Res<ButtonInput<KeyCode>>,
+    control_settings: Res<ControlSettings>,
+) {
+    if control_settings.check(ControlCode::Debug, &keys) {
+        let new_state = match current_state.get() {
+            DiagnosticsState::Off => DiagnosticsState::On,
+            DiagnosticsState::On => DiagnosticsState::Off,
+        };
+        next_state.set(new_state);
+    }
 }
 
 fn update_diagnostics_text(
@@ -86,7 +98,7 @@ fn update_diagnostics_text(
             let y = vec.y;
             format!("({x:.2}, {y:.2})")
         } else {
-            "Outside".to_string()
+            "Unknown".to_string()
         };
 
         text.0 = format!("FPS: {fps_str}\nCursor: {coords_str}");

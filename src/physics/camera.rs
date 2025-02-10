@@ -22,9 +22,17 @@ pub fn translate_cursor_position(
     q_camera: Query<(&Camera, &GlobalTransform), With<PrimaryCamera>>,
 ) {
     let (camera, camera_transform) = q_camera.single();
-    let window = q_window.single();
-    coords.0 = window
+    let window = if let Ok(window) = q_window.get_single() {
+        window
+    } else {
+        return;
+    };
+    let ray = window
         .cursor_position()
-        .and_then(|cursor| Some(camera.viewport_to_world(camera_transform, cursor)))
-        .map(|ray| ray.unwrap().origin.truncate());
+        .and_then(|cursor| Some(camera.viewport_to_world(camera_transform, cursor)));
+    coords.0 = if let Some(Ok(ray3d)) = ray {
+        Some(ray3d.origin.truncate())
+    } else {
+        None
+    }
 }
