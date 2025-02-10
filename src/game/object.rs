@@ -1,4 +1,4 @@
 use bevy::prelude::*;
 
 #[derive(Component)]
-struct NonUnique(pub String);
+pub struct NonUnique(pub String);
