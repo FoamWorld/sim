@@ -4,9 +4,10 @@ extern crate bevy;
 use avian2d::{math::*, prelude::*};
 use bevy::prelude::*;
 
-mod ui;
-
 mod assets;
+mod character;
+mod game;
+mod ui;
 
 mod message;
 use message::*;
@@ -25,8 +26,6 @@ use state::*;
 
 mod diagnostics;
 use diagnostics::*;
-
-mod game;
 
 #[bevy_main]
 fn main() {
