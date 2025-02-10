@@ -1,10 +1,9 @@
+use crate::{constants::PROJECT_TITLE, state::AppState};
 use bevy::{
     prelude::*,
     window::{PrimaryWindow, SystemCursorIcon},
     winit::cursor::CursorIcon,
 };
-
-use crate::state::AppState;
 
 #[derive(Component)]
 pub struct WillDestroy;
@@ -35,11 +34,11 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
     background.with_children(|parent: &mut ChildBuilder<'_>| {
         parent.spawn((
-            Text::new("Mercury & Milfoil"),
+            Text::new(PROJECT_TITLE),
             TextFont {
                 // weight:700
                 font: asset_server.load("fonts/quattrocento.regular.ttf"),
-                font_size: 40.0,
+                font_size: 25.0,
                 ..default()
             },
             TextColor(Color::BLACK),
@@ -49,12 +48,12 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                 Button,
                 Text::new("Start"),
                 TextFont {
-                    // weight: 300
+                    // weight: 700
                     font: asset_server.load("fonts/open-sans.regular.ttf"),
-                    font_size: 30.0,
+                    font_size: 16.0,
                     ..default()
                 },
-                TextColor(Color::BLACK),
+                TextColor(Color::srgb_u8(0xb9, 0x7c, 0x2c)),
                 TextLayout {
                     justify: JustifyText::Center,
                     ..default()
