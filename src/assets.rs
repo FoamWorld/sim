@@ -16,8 +16,8 @@ impl RpgTextures {
         dictionary: HashMap<String, Option<(u32, u32, u32)>>,
     ) -> Self {
         Self {
-            folder: folder,
-            dictionary: dictionary,
+            folder,
+            dictionary,
             named_images: HashMap::<_, _>::new(),
             named_atlases_layout: HashMap::<_, _>::new(),
         }
@@ -63,7 +63,7 @@ impl RpgTextures {
         let handle = self.named_atlases_layout.get(name.into()).unwrap();
         TextureAtlas {
             layout: handle.clone_weak(),
-            index: index,
+            index,
         }
     }
 }
@@ -73,7 +73,7 @@ pub fn load_textures(mut commands: Commands, asset_server: Res<AssetServer>) {
         // todo: add "notexture" fallback
         ("character".into(), None),
         ("sign".into(), Some((32, 3, 5))),
-        ("spells".into(), Some((16, 2, 1))),
+        ("spells".into(), Some((16, 4, 1))),
     ];
     commands.insert_resource(RpgTextures::new(
         asset_server.load_folder("textures"),

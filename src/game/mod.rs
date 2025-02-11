@@ -34,7 +34,7 @@ pub fn inputs_use(
         commands.spawn((
             Sprite::from_atlas_image(
                 rpg_folder.get_image_handle("spells"),
-                rpg_folder.get_texture_atlas("spells", 0),
+                rpg_folder.get_texture_atlas("spells", 3),
             ),
             Transform::from_xyz(
                 start_point.x + unit.x * 10.0,
