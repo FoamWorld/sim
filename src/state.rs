@@ -74,20 +74,13 @@ fn exit_pause(
 
 fn setup_game(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
+    rpg_folder: Res<RpgTextures>,
 ) {
     spawn_room(&mut commands);
 
-    let texture_handle = asset_server.get_handle("textures/sign.png").unwrap();
-    let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 3, 5, None, None);
-
     let sprite = Sprite::from_atlas_image(
-        texture_handle,
-        TextureAtlas {
-            layout: texture_atlases.add(layout),
-            index: 12,
-        },
+        rpg_folder.get_image_handle("sign"),
+        rpg_folder.get_texture_atlas("sign", 12),
     );
     spawn_sign(&mut commands, -200.0, 0.0, sprite);
 }
