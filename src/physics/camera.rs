@@ -1,3 +1,4 @@
+use avian2d::prelude::Rotation;
 use bevy::{prelude::*, window::PrimaryWindow};
 
 #[derive(Component)]
@@ -44,3 +45,6 @@ pub fn translate_cursor_position(
         None
     }
 }
+
+#[derive(Component)]
+pub struct RotateWithMouse(pub Rotation); // offset

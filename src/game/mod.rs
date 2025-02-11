@@ -1,4 +1,4 @@
-use crate::{assets::RpgTextures, control::*};
+use crate::{assets::RpgTextures, constants::*, control::*};
 use avian2d::prelude::*;
 use bevy::prelude::*;
 
@@ -21,13 +21,14 @@ pub fn inputs_use(
     let actor = actors.single();
     if click.just_pressed(MouseButton::Left) || control_settings.check(ControlCode::Use, &keys) {
         let storage = q_st.get(actor).unwrap();
-        let _item = if let Some(item) = storage.0[0] {
+        let _item = if let Some(item) = storage.get_index(0) {
             item
         } else {
             return;
         };
 
-        let start_point = q_pos.get(actor).unwrap().translation.truncate();
+        let start_point =
+            q_pos.get(actor).unwrap().translation.truncate() + CHARACTER_LEFT_HAND_OFFSET;
         let ray = coords.0.unwrap() - start_point;
         let unit = ray / ray.length();
 
@@ -44,7 +45,7 @@ pub fn inputs_use(
             RigidBody::Dynamic,
             Collider::circle(2.0),
             LockedAxes::ROTATION_LOCKED,
-            LinearVelocity(unit * 20.0),
+            LinearVelocity(unit * 40.0),
         ));
     }
 }

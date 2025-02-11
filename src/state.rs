@@ -38,6 +38,7 @@ impl Plugin for AppStatePlugin {
 
         // while in game
         app.add_event::<CrashEvent>();
+        app.init_resource::<SelectedSlot>();
         app.add_systems(
             OnEnter(AppState::InGame),
             (setup_game, set_cursor, setup_character),
@@ -45,7 +46,9 @@ impl Plugin for AppStatePlugin {
 
         app.add_systems(
             PostProcessCollisions,
-            touch_detection.before(crash_detection).run_if(in_state(AppState::InGame)),
+            touch_detection
+                .before(crash_detection)
+                .run_if(in_state(AppState::InGame)),
         );
 
         app.add_systems(OnEnter(RunState::Paused), enter_pause)
