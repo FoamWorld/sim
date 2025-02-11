@@ -27,8 +27,8 @@ pub fn inputs_use(
             return;
         };
 
-        let transform = q_pos.get(actor).unwrap();
-        let ray = coords.0.unwrap() - transform.translation.truncate();
+        let start_point = q_pos.get(actor).unwrap().translation.truncate();
+        let ray = coords.0.unwrap() - start_point;
         let unit = ray / ray.length();
 
         commands.spawn((
@@ -36,11 +36,15 @@ pub fn inputs_use(
                 rpg_folder.get_image_handle("spells"),
                 rpg_folder.get_texture_atlas("spells", 0),
             ),
-            Transform::from_xyz(ray.x + unit.x * 10.0, ray.y + unit.y * 10.0, 0.0),
+            Transform::from_xyz(
+                start_point.x + unit.x * 10.0,
+                start_point.y + unit.y * 10.0,
+                0.0,
+            ),
             RigidBody::Dynamic,
             Collider::circle(2.0),
             LockedAxes::ROTATION_LOCKED,
-            LinearVelocity(ray * 200.0),
+            LinearVelocity(ray * 1.0),
         ));
     }
 }

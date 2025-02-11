@@ -91,8 +91,8 @@ impl Plugin for ControlPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<ControlSettings>().add_systems(
             Update,
-            (inputs_move, inputs_wait, crate::game::inputs_use).run_if(in_state(AppState::InGame)),
-            // todo: add in_state(RunState::Running)
+            (inputs_move, inputs_wait, crate::game::inputs_use)
+                .run_if(in_state(AppState::InGame).and(in_state(RunState::Running))),
         );
     }
 }

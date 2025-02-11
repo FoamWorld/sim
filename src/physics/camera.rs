@@ -7,9 +7,16 @@ pub struct PrimaryCameraPlugin;
 impl Plugin for PrimaryCameraPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<CursorCoords>();
-        app.insert_resource(ClearColor(Color::srgb(0.9, 0.9, 0.9)));
         app.add_systems(Startup, |mut commands: Commands| {
-            commands.spawn((Camera2d::default(), PrimaryCamera));
+            commands.spawn((
+                Camera {
+                    // hdr: true,
+                    clear_color: ClearColorConfig::Custom(Color::srgb(0.0, 0.0, 0.0)),
+                    ..default()
+                },
+                Camera2d,
+                PrimaryCamera,
+            ));
         });
     }
 }
