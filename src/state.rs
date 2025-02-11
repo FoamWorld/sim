@@ -92,7 +92,7 @@ fn setup_game(mut commands: Commands, rpg_folder: Res<RpgTextures>) {
 
     let sprite = Sprite::from_atlas_image(
         rpg_folder.get_image_handle("sign"),
-        rpg_folder.get_texture_atlas("sign", 12),
+        rpg_folder.get_texture_atlas("sign", 1),
     );
     spawn_sign(&mut commands, -200.0, 0.0, sprite);
 }

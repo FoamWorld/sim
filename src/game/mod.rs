@@ -44,7 +44,7 @@ pub fn inputs_use(
             RigidBody::Dynamic,
             Collider::circle(2.0),
             LockedAxes::ROTATION_LOCKED,
-            LinearVelocity(ray * 1.0),
+            LinearVelocity(unit * 20.0),
         ));
     }
 }

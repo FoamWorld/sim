@@ -1,5 +1,5 @@
 use crate::state::AppState;
-use bevy::{asset::LoadedFolder, prelude::*};
+use bevy::{asset::LoadedFolder, image::ImageSampler, prelude::*};
 use std::collections::HashMap;
 
 #[derive(Resource, Clone)]
@@ -41,6 +41,10 @@ impl RpgTextures {
                 warn!("{asset_path} did not resolve to an `Image` asset.");
                 continue;
             };
+
+            // Config sampler.
+            let image = textures.get_mut(id).unwrap();
+            image.sampler = ImageSampler::nearest();
 
             // Inserts.
             self.named_images.insert(string.clone(), texture);
