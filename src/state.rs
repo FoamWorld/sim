@@ -1,4 +1,10 @@
-use crate::{assets::*, character::*, control::*, physics::room::*, ui::*};
+use crate::{
+    assets::*,
+    character::*,
+    control::*,
+    physics::{collision::*, room::*},
+    ui::*,
+};
 use avian2d::prelude::*;
 use bevy::{asset::*, prelude::*};
 
@@ -22,17 +28,26 @@ impl Plugin for AppStatePlugin {
         app.insert_state(AppState::Loading)
             .insert_state(RunState::Running);
 
-        // AppState
+        // while loading
         app.add_systems(OnEnter(AppState::Loading), load_textures)
-            .add_systems(Update, check_textures.run_if(in_state(AppState::Loading)))
-            .add_systems(OnEnter(AppState::Menu), start_menu)
-            .add_systems(OnExit(AppState::Menu), finish_ui)
-            .add_systems(
-                OnEnter(AppState::InGame),
-                (setup_game, set_cursor, setup_character),
-            );
+            .add_systems(Update, check_textures.run_if(in_state(AppState::Loading)));
 
-        // RunState
+        // while at menu
+        app.add_systems(OnEnter(AppState::Menu), start_menu)
+            .add_systems(OnExit(AppState::Menu), finish_ui);
+
+        // while in game
+        app.add_event::<CrashEvent>();
+        app.add_systems(
+            OnEnter(AppState::InGame),
+            (setup_game, set_cursor, setup_character),
+        );
+
+        app.add_systems(
+            PostProcessCollisions,
+            touch_detection.before(crash_detection).run_if(in_state(AppState::InGame)),
+        );
+
         app.add_systems(OnEnter(RunState::Paused), enter_pause)
             .add_systems(OnExit(RunState::Paused), exit_pause)
             .add_systems(Update, toggle_pause.run_if(in_state(AppState::InGame)));
@@ -72,10 +87,7 @@ fn exit_pause(
     finish_ui(commands, query);
 }
 
-fn setup_game(
-    mut commands: Commands,
-    rpg_folder: Res<RpgTextures>,
-) {
+fn setup_game(mut commands: Commands, rpg_folder: Res<RpgTextures>) {
     spawn_room(&mut commands);
 
     let sprite = Sprite::from_atlas_image(

@@ -1,5 +1,4 @@
-use crate::{physics::touch::*, state::AppState};
-use avian2d::prelude::PostProcessCollisions;
+use crate::{physics::collision::*, state::AppState};
 use bevy::prelude::*;
 
 pub struct MessagePlugin;
@@ -8,11 +7,7 @@ impl Plugin for MessagePlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<TouchEvent>();
         app.add_systems(Startup, init_info_text);
-        app.add_systems(
-            PostProcessCollisions,
-            collision_detection.run_if(in_state(AppState::InGame)),
-        );
-        app.add_systems(Update, read_touch_sign);
+        app.add_systems(Update, read_touch_sign.run_if(in_state(AppState::InGame)));
     }
 }
 

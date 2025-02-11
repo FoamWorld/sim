@@ -1,11 +1,30 @@
-use crate::control::Actor;
+use crate::{control::Actor, game::health::Health};
 use avian2d::prelude::*;
 use bevy::prelude::*;
 
 #[derive(Event)]
+pub struct CrashEvent(pub Entity, pub Entity);
+
+pub fn crash_detection(
+    query_sufferer: Query<Entity, With<Health>>,
+    mut collisions: ResMut<Collisions>,
+    mut writer: EventWriter<CrashEvent>,
+) {
+    collisions.retain(|contacts| {
+        if query_sufferer.contains(contacts.entity1) {
+            writer.send(CrashEvent(contacts.entity1, contacts.entity2));
+        }
+        else if query_sufferer.contains(contacts.entity2) {
+            writer.send(CrashEvent(contacts.entity2, contacts.entity1));
+        }
+        true
+    });
+}
+
+#[derive(Event)]
 pub struct TouchEvent(pub Entity);
 
-pub fn collision_detection(
+pub fn touch_detection(
     mut query_player: Query<Entity, (With<Actor>, With<RigidBody>)>,
     mut query_pillow: Query<Entity, (With<RigidBody>, With<RigidBodyDisabled>)>,
     mut collisions: ResMut<Collisions>,
