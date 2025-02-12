@@ -2,7 +2,10 @@ use crate::{
     assets::RpgTextures,
     constants::*,
     control::*,
-    game::{health::*, item::*, object::*},
+    game::{
+        item::{debug_wand::DebugWand, *},
+        object::*,
+    },
     physics::camera::RotateWithMouse,
 };
 use avian2d::{math::*, prelude::*};
@@ -18,7 +21,11 @@ pub fn setup_character(
     rpg_folder: Res<RpgTextures>,
 ) {
     let launcher = commands
-        .spawn((NonUnique("launcher".to_string()), Health::fragile()))
+        .spawn((
+            DebugWand { mode: 3 },
+            ObjectType::<DebugWand>::new(),
+            ItemType::<DebugWand>::new(),
+        ))
         .id();
 
     // two hands

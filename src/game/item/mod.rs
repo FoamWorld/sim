@@ -1,9 +1,11 @@
+use super::object::Object;
 use bevy::prelude::*;
 
 /// Added when the clone is inside an item container.
 /// In this state, the entity spawns a `sprite` when required, but does not hold a `RigidBody`.
 /// Field `.0` stores the number/amount stacked. This works for non-unique solids, liquids and gases.
-/// Using `f32` is acceptable since it rarely happens someone takes 8 out of 1e10, say. And when that happens, it can count as a feature.
+/// Using `f32` is acceptable since it rarely happens someone takes 8 out of 1e10, say.
+/// And when that happens, it can count as a feature.
 #[derive(Component)]
 pub struct ItemAmount(pub f32);
 
@@ -32,13 +34,25 @@ impl ItemStorage {
 }
 
 /// Trait for implementing how an item works.
-trait Item {
+pub trait Item {
     fn feed_to_storage();
 }
 
 /// Added when the entity can work as an item.
 /// Uses zero-cost abstraction.
 #[derive(Component)]
-pub struct ItemType<T: Item> {
+pub struct ItemType<T: Object + Item> {
     marker: std::marker::PhantomData<T>,
 }
+
+impl<T: Object + Item> ItemType<T> {
+    pub fn new() -> Self {
+        Self {
+            marker: std::marker::PhantomData::<T>::default(),
+        }
+    }
+}
+
+/* List of items. */
+
+pub mod debug_wand;
