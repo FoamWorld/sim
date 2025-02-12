@@ -5,7 +5,7 @@ use crate::{
     game::{health::*, item::*, object::*},
     physics::camera::RotateWithMouse,
 };
-use avian2d::prelude::*;
+use avian2d::{math::*, prelude::*};
 use bevy::{prelude::*, sprite::Anchor};
 
 #[derive(Resource, Default)]
@@ -54,6 +54,6 @@ pub fn setup_item_sprite(_item: Entity, parent: &mut ChildBuilder, rpg_folder: &
             ..default()
         },
         Transform::from_translation(CHARACTER_LEFT_HAND_OFFSET.extend(CHARACTER_HOLD_OFFSET)),
-        RotateWithMouse(Rotation::FRAC_PI_4),
+        RotateWithMouse(Quat::from_rotation_z(-PI * 0.25)),
     ));
 }

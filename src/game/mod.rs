@@ -38,12 +38,12 @@ pub fn inputs_use(
                 rpg_folder.get_texture_atlas("spells", 3),
             ),
             Transform::from_xyz(
-                start_point.x + unit.x * 10.0,
-                start_point.y + unit.y * 10.0,
+                start_point.x + unit.x * 24.0,
+                start_point.y + unit.y * 24.0,
                 0.0,
             ),
             RigidBody::Dynamic,
-            Collider::circle(2.0),
+            Collider::circle(5.0),
             LockedAxes::ROTATION_LOCKED,
             LinearVelocity(unit * 40.0),
         ));

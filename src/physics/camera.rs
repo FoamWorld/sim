@@ -1,4 +1,4 @@
-use avian2d::prelude::Rotation;
+use crate::state::AppState;
 use bevy::{prelude::*, window::PrimaryWindow};
 
 #[derive(Component)]
@@ -19,6 +19,10 @@ impl Plugin for PrimaryCameraPlugin {
                 PrimaryCamera,
             ));
         });
+        app.add_systems(
+            Update,
+            (translate_cursor_position, rotate_with_mouse).run_if(in_state(AppState::InGame)),
+        );
     }
 }
 
@@ -47,4 +51,21 @@ pub fn translate_cursor_position(
 }
 
 #[derive(Component)]
-pub struct RotateWithMouse(pub Rotation); // offset
+pub struct RotateWithMouse(pub Quat); // offset
+
+pub fn rotate_with_mouse(
+    coords: Res<CursorCoords>,
+    mut query: Query<(&mut Transform, &RotateWithMouse, &GlobalTransform), With<Sprite>>,
+) {
+    let dest = if let Some(dest) = coords.0 {
+        dest
+    } else {
+        return;
+    };
+    for (mut transform, rotate_offset, global_transform) in query.iter_mut() {
+        let start = global_transform.translation().truncate();
+        let ray = dest - start;
+        let rotation = Quat::from_rotation_z(ops::atan2(ray.y, ray.x)).mul_quat(rotate_offset.0);
+        transform.rotation = rotation;
+    }
+}

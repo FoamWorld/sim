@@ -32,7 +32,6 @@ impl Plugin for DiagnosticsTextPlugin {
                 Update,
                 (
                     toggle_diagnostics_mode,
-                    translate_cursor_position,
                     update_diagnostics_text.run_if(in_state(DiagnosticsState::On)),
                 ),
             );
@@ -48,10 +47,10 @@ fn setup_diagnostics_text(mut commands: Commands, asset_server: Res<AssetServer>
         TextFont {
             // weight: 300
             font: asset_server.load("fonts/open-sans.regular.ttf"),
-            font_size: 20.0,
+            font_size: 10.0,
             ..default()
         },
-        TextColor(Color::BLACK),
+        TextColor(Color::WHITE),
         Node {
             position_type: PositionType::Absolute,
             top: Val::Px(5.0),
