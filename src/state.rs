@@ -53,7 +53,12 @@ impl Plugin for AppStatePlugin {
 
         app.add_systems(OnEnter(RunState::Paused), enter_pause)
             .add_systems(OnExit(RunState::Paused), exit_pause)
-            .add_systems(Update, toggle_pause.run_if(in_state(AppState::InGame)));
+            .add_systems(Update, toggle_pause.run_if(in_state(AppState::InGame)))
+            .add_systems(
+                Update,
+                (read_crash, crate::game::health::read_health_cleared)
+                    .run_if(in_state(AppState::InGame)),
+            );
     }
 }
 

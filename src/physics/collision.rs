@@ -1,4 +1,7 @@
-use crate::{control::Actor, game::health::Health};
+use crate::{
+    control::Actor,
+    game::health::{Health, HealthClearedEvent},
+};
 use avian2d::prelude::*;
 use bevy::prelude::*;
 
@@ -13,12 +16,25 @@ pub fn crash_detection(
     collisions.retain(|contacts| {
         if query_sufferer.contains(contacts.entity1) {
             writer.send(CrashEvent(contacts.entity1, contacts.entity2));
-        }
-        else if query_sufferer.contains(contacts.entity2) {
+        } else if query_sufferer.contains(contacts.entity2) {
             writer.send(CrashEvent(contacts.entity2, contacts.entity1));
         }
         true
     });
+}
+
+pub fn read_crash(
+    mut reader: EventReader<CrashEvent>,
+    mut writer: EventWriter<HealthClearedEvent>,
+    mut q_h: Query<&mut Health>,
+) {
+    for crash in reader.read() {
+        let sufferer = crash.0;
+        let mut health = q_h.get_mut(sufferer).unwrap();
+        if health.shift(1.0) < 1e-7 {
+            writer.send(HealthClearedEvent(sufferer));
+        }
+    }
 }
 
 #[derive(Event)]
