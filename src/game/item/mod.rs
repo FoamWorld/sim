@@ -1,5 +1,6 @@
 use super::object::Object;
 use bevy::prelude::*;
+use std::sync::Arc;
 
 /// Added when the clone is inside an item container.
 /// In this state, the entity spawns a `sprite` when required, but does not hold a `RigidBody`.
@@ -35,23 +36,31 @@ impl ItemStorage {
 
 /// Trait for implementing how an item works.
 pub trait Item {
-    fn feed_to_storage();
+    fn feed_to_storage(&self);
+    fn check_can_use(&self) -> bool {
+        true
+    }
+    fn item_use(
+        &mut self,
+        commands: &mut Commands,
+        hold_point: Vec2,
+        coords: Res<crate::physics::camera::CursorCoords>,
+        rpg_folder: Res<crate::assets::RpgTextures>,
+    );
+    fn check_can_consume(&self) -> bool {
+        false
+    }
+    fn item_consume(&self);
 }
 
 /// Added when the entity can work as an item.
+/// There are three different status for an item entity:
+/// * lying on the ground (primary):          includes `IsObject`, `IsItem`, visual, ?physics
+/// * visual image attached to the character: includes `IsObject`, `IsItem`, visual, ?physics, extra
+/// * visual image in inventory (primary):    includes `IsObject`, `IsItem`, `ItemAmount`, visual
 /// Uses zero-cost abstraction.
 #[derive(Component)]
-pub struct ItemType<T: Object + Item> {
-    marker: std::marker::PhantomData<T>,
-}
-
-impl<T: Object + Item> ItemType<T> {
-    pub fn new() -> Self {
-        Self {
-            marker: std::marker::PhantomData::<T>::default(),
-        }
-    }
-}
+pub struct IsItem(pub Arc<dyn Item + Send + Sync>);
 
 /* List of items. */
 

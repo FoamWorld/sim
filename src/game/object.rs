@@ -1,29 +1,23 @@
 use crate::assets::RpgTextures;
 use avian2d::{math::*, prelude::*};
 use bevy::prelude::*;
+use std::sync::Arc;
 
 /// Trait for implementing how a game object works.
 #[diagnostic::on_unimplemented(message = "`{Self}` is not an `Object`", label = "invalid `Object`")]
 pub trait Object {
     fn add_physics_components(&self, _commands: &mut EntityCommands) {}
-    fn add_sprite_components(&self, commands: &mut EntityCommands, rpg_folder: &Res<RpgTextures>);
+    fn add_visual_components(&self, commands: &mut EntityCommands, rpg_folder: &Res<RpgTextures>);
     fn add_extra_components(&self, commands: &mut EntityCommands) {}
-    // fn_spawn()
 }
 
 /// Added when the entity is a game object.
-/// A struct of type `T` shall also be held.
-/// Uses zero-cost abstraction.
 #[derive(Component)]
-pub struct ObjectType<T: Object> {
-    marker: std::marker::PhantomData<T>,
-}
+pub struct IsObject(Arc<dyn Object + Send + Sync>);
 
-impl<T: Object> ObjectType<T> {
-    pub fn new() -> Self {
-        Self {
-            marker: std::marker::PhantomData::<T>::default(),
-        }
+impl IsObject {
+    fn copy_pointer(&self) -> Arc<dyn Object + Send + Sync> {
+        self.0.clone()
     }
 }
 
@@ -42,7 +36,7 @@ impl Object for Barrier {
             Collider::rectangle(self.x_length, self.y_length),
         ));
     }
-    fn add_sprite_components(&self, commands: &mut EntityCommands, _: &Res<RpgTextures>) {
+    fn add_visual_components(&self, commands: &mut EntityCommands, _: &Res<RpgTextures>) {
         commands.insert(Sprite::from_color(
             bevy::color::palettes::basic::GRAY,
             Vec2::new(self.x_length, self.y_length),
