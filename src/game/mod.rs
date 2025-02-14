@@ -1,6 +1,6 @@
 use crate::{assets::RpgTextures, constants::*, control::*};
 use bevy::prelude::*;
-use item::IsItem;
+use item::*;
 
 pub mod health;
 pub mod item;
@@ -8,6 +8,7 @@ pub mod object;
 
 pub fn inputs_use(
     mut commands: Commands,
+    world: &World,
     keys: Res<ButtonInput<KeyCode>>,
     click: Res<ButtonInput<MouseButton>>,
     control_settings: Res<ControlSettings>,
@@ -29,13 +30,10 @@ pub fn inputs_use(
         };
 
         let it = q_it.get(item).unwrap();
-        if !it.0.check_can_use() {
-            return;
+        if it.useable(world, item) {
+            let hold_point =
+                q_pos.get(actor).unwrap().translation.truncate() + CHARACTER_LEFT_HAND_OFFSET;
+            it.item_use(&mut commands, world, item, hold_point, coords.0, rpg_folder);
         }
-
-        let hold_point =
-            q_pos.get(actor).unwrap().translation.truncate() + CHARACTER_LEFT_HAND_OFFSET;
-
-        it.0.item_use(&mut commands, hold_point, coords, rpg_folder);
     }
 }

@@ -1,8 +1,9 @@
+use super::*;
 use crate::{assets::RpgTextures, game::object::Object};
 use avian2d::prelude::*;
-use bevy::prelude::*;
 
-#[derive(Component)]
+#[derive(Reflect)]
+#[reflect(Item)]
 pub struct DebugWand {
     pub mode: usize,
 }
@@ -23,16 +24,15 @@ impl Object for DebugWand {
     }
 }
 
-impl super::Item for DebugWand {
-    fn feed_to_storage(&self) {}
+impl Item for DebugWand {
     fn item_use(
         &mut self,
         commands: &mut Commands,
         hold_point: Vec2,
-        coords: Res<crate::physics::camera::CursorCoords>,
+        coords: Option<Vec2>,
         rpg_folder: Res<RpgTextures>,
     ) {
-        let ray = coords.0.unwrap() - hold_point;
+        let ray = coords.unwrap() - hold_point;
         let unit = ray / ray.length();
 
         commands.spawn((
@@ -52,5 +52,13 @@ impl super::Item for DebugWand {
             crate::game::health::Health::fragile(),
         ));
     }
-    fn item_consume(&self) {}
+    fn check_can_consume(&self) -> bool {
+        true
+    }
+    fn item_consume(&mut self) {
+        self.mode += 1;
+        if self.mode >= 4 {
+            self.mode = 0;
+        }
+    }
 }

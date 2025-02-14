@@ -6,13 +6,16 @@ use crate::{
         item::{debug_wand::DebugWand, *},
         object::*,
     },
-    physics::camera::RotateWithMouse,
 };
-use avian2d::{math::*, prelude::*};
-use bevy::{prelude::*, sprite::Anchor};
+use avian2d::prelude::*;
+use bevy::prelude::*;
+use std::any::Any;
 
 #[derive(Resource, Default)]
 pub struct SelectedSlot(pub usize);
+
+#[derive(Component)]
+pub struct IsSelected;
 
 pub fn setup_character(
     mut commands: Commands,
@@ -20,13 +23,10 @@ pub fn setup_character(
     // asset_server: Res<AssetServer>,
     rpg_folder: Res<RpgTextures>,
 ) {
-    let launcher = commands
-        .spawn((
-            DebugWand { mode: 3 },
-            ObjectType::<DebugWand>::new(),
-            ItemType::<DebugWand>::new(),
-        ))
-        .id();
+    let debug_wand = DebugWand { mode: 3 };
+    let ty = IsObject(debug_wand.type_id());
+    let launcher = commands.spawn(ty.clone()).id();
+    ty.spawn_into(world, &mut commands, launcher, &rpg_folder);
 
     // two hands
     let mut storage = ItemStorage::with_capacity(2);
@@ -53,14 +53,7 @@ pub fn setup_character(
 }
 
 pub fn setup_item_sprite(_item: Entity, parent: &mut ChildBuilder, rpg_folder: &Res<RpgTextures>) {
-    parent.spawn((
-        Sprite {
-            image: rpg_folder.get_image_handle("items"),
-            texture_atlas: Some(rpg_folder.get_texture_atlas("items", 0)),
-            anchor: Anchor::Custom(Vec2::new(-0.4, -0.4)),
-            ..default()
-        },
-        Transform::from_translation(CHARACTER_LEFT_HAND_OFFSET.extend(CHARACTER_HOLD_OFFSET)),
-        RotateWithMouse(Quat::from_rotation_z(-PI * 0.25)),
+    let ec = parent.spawn(Transform::from_translation(
+        CHARACTER_LEFT_HAND_OFFSET.extend(CHARACTER_HOLD_OFFSET),
     ));
 }

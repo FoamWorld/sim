@@ -1,29 +1,43 @@
 use crate::assets::RpgTextures;
 use avian2d::{math::*, prelude::*};
-use bevy::prelude::*;
-use std::sync::Arc;
+use bevy::{prelude::*, reflect::FromType};
+use std::any::TypeId;
 
 /// Trait for implementing how a game object works.
 #[diagnostic::on_unimplemented(message = "`{Self}` is not an `Object`", label = "invalid `Object`")]
+#[reflect_trait]
 pub trait Object {
     fn add_physics_components(&self, _commands: &mut EntityCommands) {}
     fn add_visual_components(&self, commands: &mut EntityCommands, rpg_folder: &Res<RpgTextures>);
-    fn add_extra_components(&self, commands: &mut EntityCommands) {}
+    fn add_extra_components(&self, _commands: &mut EntityCommands) {}
 }
 
 /// Added when the entity is a game object.
-#[derive(Component)]
-pub struct IsObject(Arc<dyn Object + Send + Sync>);
+#[derive(Component, Clone)]
+pub struct IsObject(pub TypeId);
 
 impl IsObject {
-    fn copy_pointer(&self) -> Arc<dyn Object + Send + Sync> {
-        self.0.clone()
+    pub fn spawn_into(
+        &self,
+        world: &World,
+        commands: &mut Commands,
+        entity: Entity,
+        rpg_folder: &Res<RpgTextures>,
+    ) {
+        let x = world.get_reflect(entity, self.0).unwrap();
+        let r: ReflectObject = FromType::<Barrier>::from_type();
+        let e = r.get(&*x).unwrap();
+        let mut ec = commands.entity(entity);
+        e.add_physics_components(&mut ec);
+        e.add_visual_components(&mut ec, rpg_folder);
+        e.add_extra_components(&mut ec);
     }
 }
 
 /*  List of objects.  */
 
-#[derive(Component)]
+#[derive(Reflect)]
+#[reflect(Object)]
 pub struct Barrier {
     x_length: Scalar,
     y_length: Scalar,
@@ -47,5 +61,14 @@ impl Object for Barrier {
 /// A type that records unclassified objects but gives a type name.
 /// Such objects do not have special effects.
 /// It is suggested to use Rust type name naming rule.
-#[derive(Component)]
+
+#[derive(Reflect)]
+#[reflect(Object)]
 pub struct NonUnique(pub String);
+
+impl Object for NonUnique {
+    fn add_visual_components(&self, commands: &mut EntityCommands, rpg_folder: &Res<RpgTextures>) {
+        let str = self.0.as_str();
+        commands.insert(Sprite::from_image(rpg_folder.get_image_handle(str)));
+    }
+}
