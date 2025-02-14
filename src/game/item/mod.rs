@@ -42,8 +42,9 @@ pub trait Item {
         true
     }
     fn item_use(
-        &mut self,
+        &self,
         commands: &mut Commands,
+        entity: Entity,
         hold_point: Vec2,
         coords: Option<Vec2>,
         rpg_folder: Res<crate::assets::RpgTextures>,
@@ -64,23 +65,26 @@ pub trait Item {
 pub struct IsItem(pub TypeId);
 
 impl IsItem {
-    pub fn useable(
-        &self,
-        world: &World,
-        entity: Entity,
-    ) -> bool {
+    pub fn useable(&self, world: &World, entity: Entity) -> bool {
         let x = world.get_reflect(entity, self.0).unwrap();
         let r: ReflectItem = FromType::<DebugWand>::from_type();
         let e = r.get(&*x).unwrap();
         e.check_can_use()
     }
-    pub fn item_use(&self,
+    pub fn item_use(
+        &self,
         commands: &mut Commands,
         world: &World,
         entity: Entity,
         hold_point: Vec2,
         coords: Option<Vec2>,
-        rpg_folder: Res<crate::assets::RpgTextures>,) {}
+        rpg_folder: Res<crate::assets::RpgTextures>,
+    ) {
+        let x = world.get_reflect(entity, self.0).unwrap();
+        let r: ReflectItem = FromType::<DebugWand>::from_type();
+        let e = r.get(&*x).unwrap();
+        e.item_use(commands, entity, hold_point, coords, rpg_folder);
+    }
     pub fn spawn_into(
         &self,
         world: &World,

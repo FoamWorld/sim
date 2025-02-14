@@ -1,4 +1,4 @@
-use crate::state::AppState;
+use crate::{character::IsSelected, state::AppState};
 use bevy::{prelude::*, window::PrimaryWindow};
 
 #[derive(Component)]
@@ -55,7 +55,10 @@ pub struct RotateWithMouse(pub Quat); // offset
 
 pub fn rotate_with_mouse(
     coords: Res<CursorCoords>,
-    mut query: Query<(&mut Transform, &RotateWithMouse, &GlobalTransform), With<Sprite>>,
+    mut query: Query<
+        (&mut Transform, &RotateWithMouse, &GlobalTransform),
+        (With<Sprite>, With<IsSelected>),
+    >,
 ) {
     let dest = if let Some(dest) = coords.0 {
         dest

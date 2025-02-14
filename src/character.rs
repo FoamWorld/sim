@@ -25,7 +25,8 @@ pub fn setup_character(
 ) {
     let debug_wand = DebugWand { mode: 3 };
     let ty = IsObject(debug_wand.type_id());
-    let launcher = commands.spawn(ty.clone()).id();
+    let ty2 = IsItem(debug_wand.type_id());
+    let launcher = commands.spawn((debug_wand, ty.clone(), ty2)).id();
     ty.spawn_into(world, &mut commands, launcher, &rpg_folder);
 
     // two hands

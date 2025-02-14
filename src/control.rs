@@ -89,7 +89,8 @@ pub struct ControlPlugin;
 
 impl Plugin for ControlPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<ControlSettings>().add_systems(
+        app.init_resource::<ControlSettings>();
+        app.add_systems(
             Update,
             (inputs_move, inputs_wait, crate::game::inputs_use)
                 .run_if(in_state(AppState::InGame).and(in_state(RunState::Running))),

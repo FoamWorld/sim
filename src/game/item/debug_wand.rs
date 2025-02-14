@@ -2,7 +2,7 @@ use super::*;
 use crate::{assets::RpgTextures, game::object::Object};
 use avian2d::prelude::*;
 
-#[derive(Reflect)]
+#[derive(Reflect, Component, Clone, Copy)]
 #[reflect(Item)]
 pub struct DebugWand {
     pub mode: usize,
@@ -26,8 +26,9 @@ impl Object for DebugWand {
 
 impl Item for DebugWand {
     fn item_use(
-        &mut self,
+        &self,
         commands: &mut Commands,
+        _: Entity,
         hold_point: Vec2,
         coords: Option<Vec2>,
         rpg_folder: Res<RpgTextures>,

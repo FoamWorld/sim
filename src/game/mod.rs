@@ -30,9 +30,9 @@ pub fn inputs_use(
         };
 
         let it = q_it.get(item).unwrap();
+        let hold_point =
+            q_pos.get(actor).unwrap().translation.truncate() + CHARACTER_LEFT_HAND_OFFSET;
         if it.useable(world, item) {
-            let hold_point =
-                q_pos.get(actor).unwrap().translation.truncate() + CHARACTER_LEFT_HAND_OFFSET;
             it.item_use(&mut commands, world, item, hold_point, coords.0, rpg_folder);
         }
     }
