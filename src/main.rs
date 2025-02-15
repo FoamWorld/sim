@@ -10,6 +10,7 @@ use bevy::{
 mod assets;
 mod character;
 mod game;
+mod scene;
 mod ui;
 
 mod message;

@@ -16,3 +16,6 @@ Cargo.lock
 /private
 temp/
 *.temp.*
+
+# Testing
+saved/

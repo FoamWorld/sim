@@ -13,6 +13,7 @@ default = [
 	# Default Features
 	"bevy/bevy_asset",
 	"bevy/bevy_render",
+	"bevy/bevy_scene",
 	"bevy/bevy_sprite",
 	"bevy/bevy_state",
 	"bevy/bevy_text",
@@ -24,6 +25,7 @@ default = [
 
 	# Optional Features
 	"bevy/dynamic_linking",
+	"bevy/serialize",
 ]
 
 [profile.dev]
