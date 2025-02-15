@@ -9,7 +9,7 @@ pub struct DebugWand {
 }
 
 impl Object for DebugWand {
-    fn add_visual_components(&self, commands: &mut EntityCommands, rpg_folder: &Res<RpgTextures>) {
+    fn add_visual_components(&self, commands: &mut EntityCommands, rpg_folder: &RpgTextures) {
         commands.insert(Sprite {
             image: rpg_folder.get_image_handle("items"),
             texture_atlas: Some(rpg_folder.get_texture_atlas("items", 0)),
@@ -29,11 +29,15 @@ impl Item for DebugWand {
         &self,
         commands: &mut Commands,
         _: Entity,
-        hold_point: Vec2,
-        coords: Option<Vec2>,
-        rpg_folder: Res<RpgTextures>,
+        source: Vec2,
+        target: Option<Vec2>,
+        rpg_folder: &RpgTextures,
     ) {
-        let ray = coords.unwrap() - hold_point;
+        let ray = if let Some(tar) = target {
+            tar - source
+        } else {
+            Vec2::new(1.0, 0.0)
+        };
         let unit = ray / ray.length();
 
         commands.spawn((
@@ -41,11 +45,7 @@ impl Item for DebugWand {
                 rpg_folder.get_image_handle("spells"),
                 rpg_folder.get_texture_atlas("spells", self.mode),
             ),
-            Transform::from_xyz(
-                hold_point.x + unit.x * 24.0,
-                hold_point.y + unit.y * 24.0,
-                0.0,
-            ),
+            Transform::from_xyz(source.x + unit.x * 24.0, source.y + unit.y * 24.0, 0.0),
             RigidBody::Dynamic,
             Collider::circle(6.0),
             LockedAxes::ROTATION_LOCKED,

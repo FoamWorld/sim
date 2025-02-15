@@ -15,7 +15,7 @@ use std::any::Any;
 pub struct SelectedSlot(pub usize);
 
 #[derive(Component)]
-pub struct IsSelected;
+pub struct IsActive;
 
 pub fn setup_character(
     mut commands: Commands,
@@ -55,7 +55,6 @@ pub fn setup_attached_image(
     mut commands: Commands,
     world: &World,
     // asset_server: Res<AssetServer>,
-    rpg_folder: Res<RpgTextures>,
     actors: Query<Entity, With<Actor>>,
     q_st: Query<&ItemStorage>,
     q_obj: Query<&IsObject>,
@@ -67,7 +66,7 @@ pub fn setup_attached_image(
         commands
             .entity(actor)
             .with_children(|parent: &mut ChildBuilder<'_>| {
-                setup_item_sprite(world, item, parent, &rpg_folder, q_obj);
+                setup_item_sprite(world, item, parent,  q_obj);
             });
     };
 }
@@ -76,14 +75,13 @@ pub fn setup_item_sprite(
     world: &World,
     item: Entity,
     parent: &mut ChildBuilder,
-    rpg_folder: &Res<RpgTextures>,
     q_obj: Query<&IsObject>,
 ) {
     let registery = world.get_resource::<AppTypeRegistry>().unwrap();
     let it = q_obj.get(item).unwrap();
     let mut ec = parent.spawn((
         Transform::from_translation(CHARACTER_LEFT_HAND_OFFSET.extend(CHARACTER_HOLD_OFFSET)),
-        IsSelected,
+        IsActive,
     ));
-    it.spawn_attach_image(world, &mut ec, item, rpg_folder, registery);
+    it.spawn_attach_image(world, &mut ec, item,  registery);
 }

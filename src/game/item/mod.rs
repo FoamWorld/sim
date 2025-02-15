@@ -1,4 +1,5 @@
 use super::object::*;
+use crate::assets::RpgTextures;
 use bevy::{prelude::*, reflect::FromType};
 use debug_wand::DebugWand;
 use std::any::TypeId;
@@ -46,7 +47,7 @@ pub trait Item {
         entity: Entity,
         hold_point: Vec2,
         coords: Option<Vec2>,
-        rpg_folder: Res<crate::assets::RpgTextures>,
+        rpg_folder: &RpgTextures,
     );
     fn check_can_consume(&self) -> bool {
         false
@@ -81,7 +82,7 @@ impl IsItem {
         entity: Entity,
         hold_point: Vec2,
         coords: Option<Vec2>,
-        rpg_folder: Res<crate::assets::RpgTextures>,
+        rpg_folder: &RpgTextures,
     ) {
         let x = world.get_reflect(entity, self.0).unwrap();
         let r: ReflectItem = FromType::<DebugWand>::from_type();

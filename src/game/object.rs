@@ -1,6 +1,6 @@
 use crate::assets::RpgTextures;
 use avian2d::{math::*, prelude::*};
-use bevy::{prelude::*, reflect::FromType};
+use bevy::prelude::*;
 use std::any::TypeId;
 
 /// Trait for implementing how a game object works.
@@ -8,7 +8,7 @@ use std::any::TypeId;
 #[reflect_trait]
 pub trait Object {
     fn add_physics_components(&self, _commands: &mut EntityCommands) {}
-    fn add_visual_components(&self, commands: &mut EntityCommands, rpg_folder: &Res<RpgTextures>);
+    fn add_visual_components(&self, commands: &mut EntityCommands, rpg_folder: &RpgTextures);
     fn add_extra_components(&self, _commands: &mut EntityCommands) {}
 }
 
@@ -17,35 +17,36 @@ pub trait Object {
 pub struct IsObject(pub TypeId);
 
 impl IsObject {
-    pub fn spawn_into(
+    pub fn spawn_full(
         &self,
         world: &World,
-        commands: &mut Commands,
+        ec: &mut EntityCommands,
         entity: Entity,
-        rpg_folder: &Res<RpgTextures>,
+        type_registry: &AppTypeRegistry,
     ) {
-        let x = world.get_reflect(entity, self.0).unwrap();
-        let r: ReflectObject = FromType::<Barrier>::from_type();
-        let e = r.get(&*x).unwrap();
-        let mut ec = commands.entity(entity);
-        e.add_physics_components(&mut ec);
-        e.add_visual_components(&mut ec, rpg_folder);
-        e.add_extra_components(&mut ec);
+        let comp = world.get_reflect(entity, self.0).unwrap();
+        let guard = type_registry.0.read();
+        let refl = guard.get_type_data::<ReflectObject>(self.0).unwrap();
+        let obj = refl.get(&*comp).unwrap();
+        let rpg_folder = world.get_resource::<RpgTextures>().unwrap();
+        obj.add_physics_components(ec);
+        obj.add_visual_components(ec, rpg_folder);
+        obj.add_extra_components(ec);
     }
     pub fn spawn_attach_image(
         &self,
         world: &World,
         ec: &mut EntityCommands,
         entity: Entity,
-        rpg_folder: &Res<RpgTextures>,
         type_registry: &AppTypeRegistry,
     ) {
-        let x = world.get_reflect(entity, self.0).unwrap();
-        let binding = type_registry.0.read();
-        let r = binding.get_type_data::<ReflectObject>(self.0).unwrap();
-        let e = r.get(&*x).unwrap();
-        e.add_visual_components(ec, rpg_folder);
-        e.add_extra_components(ec);
+        let comp = world.get_reflect(entity, self.0).unwrap();
+        let guard = type_registry.0.read();
+        let refl = guard.get_type_data::<ReflectObject>(self.0).unwrap();
+        let obj = refl.get(&*comp).unwrap();
+        let rpg_folder = world.get_resource::<RpgTextures>().unwrap();
+        obj.add_visual_components(ec, rpg_folder);
+        obj.add_extra_components(ec);
     }
 }
 
@@ -65,7 +66,7 @@ impl Object for Barrier {
             Collider::rectangle(self.x_length, self.y_length),
         ));
     }
-    fn add_visual_components(&self, commands: &mut EntityCommands, _: &Res<RpgTextures>) {
+    fn add_visual_components(&self, commands: &mut EntityCommands, _: &RpgTextures) {
         commands.insert(Sprite::from_color(
             bevy::color::palettes::basic::GRAY,
             Vec2::new(self.x_length, self.y_length),
@@ -82,7 +83,7 @@ impl Object for Barrier {
 pub struct NonUnique(pub String);
 
 impl Object for NonUnique {
-    fn add_visual_components(&self, commands: &mut EntityCommands, rpg_folder: &Res<RpgTextures>) {
+    fn add_visual_components(&self, commands: &mut EntityCommands, rpg_folder: &RpgTextures) {
         let str = self.0.as_str();
         commands.insert(Sprite::from_image(rpg_folder.get_image_handle(str)));
     }

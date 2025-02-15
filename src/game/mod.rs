@@ -22,7 +22,7 @@ pub fn inputs_use(
     control_settings: Res<ControlSettings>,
     coords: Res<crate::physics::camera::CursorCoords>,
     actors: Query<Entity, With<Actor>>,
-    q_st: Query<&item::ItemStorage>,
+    q_st: Query<&ItemStorage>,
     q_pos: Query<&Transform>,
     q_it: Query<&IsItem>,
     // asset_server: Res<AssetServer>,
@@ -41,7 +41,14 @@ pub fn inputs_use(
         let hold_point =
             q_pos.get(actor).unwrap().translation.truncate() + CHARACTER_LEFT_HAND_OFFSET;
         if it.useable(world, item) {
-            it.item_use(&mut commands, world, item, hold_point, coords.0, rpg_folder);
+            it.item_use(
+                &mut commands,
+                world,
+                item,
+                hold_point,
+                coords.0,
+                rpg_folder.as_ref(),
+            );
         }
     }
 }
