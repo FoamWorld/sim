@@ -37,18 +37,20 @@ pub fn inputs_use(
             return;
         };
 
+        let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
         let it = q_it.get(item).unwrap();
-        let hold_point =
-            q_pos.get(actor).unwrap().translation.truncate() + CHARACTER_LEFT_HAND_OFFSET;
-        if it.useable(world, item) {
-            it.item_use(
-                &mut commands,
-                world,
-                item,
-                hold_point,
-                coords.0,
-                rpg_folder.as_ref(),
-            );
-        }
+        it.inspect_then(world, item, type_registry, |guarded| {
+            if guarded.check_can_use() {
+                let hold_point =
+                    q_pos.get(actor).unwrap().translation.truncate() + CHARACTER_LEFT_HAND_OFFSET;
+                guarded.item_use(
+                    &mut commands,
+                    item,
+                    hold_point,
+                    coords.0,
+                    rpg_folder.as_ref(),
+                );
+            }
+        });
     }
 }

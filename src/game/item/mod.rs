@@ -1,7 +1,6 @@
 use super::object::*;
 use crate::assets::RpgTextures;
-use bevy::{prelude::*, reflect::FromType};
-use debug_wand::DebugWand;
+use bevy::prelude::*;
 use std::any::TypeId;
 
 /// Added when the clone is inside an item container.
@@ -69,25 +68,20 @@ pub trait Item {
 pub struct IsItem(pub TypeId);
 
 impl IsItem {
-    pub fn useable(&self, world: &World, entity: Entity) -> bool {
-        let x = world.get_reflect(entity, self.0).unwrap();
-        let r: ReflectItem = FromType::<DebugWand>::from_type();
-        let e = r.get(&*x).unwrap();
-        e.check_can_use()
-    }
-    pub fn item_use(
+    pub fn inspect_then<F>(
         &self,
-        commands: &mut Commands,
         world: &World,
         entity: Entity,
-        hold_point: Vec2,
-        coords: Option<Vec2>,
-        rpg_folder: &RpgTextures,
-    ) {
-        let x = world.get_reflect(entity, self.0).unwrap();
-        let r: ReflectItem = FromType::<DebugWand>::from_type();
-        let e = r.get(&*x).unwrap();
-        e.item_use(commands, entity, hold_point, coords, rpg_folder);
+        type_registry: &AppTypeRegistry,
+        f: F,
+    ) where
+        F: FnOnce(&dyn Item) -> (),
+    {
+        let comp = world.get_reflect(entity, self.0).unwrap();
+        let guard = type_registry.0.read();
+        let refl = guard.get_type_data::<ReflectItem>(self.0).unwrap();
+        let it = refl.get(&*comp).unwrap();
+        f(it);
     }
 }
 
