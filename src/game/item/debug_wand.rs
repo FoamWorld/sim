@@ -53,13 +53,16 @@ impl Item for DebugWand {
             crate::game::health::Health::fragile(),
         ));
     }
-    fn check_can_consume(&self) -> bool {
+    fn check_can_modify(&self) -> bool {
         true
     }
-    fn item_consume(&mut self) {
-        self.mode += 1;
-        if self.mode >= 4 {
-            self.mode = 0;
-        }
+    fn item_modify(&self, commands: &mut Commands, entity: Entity) {
+        let mode = if self.mode == 3 { 0 } else { self.mode + 1 };
+        commands
+            .entity(entity)
+            .entry::<DebugWand>()
+            .and_modify(move |mut wand| {
+                wand.mode = mode;
+            });
     }
 }

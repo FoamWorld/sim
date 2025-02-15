@@ -44,14 +44,14 @@ pub trait Item {
         &self,
         commands: &mut Commands,
         entity: Entity,
-        hold_point: Vec2,
-        coords: Option<Vec2>,
+        source: Vec2,
+        target: Option<Vec2>,
         rpg_folder: &RpgTextures,
     );
-    fn check_can_consume(&self) -> bool {
+    fn check_can_modify(&self) -> bool {
         false
     }
-    fn item_consume(&mut self);
+    fn item_modify(&self, commands: &mut Commands, entity: Entity);
 }
 
 /// Added when the entity can work as an item.

@@ -54,3 +54,34 @@ pub fn inputs_use(
         });
     }
 }
+
+pub fn inputs_modify(
+    mut commands: Commands,
+    world: &World,
+    keys: Res<ButtonInput<KeyCode>>,
+    click: Res<ButtonInput<MouseButton>>,
+    control_settings: Res<ControlSettings>,
+    actors: Query<Entity, With<Actor>>,
+    q_st: Query<&ItemStorage>,
+    q_it: Query<&IsItem>,
+    // asset_server: Res<AssetServer>,
+) {
+    let actor = actors.single();
+    if click.just_pressed(MouseButton::Right) || control_settings.check(ControlCode::Modify, &keys)
+    {
+        let storage = q_st.get(actor).unwrap();
+        let item = if let Some(item) = storage.get_index(0) {
+            item
+        } else {
+            return;
+        };
+
+        let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
+        let it = q_it.get(item).unwrap();
+        it.inspect_then(world, item, type_registry, |guarded| {
+            if guarded.check_can_modify() {
+                guarded.item_modify(&mut commands, item);
+            }
+        });
+    }
+}

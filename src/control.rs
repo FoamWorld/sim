@@ -1,4 +1,4 @@
-use crate::state::*;
+use crate::{game::*, state::*};
 use avian2d::{math::*, prelude::*};
 use bevy::prelude::*;
 use std::collections::HashMap;
@@ -14,7 +14,7 @@ pub enum ControlCode {
     MoveUp,
     MoveDown,
     Use,
-    // Consume,
+    Modify,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -63,6 +63,10 @@ impl Default for ControlSettings {
                 ControlCode::Use,
                 InputDetectionType::JustPressed(KeyCode::KeyT),
             ),
+            (
+                ControlCode::Modify,
+                InputDetectionType::JustPressed(KeyCode::KeyI),
+            ),
         ];
         let map: HashMap<_, _> = list.into_iter().collect();
         Self(map)
@@ -92,7 +96,7 @@ impl Plugin for ControlPlugin {
         app.init_resource::<ControlSettings>();
         app.add_systems(
             Update,
-            (inputs_move, inputs_wait, crate::game::inputs_use)
+            (inputs_move, inputs_wait, inputs_use, inputs_modify)
                 .run_if(in_state(AppState::InGame).and(in_state(RunState::Running))),
         );
     }
