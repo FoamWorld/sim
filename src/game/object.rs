@@ -3,12 +3,44 @@ use avian2d::{math::*, prelude::*};
 use bevy::prelude::*;
 use std::any::TypeId;
 
+pub struct AdditionConfig {
+    // pub attached_tags: bool,
+    pub physics: bool,
+    pub visual: bool,
+    pub extra: bool,
+}
+
+impl AdditionConfig {
+    pub const FULL: Self = Self {
+        physics: true,
+        visual: true,
+        extra: true,
+    };
+
+    pub const PLAIN_SPRITE: Self = Self {
+        physics: false,
+        visual: false,
+        extra: false,
+    };
+
+    pub const CHARACTER_ATTACH: Self = Self {
+        physics: false,
+        visual: true,
+        extra: true,
+    };
+}
+
 /// Trait for implementing how a game object works.
 #[diagnostic::on_unimplemented(message = "`{Self}` is not an `Object`", label = "invalid `Object`")]
 #[reflect_trait]
 pub trait Object {
+    /// Mechanics when it's a physical concrete entity.
     fn add_physics_components(&self, _commands: &mut EntityCommands) {}
+
+    /// Mechanics for **plain** visual effects.
     fn add_visual_components(&self, commands: &mut EntityCommands, rpg_folder: &RpgTextures);
+
+    /// Mechanics when it's active.
     fn add_extra_components(&self, _commands: &mut EntityCommands) {}
 }
 
@@ -17,36 +49,28 @@ pub trait Object {
 pub struct IsObject(pub TypeId);
 
 impl IsObject {
-    pub fn spawn_full(
+    pub fn add_components(
         &self,
         world: &World,
         ec: &mut EntityCommands,
         entity: Entity,
         type_registry: &AppTypeRegistry,
+        config: AdditionConfig,
     ) {
         let comp = world.get_reflect(entity, self.0).unwrap();
         let guard = type_registry.0.read();
         let refl = guard.get_type_data::<ReflectObject>(self.0).unwrap();
         let obj = refl.get(&*comp).unwrap();
-        let rpg_folder = world.get_resource::<RpgTextures>().unwrap();
-        obj.add_physics_components(ec);
-        obj.add_visual_components(ec, rpg_folder);
-        obj.add_extra_components(ec);
-    }
-    pub fn spawn_attach_image(
-        &self,
-        world: &World,
-        ec: &mut EntityCommands,
-        entity: Entity,
-        type_registry: &AppTypeRegistry,
-    ) {
-        let comp = world.get_reflect(entity, self.0).unwrap();
-        let guard = type_registry.0.read();
-        let refl = guard.get_type_data::<ReflectObject>(self.0).unwrap();
-        let obj = refl.get(&*comp).unwrap();
-        let rpg_folder = world.get_resource::<RpgTextures>().unwrap();
-        obj.add_visual_components(ec, rpg_folder);
-        obj.add_extra_components(ec);
+        if config.physics {
+            obj.add_physics_components(ec);
+        }
+        if config.visual {
+            let rpg_folder = world.get_resource::<RpgTextures>().unwrap();
+            obj.add_visual_components(ec, rpg_folder);
+        }
+        if config.extra {
+            obj.add_extra_components(ec);
+        }
     }
 }
 

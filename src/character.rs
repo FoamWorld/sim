@@ -66,7 +66,7 @@ pub fn setup_attached_image(
         commands
             .entity(actor)
             .with_children(|parent: &mut ChildBuilder<'_>| {
-                setup_item_sprite(world, item, parent,  q_obj);
+                setup_item_sprite(world, item, parent, q_obj);
             });
     };
 }
@@ -77,11 +77,17 @@ pub fn setup_item_sprite(
     parent: &mut ChildBuilder,
     q_obj: Query<&IsObject>,
 ) {
-    let registery = world.get_resource::<AppTypeRegistry>().unwrap();
+    let registry = world.get_resource::<AppTypeRegistry>().unwrap();
     let it = q_obj.get(item).unwrap();
     let mut ec = parent.spawn((
         Transform::from_translation(CHARACTER_LEFT_HAND_OFFSET.extend(CHARACTER_HOLD_OFFSET)),
         IsActive,
     ));
-    it.spawn_attach_image(world, &mut ec, item,  registery);
+    it.add_components(
+        world,
+        &mut ec,
+        item,
+        registry,
+        AdditionConfig::CHARACTER_ATTACH,
+    );
 }

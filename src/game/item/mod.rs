@@ -56,15 +56,15 @@ pub trait Item {
 }
 
 /// Added when the entity can work as an item.
-/// There are three different status for an item entity:
-/// * lying on the ground (primary):
-/// includes `IsObject`, `IsItem`, `#visual`, `?#physics`
-/// * visual image attached to the character:
-/// includes `#visual`, `#extra (?RotateWithMouse)`
-/// * visual image in inventory (primary):
-/// includes `IsObject`, `IsItem`, `#visual`, `ItemAmount (inserted)`
-///
-/// Uses zero-cost abstraction.
+/// The different status of an item entity:
+/// * (unique) lying on the ground:
+/// contains `#type`, `#is-tags`, `#physics`, `#visual`
+/// * (unique) in storage:
+/// contains `#type`, `#is-tags`, `ItemAmount (inserted)`
+/// * (clone) sprite in storage display:
+/// contains `#visual`
+/// * (clone) active entity attached to the character:
+/// contains `#visual`, `#extra (?RotateWithMouse)`
 #[derive(Component, Clone)]
 pub struct IsItem(pub TypeId);
 
