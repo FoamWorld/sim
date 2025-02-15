@@ -3,6 +3,7 @@ cargo-features = ["profile-rustflags"]
 [package]
 name = "sim"
 version = "0.1.0"
+keywords = ["game", "bevy"]
 edition = "2021"
 authors = ["Rratic"]
 license = "MIT"
@@ -27,6 +28,8 @@ default = [
 	"bevy/dynamic_linking",
 	"bevy/serialize",
 ]
+
+devtools = ["default"]
 
 [profile.dev]
 debug = false

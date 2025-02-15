@@ -1,6 +1,6 @@
 ## Develop
 ```sh
-cargo run --profile dev
+cargo run --profile dev --features devtools
 ```
 
 ## LICENSE

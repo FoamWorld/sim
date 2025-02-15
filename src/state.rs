@@ -22,12 +22,19 @@ pub enum RunState {
     Paused,
 }
 
+#[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
+pub enum StorageState {
+    None,
+    Saving,
+}
+
 pub struct AppStatePlugin;
 
 impl Plugin for AppStatePlugin {
     fn build(&self, app: &mut App) {
         app.insert_state(AppState::Loading)
-            .insert_state(RunState::Running);
+            .insert_state(RunState::Running)
+            .insert_state(StorageState::None);
 
         // while loading
         app.add_systems(OnEnter(AppState::Loading), load_textures)
@@ -57,11 +64,22 @@ impl Plugin for AppStatePlugin {
 
         app.add_systems(OnEnter(RunState::Paused), enter_pause)
             .add_systems(OnExit(RunState::Paused), exit_pause)
-            .add_systems(Update, toggle_pause.run_if(in_state(AppState::InGame)))
+            .add_systems(
+                Update,
+                toggle_pause
+                    .run_if(in_state(AppState::InGame))
+                    .run_if(in_state(StorageState::None)),
+            )
             .add_systems(
                 Update,
                 (read_crash, read_health_cleared).run_if(in_state(AppState::InGame)),
             );
+
+        #[cfg(feature = "devtools")]
+        app.add_systems(
+            OnEnter(StorageState::Saving),
+            crate::scene::save_scene_system,
+        );
     }
 }
 

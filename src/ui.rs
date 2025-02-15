@@ -1,4 +1,4 @@
-use crate::{constants::PROJECT_TITLE, state::AppState};
+use crate::{constants::PROJECT_TITLE, state::*};
 use bevy::{
     prelude::*,
     window::{PrimaryWindow, SystemCursorIcon},
@@ -68,33 +68,50 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 pub fn start_pause(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let mut background = commands.spawn((
-        Node {
-            width: Val::Percent(100.0),
-            height: Val::Percent(100.0),
-            align_items: AlignItems::Center,
-            justify_content: JustifyContent::Center,
-            flex_direction: FlexDirection::Column,
-            ..default()
-        },
-        BackgroundColor(Color::srgba(1.0, 1.0, 1.0, 0.75)),
-        WillDestroy,
-    ));
-    background.with_children(|parent: &mut ChildBuilder<'_>| {
-        parent.spawn((
-            Text::new("--- paused ---"),
-            TextFont {
-                // open sans, weight: 300
-                font: asset_server.load("fonts/open-sans.regular.ttf"),
-                font_size: 40.0,
-                ..default()
-            },
-            TextColor(Color::BLACK),
-            TextLayout {
-                justify: JustifyText::Center,
-                ..default()
-            },
-        ));
+    with_background(&mut commands, |parent| {
+        parent
+            .spawn((
+                Button,
+                Text::new("back"),
+                TextFont {
+                    // open sans, weight: 300
+                    font: asset_server.load("fonts/open-sans.regular.ttf"),
+                    font_size: 16.0,
+                    ..default()
+                },
+                TextColor(Color::BLACK),
+                TextLayout {
+                    justify: JustifyText::Center,
+                    ..default()
+                },
+            ))
+            .observe(
+                |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<RunState>>| {
+                    next_state.set(RunState::Running);
+                },
+            );
+        #[cfg(feature = "devtools")]
+        parent
+            .spawn((
+                Button,
+                Text::new("save scene"),
+                TextFont {
+                    // open sans, weight: 300
+                    font: asset_server.load("fonts/open-sans.regular.ttf"),
+                    font_size: 16.0,
+                    ..default()
+                },
+                TextColor(Color::BLACK),
+                TextLayout {
+                    justify: JustifyText::Center,
+                    ..default()
+                },
+            ))
+            .observe(
+                |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<StorageState>>| {
+                    next_state.set(StorageState::Saving);
+                },
+            );
     });
 }
 
@@ -102,4 +119,21 @@ pub fn finish_ui(mut commands: Commands, query: Query<Entity, With<WillDestroy>>
     for entity in query.iter() {
         commands.entity(entity).despawn_recursive();
     }
+}
+
+fn with_background(commands: &mut Commands, f: impl FnOnce(&mut ChildBuilder<'_>)) {
+    commands
+        .spawn((
+            Node {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                flex_direction: FlexDirection::Column,
+                ..default()
+            },
+            BackgroundColor(Color::srgba(1.0, 1.0, 1.0, 0.75)),
+            WillDestroy,
+        ))
+        .with_children(f);
 }
