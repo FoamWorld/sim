@@ -2,6 +2,7 @@ use crate::{
     assets::*,
     character::*,
     control::*,
+    game::health::*,
     physics::{collision::*, room::*},
     ui::*,
 };
@@ -37,17 +38,20 @@ impl Plugin for AppStatePlugin {
             .add_systems(OnExit(AppState::Menu), finish_ui);
 
         // while in game
-        app.add_event::<CrashEvent>();
+        app.add_event::<CrashEvent>()
+            .add_event::<HealthClearedEvent>();
         app.init_resource::<SelectedSlot>();
         app.add_systems(
             OnEnter(AppState::InGame),
-            (setup_game, set_cursor, setup_character),
+            (
+                (setup_game, set_cursor, setup_character).before(setup_attached_image),
+                setup_attached_image,
+            ),
         );
 
         app.add_systems(
             PostProcessCollisions,
-            touch_detection
-                .before(crash_detection)
+            (touch_detection.before(crash_detection), crash_detection)
                 .run_if(in_state(AppState::InGame)),
         );
 
@@ -56,8 +60,7 @@ impl Plugin for AppStatePlugin {
             .add_systems(Update, toggle_pause.run_if(in_state(AppState::InGame)))
             .add_systems(
                 Update,
-                (read_crash, crate::game::health::read_health_cleared)
-                    .run_if(in_state(AppState::InGame)),
+                (read_crash, read_health_cleared).run_if(in_state(AppState::InGame)),
             );
     }
 }

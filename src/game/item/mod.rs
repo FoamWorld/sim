@@ -1,5 +1,4 @@
-use super::object::{IsObject, Object};
-use crate::assets::RpgTextures;
+use super::object::*;
 use bevy::{prelude::*, reflect::FromType};
 use debug_wand::DebugWand;
 use std::any::TypeId;
@@ -57,9 +56,13 @@ pub trait Item {
 
 /// Added when the entity can work as an item.
 /// There are three different status for an item entity:
-/// * lying on the ground (primary):          includes `IsObject`, `IsItem`, visual, ?physics
-/// * visual image attached to the character: includes `IsObject`, `IsItem`, visual, `?RotateWithMouse`
-/// * visual image in inventory (primary):    includes `IsObject`, `IsItem`, visual, `ItemAmount (inserted)`
+/// * lying on the ground (primary):
+/// includes `IsObject`, `IsItem`, `#visual`, `?#physics`
+/// * visual image attached to the character:
+/// includes `#visual`, `#extra (?RotateWithMouse)`
+/// * visual image in inventory (primary):
+/// includes `IsObject`, `IsItem`, `#visual`, `ItemAmount (inserted)`
+///
 /// Uses zero-cost abstraction.
 #[derive(Component, Clone)]
 pub struct IsItem(pub TypeId);
@@ -84,18 +87,6 @@ impl IsItem {
         let r: ReflectItem = FromType::<DebugWand>::from_type();
         let e = r.get(&*x).unwrap();
         e.item_use(commands, entity, hold_point, coords, rpg_folder);
-    }
-    pub fn spawn_into(
-        &self,
-        world: &World,
-        commands: &mut Commands,
-        entity: Entity,
-        rpg_folder: &Res<RpgTextures>,
-    ) {
-        let x = world.get_reflect(entity, self.0).unwrap();
-        let r: ReflectItem = FromType::<DebugWand>::from_type();
-        let e = r.get(&*x).unwrap();
-        let mut ec = commands.entity(entity);
     }
 }
 

@@ -31,7 +31,7 @@ pub fn read_crash(
     for crash in reader.read() {
         let sufferer = crash.0;
         let mut health = q_h.get_mut(sufferer).unwrap();
-        if health.shift(1.0) < 1e-7 {
+        if health.shift(-1.0) < 1e-7 {
             writer.send(HealthClearedEvent(sufferer));
         }
     }

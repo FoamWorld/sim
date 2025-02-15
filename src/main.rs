@@ -56,6 +56,7 @@ fn main() {
         ControlPlugin,
         PrimaryCameraPlugin,
         MessagePlugin,
+        game::RegisteryPlugin,
     ));
     app.insert_resource(Gravity(Vector::ZERO));
     app.run();

@@ -3,7 +3,7 @@ use crate::{assets::RpgTextures, game::object::Object};
 use avian2d::prelude::*;
 
 #[derive(Reflect, Component, Clone, Copy)]
-#[reflect(Item)]
+#[reflect(Object, Item)]
 pub struct DebugWand {
     pub mode: usize,
 }

@@ -32,6 +32,21 @@ impl IsObject {
         e.add_visual_components(&mut ec, rpg_folder);
         e.add_extra_components(&mut ec);
     }
+    pub fn spawn_attach_image(
+        &self,
+        world: &World,
+        ec: &mut EntityCommands,
+        entity: Entity,
+        rpg_folder: &Res<RpgTextures>,
+        type_registry: &AppTypeRegistry,
+    ) {
+        let x = world.get_reflect(entity, self.0).unwrap();
+        let binding = type_registry.0.read();
+        let r = binding.get_type_data::<ReflectObject>(self.0).unwrap();
+        let e = r.get(&*x).unwrap();
+        e.add_visual_components(ec, rpg_folder);
+        e.add_extra_components(ec);
+    }
 }
 
 /*  List of objects.  */
