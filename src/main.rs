@@ -9,27 +9,17 @@ use bevy::{
 
 mod assets;
 mod character;
-mod game;
-mod scene;
-mod ui;
-
-mod message;
-use message::*;
-
 mod control;
-use control::*;
+mod diagnostics;
+mod game;
+mod message;
+mod physics;
+mod scene;
+mod state;
+mod ui;
 
 mod constants;
 use constants::*;
-
-mod physics;
-use physics::camera::*;
-
-mod state;
-use state::*;
-
-mod diagnostics;
-use diagnostics::*;
 
 #[bevy_main]
 fn main() {
@@ -52,12 +42,12 @@ fn main() {
             ..default()
         }),
         PhysicsPlugins::default().with_length_unit(UNIT_PER_METER),
-        AppStatePlugin,
-        DiagnosticsTextPlugin,
-        ControlPlugin,
-        PrimaryCameraPlugin,
-        MessagePlugin,
-        game::RegisteryPlugin,
+        state::AppStatePlugin,
+        diagnostics::DiagnosticsTextPlugin,
+        control::ControlPlugin,
+        physics::camera::PrimaryCameraPlugin,
+        message::MessagePlugin,
+        scene::RegisteryPlugin,
     ));
     app.insert_resource(Gravity(Vector::ZERO));
     app.run();

@@ -2,14 +2,6 @@ use crate::{assets::RpgTextures, constants::*, control::*};
 use bevy::prelude::*;
 use item::*;
 
-pub struct RegisteryPlugin;
-
-impl Plugin for RegisteryPlugin {
-    fn build(&self, app: &mut App) {
-        app.register_type::<debug_wand::DebugWand>();
-    }
-}
-
 pub mod health;
 pub mod item;
 pub mod object;

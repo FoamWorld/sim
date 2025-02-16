@@ -2,6 +2,14 @@ use crate::{control::*, game::item::*};
 use bevy::{prelude::*, tasks::IoTaskPool};
 use std::{fs::File, io::Write};
 
+pub struct RegisteryPlugin;
+
+impl Plugin for RegisteryPlugin {
+    fn build(&self, app: &mut App) {
+        app.register_type::<debug_wand::DebugWand>();
+    }
+}
+
 pub fn save_scene_system(world: &mut World) {
     let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
 

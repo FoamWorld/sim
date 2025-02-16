@@ -76,8 +76,8 @@ impl IsObject {
 
 /*  List of objects.  */
 
-#[derive(Reflect)]
-#[reflect(Object)]
+#[derive(Reflect, Component, Clone, Copy)]
+#[reflect(Object, Component)]
 pub struct Barrier {
     x_length: Scalar,
     y_length: Scalar,
@@ -100,10 +100,9 @@ impl Object for Barrier {
 
 /// A type that records unclassified objects but gives a type name.
 /// Such objects do not have special effects.
-/// It is suggested to use Rust type name naming rule.
-
-#[derive(Reflect)]
-#[reflect(Object)]
+/// The sprite image will be automatically looked up.
+#[derive(Reflect, Component, Clone)]
+#[reflect(Object, Component)]
 pub struct NonUnique(pub String);
 
 impl Object for NonUnique {
