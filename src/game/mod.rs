@@ -14,27 +14,14 @@ pub fn inputs_use(
     control_settings: Res<ControlSettings>,
     coords: Res<crate::physics::camera::CursorCoords>,
     actors: Query<Entity, With<Actor>>,
-    q_st: Query<&ItemStorage>,
-    q_pos: Query<&Transform>,
-    q_it: Query<&IsItem>,
-    // asset_server: Res<AssetServer>,
     rpg_folder: Res<RpgTextures>,
 ) {
     let actor = actors.single();
     if click.just_pressed(MouseButton::Left) || control_settings.check(ControlCode::Use, &keys) {
-        let storage = q_st.get(actor).unwrap();
-        let item = if let Some(item) = storage.get_index(0) {
-            item
-        } else {
-            return;
-        };
-
-        let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
-        let it = q_it.get(item).unwrap();
-        it.inspect_then(world, item, type_registry, |guarded| {
+        reach_inventory_item_then(world, actor, 0, |guarded, item| {
             if guarded.check_can_use() {
-                let hold_point =
-                    q_pos.get(actor).unwrap().translation.truncate() + CHARACTER_LEFT_HAND_OFFSET;
+                let transform = world.entity(actor).get::<Transform>().unwrap();
+                let hold_point = transform.translation.truncate() + CHARACTER_LEFT_HAND_OFFSET;
                 guarded.item_use(
                     &mut commands,
                     item,
@@ -54,26 +41,32 @@ pub fn inputs_modify(
     click: Res<ButtonInput<MouseButton>>,
     control_settings: Res<ControlSettings>,
     actors: Query<Entity, With<Actor>>,
-    q_st: Query<&ItemStorage>,
-    q_it: Query<&IsItem>,
-    // asset_server: Res<AssetServer>,
 ) {
     let actor = actors.single();
     if click.just_pressed(MouseButton::Right) || control_settings.check(ControlCode::Modify, &keys)
     {
-        let storage = q_st.get(actor).unwrap();
-        let item = if let Some(item) = storage.get_index(0) {
-            item
-        } else {
-            return;
-        };
-
-        let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
-        let it = q_it.get(item).unwrap();
-        it.inspect_then(world, item, type_registry, |guarded| {
+        reach_inventory_item_then(world, actor, 0, |guarded, item| {
             if guarded.check_can_modify() {
                 guarded.item_modify(&mut commands, item);
             }
         });
     }
+}
+
+pub fn reach_inventory_item_then<F>(world: &World, actor: Entity, ind: usize, f: F)
+where
+    F: FnOnce(&dyn Item, Entity) -> (),
+{
+    let storage = world.entity(actor).get::<ItemStorage>().unwrap();
+    let item = if let Some(item) = storage.get_index(ind) {
+        item
+    } else {
+        return;
+    };
+
+    let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
+    let it = world.entity(item).get::<IsItem>().unwrap();
+    it.inspect_then(world, item, type_registry, |guarded| {
+        f(guarded, item);
+    });
 }

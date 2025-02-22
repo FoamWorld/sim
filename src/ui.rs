@@ -68,7 +68,7 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 pub fn start_pause(mut commands: Commands, asset_server: Res<AssetServer>) {
-    with_background(&mut commands, |parent| {
+    with_background(&mut commands, 0.75, |parent| {
         parent
             .spawn((
                 Button,
@@ -121,7 +121,7 @@ pub fn finish_ui(mut commands: Commands, query: Query<Entity, With<WillDestroy>>
     }
 }
 
-fn with_background(commands: &mut Commands, f: impl FnOnce(&mut ChildBuilder<'_>)) {
+fn with_background(commands: &mut Commands, alpha: f32, f: impl FnOnce(&mut ChildBuilder<'_>)) {
     commands
         .spawn((
             Node {
@@ -132,7 +132,7 @@ fn with_background(commands: &mut Commands, f: impl FnOnce(&mut ChildBuilder<'_>
                 flex_direction: FlexDirection::Column,
                 ..default()
             },
-            BackgroundColor(Color::srgba(1.0, 1.0, 1.0, 0.75)),
+            BackgroundColor(Color::srgba(1.0, 1.0, 1.0, alpha)),
             WillDestroy,
         ))
         .with_children(f);
