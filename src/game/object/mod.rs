@@ -1,31 +1,37 @@
 use crate::assets::RpgTextures;
 use avian2d::{math::*, prelude::*};
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::Anchor};
 use std::any::TypeId;
+
+pub enum VisualType {
+    Simple,
+    Grid,
+    Active,
+}
 
 pub struct AdditionConfig {
     // pub attached_tags: bool,
     pub physics: bool,
-    pub visual: bool,
+    pub visual: Option<VisualType>,
     pub extra: bool,
 }
 
 impl AdditionConfig {
-    pub const FULL: Self = Self {
+    pub const IN_SCENE: Self = Self {
         physics: true,
-        visual: true,
-        extra: true,
+        visual: Some(VisualType::Simple),
+        extra: false,
     };
 
-    pub const PLAIN_SPRITE: Self = Self {
+    pub const IN_GRID: Self = Self {
         physics: false,
-        visual: false,
+        visual: Some(VisualType::Grid),
         extra: false,
     };
 
     pub const CHARACTER_ATTACH: Self = Self {
         physics: false,
-        visual: true,
+        visual: Some(VisualType::Active),
         extra: true,
     };
 }
@@ -34,11 +40,50 @@ impl AdditionConfig {
 #[diagnostic::on_unimplemented(message = "`{Self}` is not an `Object`", label = "invalid `Object`")]
 #[reflect_trait]
 pub trait Object {
+    fn texture_info(&self) -> Option<(&str, Option<usize>)> {
+        None
+    }
+
+    fn texture_anchor(&self) -> Anchor {
+        Anchor::Center
+    }
+
     /// Mechanics when it's a physical concrete entity.
     fn add_physics_components(&self, _commands: &mut EntityCommands) {}
 
     /// Mechanics for **plain** visual effects.
-    fn add_visual_components(&self, commands: &mut EntityCommands, rpg_folder: &RpgTextures);
+    fn add_visual_components(
+        &self,
+        commands: &mut EntityCommands,
+        rpg_folder: &RpgTextures,
+        visual_type: VisualType,
+    ) {
+        let (image, size) = self.texture_info().unwrap();
+        match visual_type {
+            VisualType::Simple => {
+                commands.insert(Sprite {
+                    image: rpg_folder.get_image_handle(image),
+                    texture_atlas: size.and_then(|x| Some(rpg_folder.get_texture_atlas(image, x))),
+                    ..default()
+                });
+            }
+            VisualType::Grid => {
+                commands.insert(ImageNode {
+                    image: rpg_folder.get_image_handle(image),
+                    texture_atlas: size.and_then(|x| Some(rpg_folder.get_texture_atlas(image, x))),
+                    ..default()
+                });
+            }
+            VisualType::Active => {
+                commands.insert(Sprite {
+                    image: rpg_folder.get_image_handle(image),
+                    texture_atlas: size.and_then(|x| Some(rpg_folder.get_texture_atlas(image, x))),
+                    anchor: self.texture_anchor(),
+                    ..default()
+                });
+            }
+        }
+    }
 
     /// Mechanics when it's active.
     fn add_extra_components(&self, _commands: &mut EntityCommands) {}
@@ -64,9 +109,9 @@ impl IsObject {
         if config.physics {
             obj.add_physics_components(ec);
         }
-        if config.visual {
+        if let Some(visual_type) = config.visual {
             let rpg_folder = world.get_resource::<RpgTextures>().unwrap();
-            obj.add_visual_components(ec, rpg_folder);
+            obj.add_visual_components(ec, rpg_folder, visual_type);
         }
         if config.extra {
             obj.add_extra_components(ec);
@@ -90,7 +135,7 @@ impl Object for Barrier {
             Collider::rectangle(self.x_length, self.y_length),
         ));
     }
-    fn add_visual_components(&self, commands: &mut EntityCommands, _: &RpgTextures) {
+    fn add_visual_components(&self, commands: &mut EntityCommands, _: &RpgTextures, _: VisualType) {
         commands.insert(Sprite::from_color(
             bevy::color::palettes::basic::GRAY,
             Vec2::new(self.x_length, self.y_length),
@@ -106,8 +151,7 @@ impl Object for Barrier {
 pub struct NonUnique(pub String);
 
 impl Object for NonUnique {
-    fn add_visual_components(&self, commands: &mut EntityCommands, rpg_folder: &RpgTextures) {
-        let str = self.0.as_str();
-        commands.insert(Sprite::from_image(rpg_folder.get_image_handle(str)));
+    fn texture_info(&self) -> Option<(&str, Option<usize>)> {
+        Some((self.0.as_str(), None))
     }
 }
