@@ -78,7 +78,6 @@ pub fn setup_inventory(mut commands: Commands, world: &World, actors: Query<Enti
                     ..default()
                 },
                 Outline::new(Val::Px(1.0), Val::ZERO, Color::WHITE),
-                BackgroundColor(Color::srgb(0.3, 0.3, 0.3)),
             ));
             if let Some(item) = storage.storage[ind] {
                 let object = world.entity(item).get::<IsObject>().unwrap();
