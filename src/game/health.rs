@@ -12,21 +12,38 @@ pub fn read_health_cleared(mut commands: Commands, mut reader: EventReader<Healt
     }
 }
 
-#[derive(Component)]
-pub struct Health(pub f32, pub f32);
+#[derive(Reflect, Component)]
+#[reflect(Component)]
+pub struct Health {
+    pub value: f32,
+    pub max: f32,
+}
 
 impl Health {
+    pub fn new(value: f32, max: f32) -> Self {
+        Self { value, max }
+    }
+
+    /// Spawn with full health.
+    pub fn fresh(val: f32) -> Self {
+        Health::new(val, val)
+    }
+
+    /// For fragile objects that die with a single touch.
     pub fn fragile() -> Self {
-        Self(1e-3, 1e-3)
+        Health::fresh(1e-3)
     }
-    pub fn modify(&mut self, health: f32) {
-        self.0 = health;
+
+    pub fn is_alive(&self) -> bool {
+        self.value > 1e-7
     }
+
+    /// Updates health value.
     pub fn shift(&mut self, shift: f32) -> f32 {
-        self.0 += shift;
-        if self.0 > self.1 {
-            self.0 = self.1;
+        self.value += shift;
+        if self.value > self.max {
+            self.value = self.max;
         }
-        self.0
+        self.value
     }
 }

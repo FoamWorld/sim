@@ -1,4 +1,7 @@
-use crate::{control::*, game::item::*};
+use crate::{
+    control::*,
+    game::{health::*, item::*},
+};
 use bevy::{prelude::*, tasks::IoTaskPool};
 use std::{fs::File, io::Write};
 
@@ -6,7 +9,8 @@ pub struct RegisteryPlugin;
 
 impl Plugin for RegisteryPlugin {
     fn build(&self, app: &mut App) {
-        app.register_type::<debug_wand::DebugWand>();
+        app.register_type::<Health>()
+            .register_type::<debug_wand::DebugWand>();
     }
 }
 
