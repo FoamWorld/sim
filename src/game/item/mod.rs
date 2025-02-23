@@ -10,26 +10,32 @@ use std::any::TypeId;
 #[derive(Component)]
 pub struct ItemAmount(pub f32);
 
-// todo: limits on weight (and volume?)
 /// Component for item containers. This may include: the characters two hands (and back (and pockets?)?).
 #[derive(Component, Clone)]
-pub struct ItemStorage(pub Vec<Option<Entity>>);
+pub struct ItemStorage {
+    // (?) todo: volume limit
+    pub limit: f32, // weight limit
+    pub storage: Vec<Option<Entity>>,
+}
 
 impl ItemStorage {
     pub fn with_capacity(length: usize) -> Self {
-        Self(vec![None; length])
+        Self {
+            limit: f32::INFINITY,
+            storage: vec![None; length],
+        }
     }
 
     pub fn size(&self) -> usize {
-        self.0.len()
+        self.storage.len()
     }
 
     pub fn get_index(&self, index: usize) -> Option<Entity> {
-        self.0[index]
+        self.storage[index]
     }
 
     pub fn force_give(&mut self, commands: &mut Commands, entity: Entity) {
-        self.0[0] = Some(entity);
+        self.storage[0] = Some(entity);
         commands.entity(entity).insert(ItemAmount(1.0));
     }
 }

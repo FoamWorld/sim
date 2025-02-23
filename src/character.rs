@@ -15,6 +15,9 @@ use std::any::Any;
 pub struct SelectedSlot(pub usize);
 
 #[derive(Component)]
+pub struct Inventory;
+
+#[derive(Component)]
 pub struct IsActive;
 
 pub fn setup_character(
@@ -24,16 +27,13 @@ pub fn setup_character(
 ) {
     let launcher = {
         let debug_wand = DebugWand { mode: 3 };
-        let ty = IsObject(debug_wand.type_id());
-        let ty2 = IsItem(debug_wand.type_id());
-        let mut ec = commands.spawn((
-            debug_wand,
-            ty.clone(),
-            ty2,
-            Transform::from_xyz(0.0, -100.0, 15.0),
-        ));
-        debug_wand.add_visual_components(&mut ec, &rpg_folder);
-        ec.id()
+        commands
+            .spawn((
+                debug_wand,
+                IsObject(debug_wand.type_id()),
+                IsItem(debug_wand.type_id()),
+            ))
+            .id()
     };
 
     let mut storage = ItemStorage::with_capacity(2);
@@ -49,6 +49,45 @@ pub fn setup_character(
         Actor,
         storage,
     ));
+}
+
+pub fn setup_inventory(mut commands: Commands, world: &World, actors: Query<Entity, With<Actor>>) {
+    let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
+    let rpg_folder = world.get_resource::<RpgTextures>().unwrap();
+    let actor = actors.single();
+    let storage = world.entity(actor).get::<ItemStorage>().unwrap();
+    let size = storage.size();
+    let mut inventory = commands.spawn((
+        Inventory,
+        Node {
+            position_type: PositionType::Absolute,
+            height: Val::Px(64.0),
+            bottom: Val::Px(16.0),
+            justify_self: JustifySelf::Center,
+            justify_items: JustifyItems::Center,
+            flex_direction: FlexDirection::Row,
+            ..default()
+        },
+    ));
+    inventory.with_children(|builder| {
+        for ind in 0..size {
+            let mut ec = builder.spawn((Node {
+                width: Val::Percent(64.0),
+                height: Val::Percent(64.0),
+                ..default()
+            },));
+            if let Some(item) = storage.storage[ind] {
+                ec.insert(ImageNode {
+                    image: rpg_folder.get_image_handle("items"),
+                    texture_atlas: Some(rpg_folder.get_texture_atlas("items", 0)),
+                    ..default()
+                });
+                let object = world.entity(item).get::<IsObject>().unwrap();
+            } else {
+                ec.insert(ImageNode::solid_color(Color::srgb(0.8, 0.1, 0.1)));
+            }
+        }
+    });
 }
 
 pub fn setup_attached_image(

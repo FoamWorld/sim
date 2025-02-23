@@ -51,8 +51,13 @@ impl Plugin for AppStatePlugin {
         app.add_systems(
             OnEnter(AppState::InGame),
             (
-                (setup_game, set_cursor, setup_character).before(setup_attached_image),
+                setup_game,
+                set_cursor,
+                (setup_character)
+                    .before(setup_attached_image)
+                    .before(setup_inventory),
                 setup_attached_image,
+                setup_inventory,
             ),
         );
 
