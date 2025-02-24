@@ -5,6 +5,7 @@ use bevy::sprite::Anchor;
 
 #[derive(Reflect, Component, Clone, Copy)]
 #[reflect(Component, Object, Item)]
+#[type_path = "sim::item"]
 pub struct DebugWand {
     pub mode: usize,
 }

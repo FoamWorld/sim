@@ -9,7 +9,9 @@ pub struct RegisteryPlugin;
 
 impl Plugin for RegisteryPlugin {
     fn build(&self, app: &mut App) {
-        app.register_type::<Health>()
+        app.register_type::<Actor>()
+            .register_type::<Health>()
+            .register_type::<ItemStorage>()
             .register_type::<Barrier>()
             .register_type::<NonUnique>()
             .register_type::<sign::Sign>()
@@ -25,6 +27,8 @@ pub fn save_scene_system(world: &mut World) {
         .allow_component::<Transform>()
         .allow_component::<Actor>()
         .allow_component::<Health>()
+        .allow_component::<IsObject>()
+        .allow_component::<IsItem>()
         .allow_component::<ItemStorage>()
         .allow_component::<debug_wand::DebugWand>()
         .extract_entities(world.iter_entities().map(|entity| entity.id()))

@@ -112,7 +112,9 @@ pub fn inputs_wait(
     }
 }
 
-#[derive(Component)]
+#[derive(Reflect, Component)]
+#[reflect(Component)]
+#[type_path = "sim"]
 pub struct Actor;
 
 #[derive(Component)]
@@ -129,6 +131,8 @@ pub fn inputs_move(
         let yneg = control_settings.check(ControlCode::MoveDown, &keys);
         let ypos = control_settings.check(ControlCode::MoveUp, &keys);
         linear_velocity.x = (xpos as i8 - xneg as i8) as Scalar * movement_speed.0;
-        linear_velocity.y = (ypos as i8 - yneg as i8) as Scalar * movement_speed.0;
+        if linear_velocity.y.abs() < 0.1 && ypos {
+            linear_velocity.y = 300.0;
+        }
     }
 }

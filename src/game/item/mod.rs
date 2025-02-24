@@ -11,7 +11,9 @@ use std::any::TypeId;
 pub struct ItemAmount(pub f32);
 
 /// Component for item containers. This may include: the characters two hands (and back (and pockets?)?).
-#[derive(Component, Clone)]
+#[derive(Reflect, Component)]
+#[reflect(Component)]
+#[type_path = "sim"]
 pub struct ItemStorage {
     // (?) todo: volume limit
     pub limit: f32, // weight limit
@@ -70,7 +72,8 @@ pub trait Item {
 /// contains `#visual`
 /// * (clone) active entity attached to the character:
 /// contains `#visual`, `#extra (?RotateWithMouse)`
-#[derive(Component, Clone)]
+#[derive(Reflect, Component, Clone)]
+#[reflect(Component)]
 pub struct IsItem(pub TypeId);
 
 impl IsItem {

@@ -49,6 +49,6 @@ fn main() {
         message::MessagePlugin,
         scene::RegisteryPlugin,
     ));
-    // app.insert_resource(Gravity(Vector::ZERO));
+    app.insert_resource(Gravity(Vec2::NEG_Y * 628.0));
     app.run();
 }

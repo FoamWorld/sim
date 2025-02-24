@@ -14,6 +14,7 @@ pub fn read_health_cleared(mut commands: Commands, mut reader: EventReader<Healt
 
 #[derive(Reflect, Component)]
 #[reflect(Component)]
+#[type_path = "sim"]
 pub struct Health {
     pub value: f32,
     pub max: f32,

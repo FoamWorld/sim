@@ -121,6 +121,6 @@ fn exit_pause(
     finish_ui(commands, query);
 }
 
-fn setup_game(mut commands: Commands, rpg_folder: Res<RpgTextures>) {
+fn setup_game(mut commands: Commands) {
     spawn_room(&mut commands);
 }
