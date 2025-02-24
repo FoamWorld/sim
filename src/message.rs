@@ -1,4 +1,4 @@
-use crate::{physics::collision::*, state::AppState};
+use crate::{game::object::sign::Sign, physics::collision::*, state::AppState};
 use bevy::prelude::*;
 
 pub struct MessagePlugin;
@@ -33,9 +33,6 @@ fn init_info_text(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 }
 
-#[derive(Component)]
-pub struct Sign(pub String);
-
 // todo: add duration
 fn read_touch_sign(
     mut reader: EventReader<TouchEvent>,
@@ -47,7 +44,7 @@ fn read_touch_sign(
         if result.is_ok() {
             let sign = result.unwrap();
             for mut text in &mut query_text {
-                text.0 = sign.0.clone();
+                text.0 = sign.message.clone();
             }
         }
     }

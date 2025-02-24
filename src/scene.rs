@@ -12,6 +12,7 @@ impl Plugin for RegisteryPlugin {
         app.register_type::<Health>()
             .register_type::<Barrier>()
             .register_type::<NonUnique>()
+            .register_type::<sign::Sign>()
             .register_type::<debug_wand::DebugWand>();
     }
 }

@@ -1,7 +1,7 @@
 extern crate avian2d;
 extern crate bevy;
 
-use avian2d::{math::*, prelude::*};
+use avian2d::prelude::*;
 use bevy::{
     prelude::*,
     window::{EnabledButtons, WindowResolution},
@@ -49,6 +49,6 @@ fn main() {
         message::MessagePlugin,
         scene::RegisteryPlugin,
     ));
-    app.insert_resource(Gravity(Vector::ZERO));
+    // app.insert_resource(Gravity(Vector::ZERO));
     app.run();
 }

@@ -155,3 +155,5 @@ impl Object for NonUnique {
         Some((self.0.as_str(), None))
     }
 }
+
+pub mod sign;

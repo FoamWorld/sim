@@ -1,4 +1,4 @@
-use crate::{constants::*, message::Sign};
+use crate::constants::*;
 use avian2d::{math::Scalar, prelude::*};
 use bevy::prelude::*;
 
@@ -44,15 +44,4 @@ pub fn spawn_room(commands: &mut Commands) {
         horizonal_sprite.clone(),
         horizonal_collider.clone(),
     );
-}
-
-pub fn spawn_sign(commands: &mut Commands, x: Scalar, y: Scalar, sprite: Sprite) {
-    commands.spawn((
-        sprite,
-        Transform::from_xyz(x, y, 0.0),
-        RigidBody::Static,
-        RigidBodyDisabled,
-        Collider::rectangle(28.0, 26.0),
-        Sign("This is a sign.".to_string()),
-    ));
 }

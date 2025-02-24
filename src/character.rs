@@ -45,6 +45,7 @@ pub fn setup_character(
         RigidBody::Dynamic,
         Collider::rectangle(16.0, 32.0),
         LockedAxes::ROTATION_LOCKED,
+        Mass(70.0),
         MovementSpeed(100.0),
         Actor,
         storage,
