@@ -61,8 +61,8 @@ pub fn setup_inventory(mut commands: Commands, world: &World, actors: Query<Enti
         Inventory,
         Node {
             position_type: PositionType::Absolute,
-            height: Val::Px(64.0),
-            bottom: Val::Px(16.0),
+            height: Val::Px(GRID_SIZE),
+            bottom: Val::Px(4.0),
             justify_self: JustifySelf::Center,
             justify_items: JustifyItems::Center,
             flex_direction: FlexDirection::Row,
@@ -73,8 +73,8 @@ pub fn setup_inventory(mut commands: Commands, world: &World, actors: Query<Enti
         for ind in 0..size {
             let mut ec = builder.spawn((
                 Node {
-                    width: Val::Percent(64.0),
-                    height: Val::Percent(64.0),
+                    width: Val::Px(GRID_SIZE),
+                    height: Val::Px(GRID_SIZE),
                     margin: UiRect::horizontal(Val::Px(4.0)),
                     ..default()
                 },

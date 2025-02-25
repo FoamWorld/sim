@@ -132,7 +132,7 @@ pub fn inputs_move(
         let ypos = control_settings.check(ControlCode::MoveUp, &keys);
         linear_velocity.x = (xpos as i8 - xneg as i8) as Scalar * movement_speed.0;
         if linear_velocity.y.abs() < 0.1 && ypos {
-            linear_velocity.y = 300.0;
+            linear_velocity.y = 100.0;
         }
     }
 }
