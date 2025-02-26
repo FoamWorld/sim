@@ -1,6 +1,14 @@
 use crate::assets::RpgTextures;
 use avian2d::{math::*, prelude::*};
-use bevy::{prelude::*, sprite::Anchor};
+use bevy::{
+    prelude::*,
+    reflect::{
+        serde::{ReflectSerializeWithRegistry, SerializeWithRegistry},
+        TypeRegistry,
+    },
+    sprite::Anchor,
+};
+use serde::Serializer;
 use std::any::TypeId;
 
 pub enum VisualType {
@@ -90,7 +98,10 @@ pub trait Object {
 }
 
 /// Added when the entity is a game object.
-#[derive(Component, Clone)]
+#[derive(Reflect, Component, Clone)]
+#[reflect(Component)]
+#[reflect(SerializeWithRegistry)]
+#[component(storage = "Table")]
 pub struct IsObject(pub TypeId);
 
 impl IsObject {
@@ -119,10 +130,105 @@ impl IsObject {
     }
 }
 
+impl SerializeWithRegistry for IsObject {
+    fn serialize<S>(&self, serializer: S, registry: &TypeRegistry) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let registeration = registry.get(self.0).unwrap();
+        let info = registeration.type_info();
+        let path = info.type_path();
+        let mut state = serializer.serialize_str(path)?;
+        Ok(state)
+    }
+}
+/*
+
+impl SerializeWithRegistry for EnemyList {
+            fn serialize<S>(
+                &self,
+                serializer: S,
+                registry: &TypeRegistry,
+            ) -> Result<S::Ok, S::Error>
+            where
+                S: Serializer,
+            {
+                let mut state = serializer.serialize_seq(Some(self.0.len()))?;
+                for enemy in &self.0 {
+                    state.serialize_element(&ReflectSerializer::new(
+                        (**enemy).as_partial_reflect(),
+                        registry,
+                    ))?;
+                }
+                state.end()
+            }
+        }
+
+        impl<'de> DeserializeWithRegistry<'de> for EnemyList {
+            fn deserialize<D>(deserializer: D, registry: &TypeRegistry) -> Result<Self, D::Error>
+            where
+                D: Deserializer<'de>,
+            {
+                struct EnemyListVisitor<'a> {
+                    registry: &'a TypeRegistry,
+                }
+
+                impl<'a, 'de> Visitor<'de> for EnemyListVisitor<'a> {
+                    type Value = Vec<Arc<dyn Enemy>>;
+
+                    fn expecting(&self, formatter: &mut Formatter) -> core::fmt::Result {
+                        write!(formatter, "a list of enemies")
+                    }
+
+                    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+                    where
+                        A: SeqAccess<'de>,
+                    {
+                        let mut enemies = Vec::new();
+                        while let Some(enemy) =
+                            seq.next_element_seed(ReflectDeserializer::new(self.registry))?
+                        {
+                            let registration = self
+                                .registry
+                                .get_with_type_path(
+                                    enemy.get_represented_type_info().unwrap().type_path(),
+                                )
+                                .unwrap();
+
+                            // 1. Convert any possible dynamic values to concrete ones
+                            let enemy = registration
+                                .data::<ReflectFromReflect>()
+                                .unwrap()
+                                .from_reflect(&*enemy)
+                                .unwrap();
+
+                            // 2. Convert the concrete value to a boxed trait object
+                            let enemy = registration
+                                .data::<ReflectEnemy>()
+                                .unwrap()
+                                .get_boxed(enemy)
+                                .unwrap();
+
+                            enemies.push(enemy.into());
+                        }
+
+                        Ok(enemies)
+                    }
+                }
+
+                deserializer
+                    .deserialize_seq(EnemyListVisitor { registry })
+                    .map(EnemyList)
+            }
+        }
+
+ */
+
 /*  List of objects.  */
 
 #[derive(Reflect, Component, Clone, Copy)]
 #[reflect(Object, Component)]
+#[type_path = "sim::object"]
 pub struct Barrier {
     x_length: Scalar,
     y_length: Scalar,
@@ -148,6 +254,7 @@ impl Object for Barrier {
 /// The sprite image will be automatically looked up.
 #[derive(Reflect, Component, Clone)]
 #[reflect(Object, Component)]
+#[type_path = "sim::object"]
 pub struct NonUnique(pub String);
 
 impl Object for NonUnique {

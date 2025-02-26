@@ -1,5 +1,6 @@
 extern crate avian2d;
 extern crate bevy;
+extern crate serde;
 
 use avian2d::prelude::*;
 use bevy::{

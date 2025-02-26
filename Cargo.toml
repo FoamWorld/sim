@@ -46,3 +46,4 @@ lto = "thin"
 [dependencies]
 avian2d = "0.2"
 bevy = { version = "0.15", default-features = false }
+serde = "1"

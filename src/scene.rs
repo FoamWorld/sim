@@ -12,6 +12,7 @@ impl Plugin for RegisteryPlugin {
         app.register_type::<Actor>()
             .register_type::<Health>()
             .register_type::<ItemStorage>()
+            .register_type::<IsObject>()
             .register_type::<Barrier>()
             .register_type::<NonUnique>()
             .register_type::<sign::Sign>()
