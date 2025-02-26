@@ -3,12 +3,15 @@ use avian2d::{math::*, prelude::*};
 use bevy::{
     prelude::*,
     reflect::{
-        serde::{ReflectSerializeWithRegistry, SerializeWithRegistry},
+        serde::{
+            DeserializeWithRegistry, ReflectDeserializeWithRegistry, ReflectSerializeWithRegistry,
+            SerializeWithRegistry,
+        },
         TypeRegistry,
     },
     sprite::Anchor,
 };
-use serde::Serializer;
+use serde::{de::Visitor, Serializer};
 use std::any::TypeId;
 
 pub enum VisualType {
@@ -100,7 +103,7 @@ pub trait Object {
 /// Added when the entity is a game object.
 #[derive(Reflect, Component, Clone)]
 #[reflect(Component)]
-#[reflect(SerializeWithRegistry)]
+#[reflect(SerializeWithRegistry, DeserializeWithRegistry)]
 #[component(storage = "Table")]
 pub struct IsObject(pub TypeId);
 
@@ -142,66 +145,37 @@ impl SerializeWithRegistry for IsObject {
         state
     }
 }
-/*
-        impl<'de> DeserializeWithRegistry<'de> for EnemyList {
-            fn deserialize<D>(deserializer: D, registry: &TypeRegistry) -> Result<Self, D::Error>
-            where
-                D: Deserializer<'de>,
-            {
-                struct EnemyListVisitor<'a> {
-                    registry: &'a TypeRegistry,
-                }
 
-                impl<'a, 'de> Visitor<'de> for EnemyListVisitor<'a> {
-                    type Value = Vec<Arc<dyn Enemy>>;
+impl<'de> DeserializeWithRegistry<'de> for IsObject {
+    fn deserialize<D>(deserializer: D, registry: &TypeRegistry) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct MyVisitor<'a> {
+            registry: &'a TypeRegistry,
+        }
 
-                    fn expecting(&self, formatter: &mut Formatter) -> core::fmt::Result {
-                        write!(formatter, "a list of enemies")
-                    }
+        impl<'a, 'de> Visitor<'de> for MyVisitor<'a> {
+            type Value = TypeId;
 
-                    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
-                    where
-                        A: SeqAccess<'de>,
-                    {
-                        let mut enemies = Vec::new();
-                        while let Some(enemy) =
-                            seq.next_element_seed(ReflectDeserializer::new(self.registry))?
-                        {
-                            let registration = self
-                                .registry
-                                .get_with_type_path(
-                                    enemy.get_represented_type_info().unwrap().type_path(),
-                                )
-                                .unwrap();
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                write!(formatter, "a type path")
+            }
 
-                            // 1. Convert any possible dynamic values to concrete ones
-                            let enemy = registration
-                                .data::<ReflectFromReflect>()
-                                .unwrap()
-                                .from_reflect(&*enemy)
-                                .unwrap();
-
-                            // 2. Convert the concrete value to a boxed trait object
-                            let enemy = registration
-                                .data::<ReflectEnemy>()
-                                .unwrap()
-                                .get_boxed(enemy)
-                                .unwrap();
-
-                            enemies.push(enemy.into());
-                        }
-
-                        Ok(enemies)
-                    }
-                }
-
-                deserializer
-                    .deserialize_seq(EnemyListVisitor { registry })
-                    .map(EnemyList)
+            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+                where
+                    E: serde::de::Error, {
+                let registeration = self.registry.get_with_type_path(v).unwrap();
+                let id = registeration.type_id();
+                Ok(id)
             }
         }
 
- */
+        deserializer
+            .deserialize_str(MyVisitor { registry })
+            .map(IsObject)
+    }
+}
 
 /*  List of objects.  */
 
