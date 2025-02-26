@@ -138,32 +138,11 @@ impl SerializeWithRegistry for IsObject {
         let registeration = registry.get(self.0).unwrap();
         let info = registeration.type_info();
         let path = info.type_path();
-        let mut state = serializer.serialize_str(path)?;
-        Ok(state)
+        let state = serializer.serialize_str(path);
+        state
     }
 }
 /*
-
-impl SerializeWithRegistry for EnemyList {
-            fn serialize<S>(
-                &self,
-                serializer: S,
-                registry: &TypeRegistry,
-            ) -> Result<S::Ok, S::Error>
-            where
-                S: Serializer,
-            {
-                let mut state = serializer.serialize_seq(Some(self.0.len()))?;
-                for enemy in &self.0 {
-                    state.serialize_element(&ReflectSerializer::new(
-                        (**enemy).as_partial_reflect(),
-                        registry,
-                    ))?;
-                }
-                state.end()
-            }
-        }
-
         impl<'de> DeserializeWithRegistry<'de> for EnemyList {
             fn deserialize<D>(deserializer: D, registry: &TypeRegistry) -> Result<Self, D::Error>
             where

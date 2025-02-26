@@ -20,6 +20,7 @@ impl Plugin for RegisteryPlugin {
     }
 }
 
+#[allow(dead_code, reason = "used in feature devtools")]
 pub fn save_scene_system(world: &mut World) {
     let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
 

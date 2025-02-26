@@ -52,7 +52,8 @@ impl Item for DebugWand {
             Collider::circle(6.0),
             LockedAxes::ROTATION_LOCKED,
             LinearVelocity(unit * 40.0),
-            GravityScale(0.1),
+            Mass(1.0),
+            GravityScale(0.01),
             crate::game::health::Health::fragile(),
         ));
     }

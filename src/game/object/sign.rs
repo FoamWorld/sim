@@ -3,6 +3,7 @@ use crate::game::object::Object;
 
 #[derive(Reflect, Component, Clone)]
 #[reflect(Object, Component)]
+#[type_path = "sim::object"]
 pub struct Sign {
     pub mode: usize,
     pub message: String,
