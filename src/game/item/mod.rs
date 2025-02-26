@@ -74,11 +74,10 @@ pub trait Item {
 /// contains `#visual`, `#extra (?RotateWithMouse)`
 #[derive(Reflect, Component, Clone)]
 #[reflect(Component)]
-pub struct IsItem(pub TypeId);
+pub struct IsItem;
 
 impl IsItem {
     pub fn inspect_then<F>(
-        &self,
         world: &World,
         entity: Entity,
         type_registry: &AppTypeRegistry,
@@ -86,9 +85,10 @@ impl IsItem {
     ) where
         F: FnOnce(&dyn Item) -> (),
     {
-        let comp = world.get_reflect(entity, self.0).unwrap();
+        let id = world.entity(entity).get::<IsObject>().unwrap().0;
+        let comp = world.get_reflect(entity, id).unwrap();
         let guard = type_registry.0.read();
-        let refl = guard.get_type_data::<ReflectItem>(self.0).unwrap();
+        let refl = guard.get_type_data::<ReflectItem>(id).unwrap();
         let it = refl.get(&*comp).unwrap();
         f(it);
     }

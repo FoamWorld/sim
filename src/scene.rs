@@ -15,6 +15,7 @@ impl Plugin for RegisteryPlugin {
             .register_type::<IsObject>()
             .register_type::<Barrier>()
             .register_type::<NonUnique>()
+            .register_type::<IsItem>()
             .register_type::<sign::Sign>()
             .register_type::<debug_wand::DebugWand>();
     }

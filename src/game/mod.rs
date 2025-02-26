@@ -65,8 +65,7 @@ where
     };
 
     let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
-    let it = world.entity(item).get::<IsItem>().unwrap();
-    it.inspect_then(world, item, type_registry, |guarded| {
+    IsItem::inspect_then(world, item, type_registry, |guarded| {
         f(guarded, item);
     });
 }

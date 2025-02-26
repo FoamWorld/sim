@@ -31,7 +31,7 @@ pub fn setup_character(
             .spawn((
                 debug_wand,
                 IsObject(debug_wand.type_id()),
-                IsItem(debug_wand.type_id()),
+                IsItem,
             ))
             .id()
     };
