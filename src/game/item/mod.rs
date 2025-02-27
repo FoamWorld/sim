@@ -1,7 +1,6 @@
 use super::object::*;
 use crate::assets::RpgTextures;
 use bevy::prelude::*;
-use std::any::TypeId;
 
 /// Added when the clone is inside an item container.
 /// Field `.0` stores the number/amount stacked. This works for non-unique solids, liquids and gases.
@@ -13,7 +12,7 @@ pub struct ItemAmount(pub f32);
 /// Component for item containers. This may include: the characters two hands (and back (and pockets?)?).
 #[derive(Reflect, Component)]
 #[reflect(Component)]
-#[type_path = "sim"]
+#[type_path = "sim::item"]
 pub struct ItemStorage {
     // (?) todo: volume limit
     pub limit: f32, // weight limit
@@ -74,6 +73,7 @@ pub trait Item {
 /// contains `#visual`, `#extra (?RotateWithMouse)`
 #[derive(Reflect, Component, Clone)]
 #[reflect(Component)]
+#[type_path = "sim::item"]
 pub struct IsItem;
 
 impl IsItem {

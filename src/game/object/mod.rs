@@ -105,6 +105,7 @@ pub trait Object {
 #[reflect(Component)]
 #[reflect(SerializeWithRegistry, DeserializeWithRegistry)]
 #[component(storage = "Table")]
+#[type_path = "sim::core"]
 pub struct IsObject(pub TypeId);
 
 impl IsObject {

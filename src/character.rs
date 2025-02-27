@@ -28,11 +28,7 @@ pub fn setup_character(
     let launcher = {
         let debug_wand = DebugWand { mode: 3 };
         commands
-            .spawn((
-                debug_wand,
-                IsObject(debug_wand.type_id()),
-                IsItem,
-            ))
+            .spawn((debug_wand, IsObject(debug_wand.type_id()), IsItem))
             .id()
     };
 
@@ -40,10 +36,14 @@ pub fn setup_character(
     storage.force_give(&mut commands, launcher);
 
     commands.spawn((
-        Sprite::from_image(rpg_folder.get_image_handle("character")),
+        Sprite {
+            image: rpg_folder.get_image_handle("character"),
+            custom_size: Some(Vec2::new(CHARACTER_X_LENGTH, CHARACTER_Y_LENGTH)),
+            ..default()
+        },
         Transform::from_xyz(0.0, 0.0, CHARACTER_LAYER),
         RigidBody::Dynamic,
-        Collider::rectangle(16.0, 32.0),
+        Collider::rectangle(CHARACTER_X_LENGTH, CHARACTER_Y_LENGTH),
         LockedAxes::ROTATION_LOCKED,
         Mass(70.0),
         MovementSpeed(100.0),
