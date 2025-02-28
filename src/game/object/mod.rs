@@ -184,8 +184,8 @@ impl<'de> DeserializeWithRegistry<'de> for IsObject {
 #[reflect(Object, Component)]
 #[type_path = "sim::object"]
 pub struct Barrier {
-    x_length: Scalar,
-    y_length: Scalar,
+    pub x_length: Scalar,
+    pub y_length: Scalar,
 }
 
 impl Object for Barrier {

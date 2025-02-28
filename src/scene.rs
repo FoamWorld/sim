@@ -16,9 +16,11 @@ impl Plugin for RegisteryPlugin {
         app.register_type::<Actor>()
             .register_type::<Health>()
             .register_type::<ItemStorage>()
+            // objects
             .register_type::<IsObject>()
             .register_type::<Barrier>()
             .register_type::<NonUnique>()
+            // items
             .register_type::<IsItem>()
             .register_type::<sign::Sign>()
             .register_type::<debug_wand::DebugWand>();
@@ -26,19 +28,24 @@ impl Plugin for RegisteryPlugin {
 }
 
 pub fn save_scene_system(world: &mut World) {
+    let scene = {
+        let mut query = world.query_filtered::<Entity, With<IsObject>>();
+        let scene_builder = DynamicSceneBuilder::from_world(&world)
+            .deny_all()
+            .allow_component::<Transform>()
+            .allow_component::<Health>()
+            // objects
+            .allow_component::<IsObject>()
+            .allow_component::<Barrier>()
+            .allow_component::<NonUnique>()
+            // items
+            .allow_component::<IsItem>()
+            .allow_component::<ItemStorage>()
+            .allow_component::<debug_wand::DebugWand>();
+        scene_builder.extract_entities(query.iter(&world)).build()
+    };
+
     let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
-
-    let scene = DynamicSceneBuilder::from_world(&world)
-        .deny_all()
-        .allow_component::<Transform>()
-        .allow_component::<Health>()
-        .allow_component::<IsObject>()
-        .allow_component::<IsItem>()
-        .allow_component::<ItemStorage>()
-        .allow_component::<debug_wand::DebugWand>()
-        .extract_entities(world.iter_entities().map(|entity| entity.id()))
-        .build();
-
     let binding = type_registry.read();
     let serialized_scene = scene.serialize(&binding).unwrap();
 
