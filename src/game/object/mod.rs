@@ -191,7 +191,7 @@ pub struct Barrier {
 impl Object for Barrier {
     fn add_physics_components(&self, commands: &mut EntityCommands) {
         commands.insert((
-            RigidBody::Dynamic,
+            RigidBody::Static,
             Collider::rectangle(self.x_length, self.y_length),
         ));
     }

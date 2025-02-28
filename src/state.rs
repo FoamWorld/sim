@@ -1,10 +1,5 @@
 use crate::{
-    assets::*,
-    character::*,
-    control::*,
-    game::health::*,
-    physics::{collision::*, room::*},
-    ui::*,
+    assets::*, character::*, control::*, game::health::*, physics::collision::*, scene::*, ui::*,
 };
 use avian2d::prelude::*;
 use bevy::{asset::*, prelude::*};
@@ -25,7 +20,14 @@ pub enum RunState {
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum StorageState {
     None,
+    Loading,
     Saving,
+}
+
+#[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
+pub enum LoadingState {
+    None,
+    Processing,
 }
 
 pub struct AppStatePlugin;
@@ -34,7 +36,8 @@ impl Plugin for AppStatePlugin {
     fn build(&self, app: &mut App) {
         app.insert_state(AppState::Loading)
             .insert_state(RunState::Running)
-            .insert_state(StorageState::None);
+            .insert_state(StorageState::None)
+            .insert_state(LoadingState::None);
 
         // while loading
         app.add_systems(OnEnter(AppState::Loading), load_textures)
@@ -51,7 +54,7 @@ impl Plugin for AppStatePlugin {
         app.add_systems(
             OnEnter(AppState::InGame),
             (
-                setup_game,
+                load_scene_system,
                 set_cursor,
                 (setup_character)
                     .before(setup_attached_image)
@@ -60,6 +63,7 @@ impl Plugin for AppStatePlugin {
                 setup_inventory,
             ),
         );
+        app.add_systems(OnEnter(LoadingState::Processing), setup_game);
 
         app.add_systems(
             PostProcessCollisions,
@@ -119,8 +123,4 @@ fn exit_pause(
 ) {
     time.unpause();
     finish_ui(commands, query);
-}
-
-fn setup_game(mut commands: Commands) {
-    spawn_room(&mut commands);
 }
