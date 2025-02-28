@@ -26,7 +26,7 @@ impl Plugin for RegisteryPlugin {
 }
 
 #[allow(dead_code, reason = "used in feature devtools")]
-pub fn save_scene_system(world: &mut World, info: Res<StorageSlotInfo>) {
+pub fn save_scene_system(world: &mut World) {
     let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
 
     let scene = DynamicSceneBuilder::from_world(&world)
@@ -42,6 +42,8 @@ pub fn save_scene_system(world: &mut World, info: Res<StorageSlotInfo>) {
 
     let binding = type_registry.read();
     let serialized_scene = scene.serialize(&binding).unwrap();
+
+    let info = world.get_resource::<StorageSlotInfo>().unwrap();
 
     let dist = "saved/".to_string() + info.0.as_str() + "/scenes/1.scn.ron";
 

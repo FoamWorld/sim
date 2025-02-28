@@ -96,7 +96,13 @@ impl Plugin for ControlPlugin {
         app.init_resource::<ControlSettings>();
         app.add_systems(
             Update,
-            (inputs_move, inputs_wait, inputs_use, inputs_modify)
+            (
+                inputs_move,
+                inputs_wait,
+                inputs_use,
+                inputs_modify,
+                change_facing.after(inputs_move),
+            )
                 .run_if(in_state(AppState::InGame).and(in_state(RunState::Running))),
         );
     }
@@ -115,6 +121,15 @@ pub fn inputs_wait(
 #[derive(Component)]
 pub struct MovementSpeed(pub Scalar);
 
+pub fn change_facing(mut actors: Query<(&mut Actor, &mut Sprite), Changed<Actor>>) {
+    if let Ok((actor, mut sprite)) = actors.get_single_mut() {
+        sprite.flip_x = match actor.0 {
+            ActorFacing::Left => true,
+            ActorFacing::Right => false,
+        }
+    }
+}
+
 pub fn inputs_move(
     keys: Res<ButtonInput<KeyCode>>,
     control_settings: Res<ControlSettings>,
@@ -126,9 +141,9 @@ pub fn inputs_move(
     // let yneg = control_settings.check(ControlCode::MoveDown, &keys);
     let jump = control_settings.check(ControlCode::MoveUp, &keys);
     if to_left {
-        actor.0 = ActorFacing::Left;
+        actor.set_facing(ActorFacing::Left);
     } else if to_right {
-        actor.0 = ActorFacing::Right;
+        actor.set_facing(ActorFacing::Right);
     }
     linear_velocity.x = (to_right as i8 - to_left as i8) as Scalar * movement_speed.0;
     if linear_velocity.y.abs() < 0.1 && jump {

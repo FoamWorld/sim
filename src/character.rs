@@ -30,6 +30,12 @@ pub enum ActorFacing {
 #[reflect(Component)]
 pub struct Actor(pub ActorFacing);
 
+impl Actor {
+    pub fn set_facing(&mut self, facing: ActorFacing) {
+        self.0 = facing;
+    }
+}
+
 pub fn setup_character(
     mut commands: Commands,
     // asset_server: Res<AssetServer>,
