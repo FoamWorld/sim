@@ -1,3 +1,5 @@
+#![allow(dead_code, reason = "developing period")]
+
 extern crate avian2d;
 extern crate bevy;
 extern crate serde;
