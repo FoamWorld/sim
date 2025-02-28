@@ -5,10 +5,14 @@ use crate::{
 use bevy::{prelude::*, tasks::IoTaskPool};
 use std::{fs::File, io::Write};
 
+#[derive(Resource)]
+pub struct StorageSlotInfo(pub String);
+
 pub struct RegisteryPlugin;
 
 impl Plugin for RegisteryPlugin {
     fn build(&self, app: &mut App) {
+        app.insert_resource(StorageSlotInfo("slot1".to_string()));
         app.register_type::<Actor>()
             .register_type::<Health>()
             .register_type::<ItemStorage>()
@@ -22,7 +26,7 @@ impl Plugin for RegisteryPlugin {
 }
 
 #[allow(dead_code, reason = "used in feature devtools")]
-pub fn save_scene_system(world: &mut World) {
+pub fn save_scene_system(world: &mut World, info: Res<StorageSlotInfo>) {
     let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
 
     let scene = DynamicSceneBuilder::from_world(&world)
@@ -40,10 +44,12 @@ pub fn save_scene_system(world: &mut World) {
     let binding = type_registry.read();
     let serialized_scene = scene.serialize(&binding).unwrap();
 
+    let dist = "saved/".to_string() + info.0.as_str() + "/scenes/1.scn.ron";
+
     IoTaskPool::get()
         .spawn(async move {
             // Write the scene RON data to file
-            File::create(String::from("saved/scenes/1.scn.ron"))
+            File::create(dist)
                 .and_then(|mut file| file.write(serialized_scene.as_bytes()))
                 .expect("Error while writing scene to file");
         })
