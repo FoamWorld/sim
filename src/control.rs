@@ -1,4 +1,4 @@
-use crate::{game::*, state::*};
+use crate::{character::*, game::*, state::*};
 use avian2d::{math::*, prelude::*};
 use bevy::prelude::*;
 use std::collections::HashMap;
@@ -112,27 +112,26 @@ pub fn inputs_wait(
     }
 }
 
-#[derive(Reflect, Component)]
-#[reflect(Component)]
-#[type_path = "sim"]
-pub struct Actor;
-
 #[derive(Component)]
 pub struct MovementSpeed(pub Scalar);
 
 pub fn inputs_move(
     keys: Res<ButtonInput<KeyCode>>,
     control_settings: Res<ControlSettings>,
-    mut actors: Query<(&mut LinearVelocity, &MovementSpeed), With<Actor>>,
+    mut actors: Query<(&mut LinearVelocity, &mut Actor, &MovementSpeed)>,
 ) {
-    for (mut linear_velocity, movement_speed) in &mut actors {
-        let xneg = control_settings.check(ControlCode::MoveLeft, &keys);
-        let xpos = control_settings.check(ControlCode::MoveRight, &keys);
-        let yneg = control_settings.check(ControlCode::MoveDown, &keys);
-        let ypos = control_settings.check(ControlCode::MoveUp, &keys);
-        linear_velocity.x = (xpos as i8 - xneg as i8) as Scalar * movement_speed.0;
-        if linear_velocity.y.abs() < 0.1 && ypos {
-            linear_velocity.y = 100.0;
-        }
+    let (mut linear_velocity, mut actor, movement_speed) = actors.single_mut();
+    let to_left = control_settings.check(ControlCode::MoveLeft, &keys);
+    let to_right = control_settings.check(ControlCode::MoveRight, &keys);
+    // let yneg = control_settings.check(ControlCode::MoveDown, &keys);
+    let jump = control_settings.check(ControlCode::MoveUp, &keys);
+    if to_left {
+        actor.0 = ActorFacing::Left;
+    } else if to_right {
+        actor.0 = ActorFacing::Right;
+    }
+    linear_velocity.x = (to_right as i8 - to_left as i8) as Scalar * movement_speed.0;
+    if linear_velocity.y.abs() < 0.1 && jump {
+        linear_velocity.y = 100.0;
     }
 }

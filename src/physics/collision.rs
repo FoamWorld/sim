@@ -1,5 +1,5 @@
 use crate::{
-    control::Actor,
+    character::Actor,
     game::health::{Health, HealthClearedEvent},
 };
 use avian2d::prelude::*;

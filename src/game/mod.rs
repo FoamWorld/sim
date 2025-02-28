@@ -1,4 +1,4 @@
-use crate::{assets::RpgTextures, constants::*, control::*};
+use crate::{assets::RpgTextures, character::*, constants::*, control::*};
 use bevy::prelude::*;
 use item::*;
 

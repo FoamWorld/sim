@@ -1,5 +1,5 @@
 use crate::{
-    control::*,
+    character::*,
     game::{health::*, item::*, object::*},
 };
 use bevy::{prelude::*, tasks::IoTaskPool};
@@ -32,7 +32,6 @@ pub fn save_scene_system(world: &mut World, info: Res<StorageSlotInfo>) {
     let scene = DynamicSceneBuilder::from_world(&world)
         .deny_all()
         .allow_component::<Transform>()
-        .allow_component::<Actor>()
         .allow_component::<Health>()
         .allow_component::<IsObject>()
         .allow_component::<IsItem>()

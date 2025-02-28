@@ -20,6 +20,16 @@ pub struct Inventory;
 #[derive(Component)]
 pub struct IsActive;
 
+#[derive(Reflect)]
+pub enum ActorFacing {
+    Left,
+    Right,
+}
+
+#[derive(Reflect, Component)]
+#[reflect(Component)]
+pub struct Actor(pub ActorFacing);
+
 pub fn setup_character(
     mut commands: Commands,
     // asset_server: Res<AssetServer>,
@@ -47,7 +57,7 @@ pub fn setup_character(
         LockedAxes::ROTATION_LOCKED,
         Mass(70.0),
         MovementSpeed(100.0),
-        Actor,
+        Actor(ActorFacing::Right),
         storage,
     ));
 }
