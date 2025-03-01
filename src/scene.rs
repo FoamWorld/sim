@@ -31,23 +31,25 @@ impl Plugin for RegisteryPlugin {
 pub fn load_scene_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut next_state: ResMut<NextState<StorageState>>,
+    mut next_state: ResMut<NextState<ProcessState>>,
 ) {
-    next_state.set(StorageState::Loading);
+    next_state.set(ProcessState::LoadScene);
     // todo: add transform
     commands
         .spawn(DynamicSceneRoot(asset_server.load("scenes/debug.scn.ron")))
         .observe(
-            |_: Trigger<SceneInstanceReady>,
-             mut change_state: ResMut<NextState<StorageState>>,
-             mut change_state2: ResMut<NextState<LoadingState>>| {
-                change_state.set(StorageState::None);
-                change_state2.set(LoadingState::Processing);
+            |_: Trigger<SceneInstanceReady>, mut change_state: ResMut<NextState<ProcessState>>| {
+                change_state.set(ProcessState::PostLoadScene);
             },
         );
 }
 
-pub fn setup_game(world: &World, mut commands: Commands, query: Query<(Entity, &IsObject)>) {
+pub fn setup_game(
+    world: &World,
+    mut commands: Commands,
+    query: Query<(Entity, &IsObject)>,
+    mut next_state: ResMut<NextState<ProcessState>>,
+) {
     let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
     for (entity, marker) in query.iter() {
         let mut ec = commands.entity(entity);
@@ -59,6 +61,7 @@ pub fn setup_game(world: &World, mut commands: Commands, query: Query<(Entity, &
             AdditionConfig::IN_SCENE,
         );
     }
+    next_state.set(ProcessState::PreEnterGame);
 }
 
 pub fn save_scene_system(world: &mut World) {

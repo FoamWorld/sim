@@ -86,8 +86,8 @@ pub fn start_pause(mut commands: Commands, asset_server: Res<AssetServer>) {
                 },
             ))
             .observe(
-                |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<RunState>>| {
-                    next_state.set(RunState::Running);
+                |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<GameState>>| {
+                    next_state.set(GameState::Running);
                 },
             );
         #[cfg(feature = "devtools")]
@@ -108,8 +108,8 @@ pub fn start_pause(mut commands: Commands, asset_server: Res<AssetServer>) {
                 },
             ))
             .observe(
-                |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<StorageState>>| {
-                    next_state.set(StorageState::Saving);
+                |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<ProcessState>>| {
+                    next_state.set(ProcessState::SaveScene);
                 },
             );
     });

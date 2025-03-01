@@ -6,64 +6,108 @@ use bevy::{asset::*, prelude::*};
 
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AppState {
-    Loading,
+    Initialize,
     Menu,
     InGame,
 }
 
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RunState {
+pub enum GameState {
+    /// locked because it's not ready yet
+    Locked,
     Running,
-    Paused,
-}
-
-#[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StorageState {
-    None,
-    Loading,
-    Saving,
-}
-
-#[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
-pub enum LoadingState {
-    None,
+    Pause,
     Processing,
 }
+
+#[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProcessState {
+    None,
+    LoadScene,
+    PostLoadScene,
+    SaveScene,
+    PreEnterGame,
+}
+
+#[derive(SystemSet, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum InGameSet {
+    /// user input
+    Input,
+    /// treat input
+    PostInput,
+    // game logic
+    Logic,
+}
+
+#[derive(SystemSet, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct ProcessSet;
 
 pub struct AppStatePlugin;
 
 impl Plugin for AppStatePlugin {
     fn build(&self, app: &mut App) {
-        app.insert_state(AppState::Loading)
-            .insert_state(RunState::Running)
-            .insert_state(StorageState::None)
-            .insert_state(LoadingState::None);
+        // Configuration
+        app.insert_state(AppState::Initialize)
+            .insert_state(GameState::Locked)
+            .insert_state(ProcessState::None);
 
-        // while loading
-        app.add_systems(OnEnter(AppState::Loading), load_textures)
-            .add_systems(Update, check_textures.run_if(in_state(AppState::Loading)));
+        app.configure_sets(
+            Update,
+            (
+                InGameSet::PostInput.after(InGameSet::Input),
+                InGameSet::Input,
+                InGameSet::Logic,
+            )
+                .run_if(in_state(GameState::Running))
+                .run_if(in_state(AppState::InGame)),
+        );
+        app.configure_sets(
+            Update,
+            ProcessSet
+                .run_if(in_state(GameState::Locked))
+                .run_if(in_state(AppState::InGame)),
+        );
 
-        // while at menu
+        // AppState::Initialize
+        app.add_systems(Startup, load_textures).add_systems(
+            Update,
+            check_textures.run_if(in_state(AppState::Initialize)),
+        );
+
+        // AppState::Menu
         app.add_systems(OnEnter(AppState::Menu), start_menu)
             .add_systems(OnExit(AppState::Menu), finish_ui);
 
-        // while in game
-        app.add_event::<CrashEvent>()
-            .add_event::<HealthClearedEvent>();
+        // AppState::InGame
         app.init_resource::<SelectedSlot>();
         app.add_systems(
             OnEnter(AppState::InGame),
+            load_scene_system.in_set(ProcessSet),
+        )
+        .add_systems(Update, toggle_pause.in_set(InGameSet::Input));
+
+        app.add_systems(
+            OnEnter(ProcessState::PostLoadScene),
+            setup_game.in_set(ProcessSet),
+        )
+        .add_systems(
+            OnEnter(ProcessState::PreEnterGame),
             (
-                load_scene_system,
                 set_cursor,
-                (setup_character)
-                    .before(setup_attached_image)
-                    .before(setup_inventory),
+                setup_character,
                 setup_attached_image,
                 setup_inventory,
-            ),
+            )
+                .chain()
+                .in_set(ProcessSet),
         );
-        app.add_systems(OnEnter(LoadingState::Processing), setup_game);
+
+        /* app.add_systems(
+            FixedUpdate,
+            (
+                // add game logic here
+            ).in_set(InGameSet::Logic),
+        ); */
 
         app.add_systems(
             PostProcessCollisions,
@@ -71,14 +115,10 @@ impl Plugin for AppStatePlugin {
                 .run_if(in_state(AppState::InGame)),
         );
 
-        app.add_systems(OnEnter(RunState::Paused), enter_pause)
-            .add_systems(OnExit(RunState::Paused), exit_pause)
-            .add_systems(
-                Update,
-                toggle_pause
-                    .run_if(in_state(AppState::InGame))
-                    .run_if(in_state(StorageState::None)),
-            )
+        app.add_event::<CrashEvent>()
+            .add_event::<HealthClearedEvent>();
+        app.add_systems(OnEnter(GameState::Running), exit_pause)
+            .add_systems(OnExit(GameState::Running), enter_pause)
             .add_systems(
                 Update,
                 (read_crash, read_health_cleared).run_if(in_state(AppState::InGame)),
@@ -86,24 +126,19 @@ impl Plugin for AppStatePlugin {
 
         #[cfg(feature = "devtools")]
         app.add_systems(
-            OnEnter(StorageState::Saving),
+            OnEnter(ProcessState::SaveScene),
             crate::scene::save_scene_system,
         );
     }
 }
 
 fn toggle_pause(
-    current_state: ResMut<State<RunState>>,
-    mut next_state: ResMut<NextState<RunState>>,
+    mut next_state: ResMut<NextState<GameState>>,
     keys: Res<ButtonInput<KeyCode>>,
     control_settings: Res<ControlSettings>,
 ) {
     if control_settings.check(ControlCode::Pause, &keys) {
-        let new_state = match current_state.get() {
-            RunState::Paused => RunState::Running,
-            RunState::Running => RunState::Paused,
-        };
-        next_state.set(new_state);
+        next_state.set(GameState::Pause);
     }
 }
 

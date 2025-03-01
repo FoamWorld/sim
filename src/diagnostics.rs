@@ -1,7 +1,4 @@
-use crate::{
-    control::{ControlCode, ControlSettings},
-    physics::camera::*,
-};
+use crate::{control::*, physics::camera::*, state::*};
 use bevy::{
     diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
     prelude::*,
@@ -33,7 +30,8 @@ impl Plugin for DiagnosticsTextPlugin {
                 (
                     toggle_diagnostics_mode,
                     update_diagnostics_text.run_if(in_state(DiagnosticsState::On)),
-                ),
+                )
+                    .in_set(InGameSet::Logic),
             );
     }
 }

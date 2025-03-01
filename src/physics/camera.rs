@@ -1,4 +1,4 @@
-use crate::{character::IsActive, state::AppState};
+use crate::{character::IsActive, state::*};
 use bevy::{prelude::*, window::PrimaryWindow};
 
 #[derive(Component)]
@@ -21,7 +21,7 @@ impl Plugin for PrimaryCameraPlugin {
         });
         app.add_systems(
             Update,
-            (translate_cursor_position, rotate_with_mouse).run_if(in_state(AppState::InGame)),
+            (translate_cursor_position, rotate_with_mouse).in_set(InGameSet::Logic),
         );
     }
 }

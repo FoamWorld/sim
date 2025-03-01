@@ -101,10 +101,11 @@ impl Plugin for ControlPlugin {
                 inputs_wait,
                 inputs_use,
                 inputs_modify,
-                change_facing.after(inputs_move),
+                // add input handling here
             )
-                .run_if(in_state(AppState::InGame).and(in_state(RunState::Running))),
+                .in_set(InGameSet::Input),
         );
+        app.add_systems(Update, change_facing.in_set(InGameSet::PostInput));
     }
 }
 
