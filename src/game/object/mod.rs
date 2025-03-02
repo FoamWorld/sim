@@ -164,8 +164,9 @@ impl<'de> DeserializeWithRegistry<'de> for IsObject {
             }
 
             fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
-                where
-                    E: serde::de::Error, {
+            where
+                E: serde::de::Error,
+            {
                 let registeration = self.registry.get_with_type_path(v).unwrap();
                 let id = registeration.type_id();
                 Ok(id)
@@ -209,11 +210,11 @@ impl Object for Barrier {
 #[derive(Reflect, Component, Clone)]
 #[reflect(Object, Component)]
 #[type_path = "sim::object"]
-pub struct NonUnique(pub String);
+pub struct NonUnique(pub String, pub Option<usize>);
 
 impl Object for NonUnique {
     fn texture_info(&self) -> Option<(&str, Option<usize>)> {
-        Some((self.0.as_str(), None))
+        Some((self.0.as_str(), self.1))
     }
 }
 

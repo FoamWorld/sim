@@ -13,4 +13,4 @@ pub const CHARACTER_LAYER: Scalar = 10.0;
 pub const CHARACTER_X_LENGTH: Scalar = 24.0;
 pub const CHARACTER_Y_LENGTH: Scalar = 48.0;
 pub const CHARACTER_HOLD_OFFSET: Scalar = 1.0;
-pub const CHARACTER_LEFT_HAND_OFFSET: Vec2 = Vec2::new(9.0, -6.0);
+pub const CHARACTER_LEFT_HAND_OFFSET: Vec2 = Vec2::new(11.0, -6.0);
