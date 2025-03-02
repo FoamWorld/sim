@@ -9,10 +9,68 @@ use std::{fs::File, io::Write};
 #[derive(Resource)]
 pub struct StorageSlotInfo(pub String);
 
+#[derive(SystemSet, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct ProcessSet;
+
+#[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProcessState {
+    None,
+    LoadScene,
+    PostLoadScene,
+    PreEnterGame,
+    PreSaveScene,
+}
+
 pub struct RegisteryPlugin;
 
 impl Plugin for RegisteryPlugin {
     fn build(&self, app: &mut App) {
+        app.insert_state(ProcessState::None);
+
+        app.configure_sets(
+            Update,
+            ProcessSet
+                .run_if(in_state(GameState::Locked))
+                .run_if(in_state(AppState::InGame)),
+        );
+
+        app.add_systems(
+            OnEnter(AppState::InGame),
+            load_scene_system.in_set(ProcessSet),
+        );
+
+        app.add_systems(
+            OnEnter(ProcessState::PostLoadScene),
+            (
+                process_loaded_scene,
+                |mut next_state: ResMut<NextState<ProcessState>>| {
+                    next_state.set(ProcessState::PreEnterGame);
+                },
+            )
+                .chain()
+                .in_set(ProcessSet),
+        );
+
+        app.add_systems(
+            OnEnter(ProcessState::PreEnterGame),
+            (
+                setup_character,
+                setup_attached_image,
+                setup_inventory,
+                |mut next_state: ResMut<NextState<GameState>>| {
+                    next_state.set(GameState::Running);
+                },
+            )
+                .chain()
+                .in_set(ProcessSet),
+        );
+
+        #[cfg(feature = "devtools")]
+        app.add_systems(
+            OnEnter(ProcessState::PreSaveScene),
+            save_scene_system,
+        );
+
         app.insert_resource(StorageSlotInfo("slot1".to_string()));
         app.register_type::<Actor>()
             .register_type::<Health>()
@@ -38,17 +96,16 @@ pub fn load_scene_system(
     commands
         .spawn(DynamicSceneRoot(asset_server.load("scenes/debug.scn.ron")))
         .observe(
-            |_: Trigger<SceneInstanceReady>, mut change_state: ResMut<NextState<ProcessState>>| {
-                change_state.set(ProcessState::PostLoadScene);
+            |_: Trigger<SceneInstanceReady>, mut next_state: ResMut<NextState<ProcessState>>| {
+                next_state.set(ProcessState::PostLoadScene);
             },
         );
 }
 
-pub fn setup_game(
+pub fn process_loaded_scene(
     world: &World,
     mut commands: Commands,
     query: Query<(Entity, &IsObject)>,
-    mut next_state: ResMut<NextState<ProcessState>>,
 ) {
     let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
     for (entity, marker) in query.iter() {
@@ -61,7 +118,6 @@ pub fn setup_game(
             AdditionConfig::IN_SCENE,
         );
     }
-    next_state.set(ProcessState::PreEnterGame);
 }
 
 pub fn save_scene_system(world: &mut World) {

@@ -1,6 +1,4 @@
-use crate::{
-    assets::*, character::*, control::*, game::health::*, physics::collision::*, scene::*, ui::*,
-};
+use crate::{assets::*, character::*, control::*, game::health::*, physics::collision::*, ui::*};
 use avian2d::prelude::*;
 use bevy::{asset::*, prelude::*};
 
@@ -20,15 +18,6 @@ pub enum GameState {
     Processing,
 }
 
-#[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProcessState {
-    None,
-    LoadScene,
-    PostLoadScene,
-    SaveScene,
-    PreEnterGame,
-}
-
 #[derive(SystemSet, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum InGameSet {
     /// user input
@@ -39,17 +28,13 @@ pub enum InGameSet {
     Logic,
 }
 
-#[derive(SystemSet, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct ProcessSet;
-
 pub struct AppStatePlugin;
 
 impl Plugin for AppStatePlugin {
     fn build(&self, app: &mut App) {
         // Configuration
         app.insert_state(AppState::Initialize)
-            .insert_state(GameState::Locked)
-            .insert_state(ProcessState::None);
+            .insert_state(GameState::Locked);
 
         app.configure_sets(
             Update,
@@ -61,18 +46,13 @@ impl Plugin for AppStatePlugin {
                 .run_if(in_state(GameState::Running))
                 .run_if(in_state(AppState::InGame)),
         );
-        app.configure_sets(
-            Update,
-            ProcessSet
-                .run_if(in_state(GameState::Locked))
-                .run_if(in_state(AppState::InGame)),
-        );
 
         // AppState::Initialize
-        app.add_systems(Startup, load_textures).add_systems(
-            Update,
-            check_textures.run_if(in_state(AppState::Initialize)),
-        );
+        app.add_systems(Startup, (load_textures, set_cursor))
+            .add_systems(
+                Update,
+                check_textures.run_if(in_state(AppState::Initialize)),
+            );
 
         // AppState::Menu
         app.add_systems(OnEnter(AppState::Menu), start_menu)
@@ -80,27 +60,7 @@ impl Plugin for AppStatePlugin {
 
         // AppState::InGame
         app.init_resource::<SelectedSlot>();
-        app.add_systems(
-            OnEnter(AppState::InGame),
-            load_scene_system.in_set(ProcessSet),
-        )
-        .add_systems(Update, toggle_pause.in_set(InGameSet::Input));
-
-        app.add_systems(
-            OnEnter(ProcessState::PostLoadScene),
-            setup_game.in_set(ProcessSet),
-        )
-        .add_systems(
-            OnEnter(ProcessState::PreEnterGame),
-            (
-                set_cursor,
-                setup_character,
-                setup_attached_image,
-                setup_inventory,
-            )
-                .chain()
-                .in_set(ProcessSet),
-        );
+        app.add_systems(Update, toggle_pause.in_set(InGameSet::Input));
 
         /* app.add_systems(
             FixedUpdate,
@@ -123,12 +83,6 @@ impl Plugin for AppStatePlugin {
                 Update,
                 (read_crash, read_health_cleared).run_if(in_state(AppState::InGame)),
             );
-
-        #[cfg(feature = "devtools")]
-        app.add_systems(
-            OnEnter(ProcessState::SaveScene),
-            crate::scene::save_scene_system,
-        );
     }
 }
 

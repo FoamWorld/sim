@@ -1,4 +1,4 @@
-use crate::{constants::PROJECT_TITLE, state::*};
+use crate::{constants::PROJECT_TITLE, scene::*, state::*};
 use bevy::{
     prelude::*,
     window::{PrimaryWindow, SystemCursorIcon},
@@ -109,7 +109,7 @@ pub fn start_pause(mut commands: Commands, asset_server: Res<AssetServer>) {
             ))
             .observe(
                 |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<ProcessState>>| {
-                    next_state.set(ProcessState::SaveScene);
+                    next_state.set(ProcessState::PreSaveScene);
                 },
             );
     });
