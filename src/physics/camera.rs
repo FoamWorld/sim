@@ -1,30 +1,8 @@
-use crate::{character::IsActive, state::*};
+use crate::character::IsActive;
 use bevy::{prelude::*, window::PrimaryWindow};
 
 #[derive(Component)]
 pub struct PrimaryCamera;
-
-pub struct PrimaryCameraPlugin;
-impl Plugin for PrimaryCameraPlugin {
-    fn build(&self, app: &mut App) {
-        app.init_resource::<CursorCoords>();
-        app.add_systems(Startup, |mut commands: Commands| {
-            commands.spawn((
-                Camera {
-                    // hdr: true,
-                    clear_color: ClearColorConfig::Custom(Color::srgb(0.0, 0.0, 0.0)),
-                    ..default()
-                },
-                Camera2d,
-                PrimaryCamera,
-            ));
-        });
-        app.add_systems(
-            Update,
-            (translate_cursor_position, rotate_with_mouse).in_set(InGameSet::Logic),
-        );
-    }
-}
 
 #[derive(Resource, Default)]
 pub struct CursorCoords(pub Option<Vec2>);

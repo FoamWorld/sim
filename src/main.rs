@@ -48,7 +48,7 @@ fn main() {
         state::AppStatePlugin,
         diagnostics::DiagnosticsTextPlugin,
         control::ControlPlugin,
-        physics::camera::PrimaryCameraPlugin,
+        physics::GamePhysicsPlugin,
         message::MessagePlugin,
         scene::RegisteryPlugin,
     ));
