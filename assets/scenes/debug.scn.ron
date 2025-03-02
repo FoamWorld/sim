@@ -24,8 +24,8 @@
         ),
         "sim::core::IsObject": "sim::object::NonUnique",
         "sim::object::NonUnique": (
-          "hint1",
-          None,
+          "hints",
+          Some(0),
         ),
       }
     )
