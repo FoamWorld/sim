@@ -1,4 +1,4 @@
-use crate::{assets::*, character::*, control::*, game::health::*, physics::collision::*, ui::*};
+use crate::{assets::*, character::*, control::*, game::mob::health::*, physics::collision::*, ui::*};
 use avian2d::prelude::*;
 use bevy::{asset::*, prelude::*};
 

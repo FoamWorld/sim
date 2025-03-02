@@ -1,6 +1,6 @@
 use crate::{
     character::*,
-    game::{health::*, item::*, object::*},
+    game::{item::*, mob::*, object::*},
     state::*,
 };
 use bevy::{prelude::*, scene::*, tasks::IoTaskPool};
@@ -66,14 +66,10 @@ impl Plugin for RegisteryPlugin {
         );
 
         #[cfg(feature = "devtools")]
-        app.add_systems(
-            OnEnter(ProcessState::PreSaveScene),
-            save_scene_system,
-        );
+        app.add_systems(OnEnter(ProcessState::PreSaveScene), save_scene_system);
 
         app.insert_resource(StorageSlotInfo("slot1".to_string()));
         app.register_type::<Actor>()
-            .register_type::<Health>()
             .register_type::<ItemStorage>()
             // objects
             .register_type::<IsObject>()
@@ -82,7 +78,9 @@ impl Plugin for RegisteryPlugin {
             // items
             .register_type::<IsItem>()
             .register_type::<sign::Sign>()
-            .register_type::<debug_wand::DebugWand>();
+            .register_type::<debug_wand::DebugWand>()
+            // mobs
+            .register_type::<health::Health>();
     }
 }
 
@@ -125,8 +123,8 @@ pub fn save_scene_system(world: &mut World) {
         let mut query = world.query_filtered::<Entity, With<IsObject>>();
         let scene_builder = DynamicSceneBuilder::from_world(&world)
             .deny_all()
+            // core
             .allow_component::<Transform>()
-            .allow_component::<Health>()
             // objects
             .allow_component::<IsObject>()
             .allow_component::<Barrier>()
@@ -134,7 +132,9 @@ pub fn save_scene_system(world: &mut World) {
             // items
             .allow_component::<IsItem>()
             .allow_component::<ItemStorage>()
-            .allow_component::<debug_wand::DebugWand>();
+            .allow_component::<debug_wand::DebugWand>()
+            // mobs
+            .allow_component::<health::Health>();
         scene_builder.extract_entities(query.iter(&world)).build()
     };
 

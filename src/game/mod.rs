@@ -2,8 +2,8 @@ use crate::{assets::RpgTextures, character::*, constants::*, control::*};
 use bevy::prelude::*;
 use item::*;
 
-pub mod health;
 pub mod item;
+pub mod mob;
 pub mod object;
 
 pub fn inputs_use(

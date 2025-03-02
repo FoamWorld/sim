@@ -1,6 +1,6 @@
 use crate::{
     character::Actor,
-    game::health::{Health, HealthClearedEvent},
+    game::mob::health::{Health, HealthClearedEvent},
 };
 use avian2d::prelude::*;
 use bevy::prelude::*;

@@ -54,7 +54,7 @@ impl Item for DebugWand {
             LinearVelocity(unit * 40.0),
             Mass(1.0),
             GravityScale(0.01),
-            crate::game::health::Health::fragile(),
+            crate::game::mob::health::Health::fragile(),
         ));
     }
     fn check_can_modify(&self) -> bool {
