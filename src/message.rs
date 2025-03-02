@@ -1,13 +1,27 @@
-use crate::{game::object::sign::Sign, physics::collision::*, state::AppState};
+use crate::{game::object::sign::Sign, physics::collision::*, state::*};
 use bevy::prelude::*;
+
+#[derive(Event)]
+pub struct MessageEvent {
+    message: String,
+}
+
+impl MessageEvent {
+    pub fn info(str: &str) -> Self {
+        Self {
+            message: str.to_string(),
+        }
+    }
+}
 
 pub struct MessagePlugin;
 
 impl Plugin for MessagePlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<TouchEvent>();
+        app.add_event::<MessageEvent>();
         app.add_systems(Startup, init_info_text);
         app.add_systems(Update, read_touch_sign.run_if(in_state(AppState::InGame)));
+        app.add_systems(Update, read_message_event.in_set(InGameSet::Logic));
     }
 }
 
@@ -33,7 +47,6 @@ fn init_info_text(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 }
 
-// todo: add duration
 fn read_touch_sign(
     mut reader: EventReader<TouchEvent>,
     mut query_text: Query<&mut Text, With<InfoText>>,
@@ -47,5 +60,17 @@ fn read_touch_sign(
                 text.0 = sign.message.clone();
             }
         }
+    }
+}
+
+// todo: add duration
+fn read_message_event(
+    mut reader: EventReader<MessageEvent>,
+    mut query_text: Query<&mut Text, With<InfoText>>,
+) {
+    for ev in reader.read() {
+        let mut text = query_text.single_mut();
+        // todo: move
+        text.0 = ev.message.clone();
     }
 }
