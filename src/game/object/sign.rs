@@ -4,12 +4,11 @@ use crate::game::object::Object;
 #[derive(Reflect, Component, Clone)]
 #[reflect(Object, Component)]
 #[type_path = "sim::object"]
-pub struct Sign {
+pub struct SignStand {
     pub mode: usize,
-    pub message: String,
 }
 
-impl Object for Sign {
+impl Object for SignStand {
     fn texture_info(&self) -> Option<(&str, Option<usize>)> {
         Some(("sign", Some(self.mode)))
     }

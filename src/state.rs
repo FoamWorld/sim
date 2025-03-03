@@ -26,6 +26,8 @@ pub enum InGameSet {
     PostInput,
     // game logic
     Logic,
+    // ui update
+    Ui,
 }
 
 pub struct AppStatePlugin;
@@ -42,6 +44,7 @@ impl Plugin for AppStatePlugin {
                 InGameSet::PostInput.after(InGameSet::Input),
                 InGameSet::Input,
                 InGameSet::Logic,
+                InGameSet::Ui,
             )
                 .run_if(in_state(GameState::Running))
                 .run_if(in_state(AppState::InGame)),

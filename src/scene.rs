@@ -1,6 +1,7 @@
 use crate::{
     character::*,
     game::{item::*, mob::*, object::*},
+    physics::collision::*,
     state::*,
 };
 use bevy::{prelude::*, scene::*, tasks::IoTaskPool};
@@ -69,15 +70,19 @@ impl Plugin for RegisteryPlugin {
         app.add_systems(OnEnter(ProcessState::PreSaveScene), save_scene_system);
 
         app.insert_resource(StorageSlotInfo("slot1".to_string()));
-        app.register_type::<Actor>()
+        app
+            // core
+            // utils
+            .register_type::<Actor>()
             .register_type::<ItemStorage>()
+            .register_type::<Sign>()
             // objects
             .register_type::<IsObject>()
             .register_type::<Barrier>()
             .register_type::<NonUnique>()
+            .register_type::<sign::SignStand>()
             // items
             .register_type::<IsItem>()
-            .register_type::<sign::Sign>()
             .register_type::<debug_wand::DebugWand>()
             // mobs
             .register_type::<health::Health>();
@@ -125,10 +130,13 @@ pub fn save_scene_system(world: &mut World) {
             .deny_all()
             // core
             .allow_component::<Transform>()
+            // utils
+            .allow_component::<Sign>()
             // objects
             .allow_component::<IsObject>()
             .allow_component::<Barrier>()
             .allow_component::<NonUnique>()
+            .allow_component::<sign::SignStand>()
             // items
             .allow_component::<IsItem>()
             .allow_component::<ItemStorage>()

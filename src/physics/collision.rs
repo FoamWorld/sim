@@ -1,6 +1,7 @@
 use crate::{
     character::Actor,
     game::mob::health::{Health, HealthClearedEvent},
+    message::MessageEvent,
 };
 use avian2d::prelude::*;
 use bevy::prelude::*;
@@ -62,3 +63,24 @@ pub fn touch_detection(
         false
     });
 }
+
+#[derive(Reflect, Component)]
+#[reflect(Component)]
+#[type_path = "sim::utils"]
+pub struct Sign(pub String);
+
+pub fn read_touch_sign(
+    mut reader: EventReader<TouchEvent>,
+    mut writer: EventWriter<MessageEvent>,
+    query_sign: Query<&Sign>,
+) {
+    for ev in reader.read() {
+        let result = query_sign.get(ev.0);
+        if result.is_ok() {
+            let sign = result.unwrap();
+            writer.send(MessageEvent::info(sign.0.as_str()));
+        }
+    }
+}
+
+pub struct Portal;
