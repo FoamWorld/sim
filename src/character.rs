@@ -48,7 +48,7 @@ pub fn setup_character(
             .id()
     };
 
-    let mut storage = ItemStorage::with_capacity(2);
+    let mut storage = ItemStorage::with_capacity(4);
     storage.force_give(&mut commands, launcher);
 
     commands.spawn((
