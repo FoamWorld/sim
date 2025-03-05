@@ -31,10 +31,11 @@ pub fn read_crash(
 ) {
     for crash in reader.read() {
         let sufferer = crash.0;
-        let mut health = q_h.get_mut(sufferer).unwrap();
-        health.shift(-1.0);
-        if !health.is_alive() {
-            writer.send(HealthClearedEvent(sufferer));
+        if let Ok(mut health) = q_h.get_mut(sufferer) {
+            health.shift(-1.0);
+            if !health.is_alive() {
+                writer.send(HealthClearedEvent(sufferer));
+            }
         }
     }
 }
@@ -49,6 +50,18 @@ pub fn touch_detection(
     mut writer: EventWriter<TouchEvent>,
 ) {
     collisions.retain(|contacts| {
+        // Already collided.
+        let any_penetrating = contacts.manifolds.iter().any(|manifold| {
+            manifold
+                .contacts
+                .iter()
+                .any(|contact| contact.penetration > 0.0)
+        });
+        if any_penetrating {
+            return true;
+        }
+
+        // Check touch.
         let (pillow, other_entity) = if let Ok(pillow) = query_pillow.get_mut(contacts.entity1) {
             (pillow, contacts.entity2)
         } else if let Ok(pillow) = query_pillow.get_mut(contacts.entity2) {
