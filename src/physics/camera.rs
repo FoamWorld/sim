@@ -7,6 +7,15 @@ pub struct PrimaryCamera;
 #[derive(Resource, Default)]
 pub struct CursorCoords(pub Option<Vec2>);
 
+#[derive(Resource, Reflect)]
+#[reflect(Resource)]
+pub struct CameraMoveConfig {
+    // (?) todo: move with cursor
+    /// Whether camera follows player position.
+    pub follow_actor: bool,
+    pub with_offset: Vec2,
+}
+
 pub fn translate_cursor_position(
     mut coords: ResMut<CursorCoords>,
     q_window: Query<&Window, With<PrimaryWindow>>,

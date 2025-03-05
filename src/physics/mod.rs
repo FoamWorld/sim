@@ -10,7 +10,11 @@ pub struct GamePhysicsPlugin;
 
 impl Plugin for GamePhysicsPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<CursorCoords>();
+        app.init_resource::<CursorCoords>()
+            .insert_resource(CameraMoveConfig {
+                follow_actor: false,
+                with_offset: Vec2::new(0.0, 0.0),
+            });
         app.add_event::<TouchEvent>();
 
         app.add_systems(Startup, |mut commands: Commands| {
