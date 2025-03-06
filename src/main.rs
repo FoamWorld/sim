@@ -19,6 +19,7 @@ mod message;
 mod physics;
 mod scene;
 mod state;
+mod statistics;
 mod ui;
 
 mod constants;
@@ -51,6 +52,7 @@ fn main() {
         physics::GamePhysicsPlugin,
         message::MessagePlugin,
         scene::RegisteryPlugin,
+        statistics::StatisticsPlugin,
     ));
     app.insert_resource(Gravity(Vec2::NEG_Y * 628.0));
     app.run();
