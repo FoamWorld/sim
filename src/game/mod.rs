@@ -9,6 +9,16 @@ impl Plugin for GamePlugin {
         app.add_event::<mob::health::HealthClearedEvent>();
 
         app.add_systems(
+            Update,
+            (
+                inputs_use,
+                inputs_modify,
+                // add input handling here
+            )
+                .in_set(InGameSet::Input),
+        );
+
+        app.add_systems(
             FixedUpdate,
             mob::health::read_health_cleared.run_if(in_state(AppState::InGame)),
         );

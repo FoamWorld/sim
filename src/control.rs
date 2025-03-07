@@ -1,4 +1,4 @@
-use crate::{character::*, game::*, state::*};
+use crate::{character::*, state::*};
 use avian2d::{math::*, prelude::*};
 use bevy::prelude::*;
 use std::collections::HashMap;
@@ -94,17 +94,7 @@ pub struct ControlPlugin;
 impl Plugin for ControlPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<ControlSettings>();
-        app.add_systems(
-            Update,
-            (
-                inputs_move,
-                inputs_wait,
-                inputs_use,
-                inputs_modify,
-                // add input handling here
-            )
-                .in_set(InGameSet::Input),
-        );
+        app.add_systems(Update, (inputs_move, inputs_wait).in_set(InGameSet::Input));
         app.add_systems(Update, change_facing.in_set(InGameSet::PostInput));
     }
 }
