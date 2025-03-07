@@ -5,7 +5,7 @@ use std::collections::HashMap;
 #[derive(Resource, Clone)]
 pub struct RpgTextures {
     pub folder: Handle<LoadedFolder>,
-    pub dictionary: HashMap<String, Option<(u32, u32, u32)>>,
+    pub dictionary: HashMap<String, Option<(u32, u32, u32, u32)>>,
     pub named_images: HashMap<String, Handle<Image>>,
     pub named_atlases_layout: HashMap<String, Handle<TextureAtlasLayout>>,
 }
@@ -13,7 +13,7 @@ pub struct RpgTextures {
 impl RpgTextures {
     fn new(
         folder: Handle<LoadedFolder>,
-        dictionary: HashMap<String, Option<(u32, u32, u32)>>,
+        dictionary: HashMap<String, Option<(u32, u32, u32, u32)>>,
     ) -> Self {
         Self {
             folder,
@@ -49,9 +49,14 @@ impl RpgTextures {
             // Inserts.
             self.named_images.insert(string.clone(), texture);
             if let Some(tuple) = self.dictionary.get(&string).unwrap() {
-                let (size, columns, rows) = tuple;
-                let texture_atlas_layout =
-                    TextureAtlasLayout::from_grid(UVec2::splat(*size), *columns, *rows, None, None);
+                let (width, length, columns, rows) = tuple;
+                let texture_atlas_layout = TextureAtlasLayout::from_grid(
+                    UVec2::new(*width, *length),
+                    *columns,
+                    *rows,
+                    None,
+                    None,
+                );
                 self.named_atlases_layout
                     .insert(string.clone(), texture_atlases.add(texture_atlas_layout));
             } else {
@@ -73,13 +78,14 @@ impl RpgTextures {
 }
 
 pub fn load_textures(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let list: Vec<(String, Option<(u32, u32, u32)>)> = vec![
+    let list: Vec<(String, Option<(u32, u32, u32, u32)>)> = vec![
         // todo: add "notexture" fallback
         ("character".into(), None),
-        ("sign".into(), Some((32, 3, 5))),
-        ("spells".into(), Some((16, 4, 1))),
-        ("items".into(), Some((16, 3, 1))),
-        ("hints".into(), Some((13, 6, 5))),
+        ("door".into(), Some((16, 32, 2, 2))),
+        ("sign".into(), Some((32, 32, 3, 5))),
+        ("spells".into(), Some((16, 16, 4, 1))),
+        ("items".into(), Some((16, 16, 3, 1))),
+        ("hints".into(), Some((13, 13, 6, 5))),
     ];
     commands.insert_resource(RpgTextures::new(
         asset_server.load_folder("textures"),

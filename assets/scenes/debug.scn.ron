@@ -18,7 +18,7 @@
     4294967297: (
       components: {
         "bevy_transform::components::transform::Transform": (
-          translation: (-80.0, -120.0, 0.0),
+          translation: (-80.0, -120.0, -1.0),
           rotation: (0.0, 0.0, -0.0, 1.0),
           scale: (2.0, 2.0, 1.0),
         ),
@@ -32,7 +32,7 @@
     4294967298: (
       components: {
         "bevy_transform::components::transform::Transform": (
-          translation: (80.0, -138.5, 0.0),
+          translation: (80.0, -130, -1.0),
           rotation: (0.0, 0.0, -0.0, 1.0),
           scale: (1.0, 1.0, 1.0),
         ),
@@ -40,6 +40,19 @@
         "sim::object::SignStand": (1),
         "sim::utils::Sign": ("Message test.")
       }
-    )
+    ),
+    4294967299: (
+      components: {
+        "bevy_transform::components::transform::Transform": (
+          translation: (40.0, -120, -1.0),
+          rotation: (0.0, 0.0, -0.0, 1.0),
+          scale: (2.0, 2.0, 1.0),
+        ),
+        "sim::core::IsObject": "sim::object::Door",
+        "sim::object::Door": (
+          is_open: false,
+        ),
+      }
+    ),
   },
 )

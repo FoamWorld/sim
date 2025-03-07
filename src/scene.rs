@@ -80,6 +80,7 @@ impl Plugin for RegisteryPlugin {
             .register_type::<Barrier>()
             .register_type::<NonUnique>()
             .register_type::<sign::SignStand>()
+            .register_type::<door::Door>()
             // items
             .register_type::<IsItem>()
             .register_type::<debug_wand::DebugWand>()
@@ -136,6 +137,7 @@ pub fn save_scene_system(world: &mut World) {
             .allow_component::<Barrier>()
             .allow_component::<NonUnique>()
             .allow_component::<sign::SignStand>()
+            .allow_component::<door::Door>()
             // items
             .allow_component::<IsItem>()
             .allow_component::<ItemStorage>()
