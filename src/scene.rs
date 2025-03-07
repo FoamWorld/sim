@@ -66,7 +66,6 @@ impl Plugin for RegisteryPlugin {
                 .in_set(ProcessSet),
         );
 
-        #[cfg(feature = "devtools")]
         app.add_systems(OnEnter(ProcessState::PreSaveScene), save_scene_system);
 
         app.insert_resource(StorageSlotInfo("slot1".to_string()));

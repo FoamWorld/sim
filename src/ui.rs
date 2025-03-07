@@ -90,11 +90,10 @@ pub fn start_pause(mut commands: Commands, asset_server: Res<AssetServer>) {
                     next_state.set(GameState::Running);
                 },
             );
-        #[cfg(feature = "devtools")]
         parent
             .spawn((
                 Button,
-                Text::new("save scene"),
+                Text::new("save"),
                 TextFont {
                     // open sans, weight: 300
                     font: asset_server.load("fonts/open-sans.regular.ttf"),
