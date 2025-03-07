@@ -185,6 +185,7 @@ impl<'de> DeserializeWithRegistry<'de> for IsObject {
 #[reflect(Object, Component)]
 #[type_path = "sim::object"]
 pub struct Barrier {
+    // todo: material
     pub x_length: Scalar,
     pub y_length: Scalar,
 }
@@ -218,4 +219,5 @@ impl Object for NonUnique {
     }
 }
 
+pub mod door;
 pub mod sign;
