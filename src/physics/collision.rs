@@ -6,6 +6,9 @@ use crate::{
 use avian2d::prelude::*;
 use bevy::prelude::*;
 
+#[derive(Component)]
+pub struct BackgroundLevel;
+
 #[derive(Event)]
 pub struct CrashEvent(pub Entity, pub Entity);
 
@@ -45,7 +48,7 @@ pub struct TouchEvent(pub Entity);
 
 pub fn touch_detection(
     mut query_player: Query<Entity, (With<Actor>, With<RigidBody>)>,
-    mut query_pillow: Query<Entity, (With<RigidBody>, With<RigidBodyDisabled>)>,
+    mut query_pillow: Query<Entity, (With<RigidBody>, With<BackgroundLevel>)>,
     mut collisions: ResMut<Collisions>,
     mut writer: EventWriter<TouchEvent>,
 ) {

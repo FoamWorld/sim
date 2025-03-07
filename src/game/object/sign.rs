@@ -1,5 +1,5 @@
 use super::*;
-use crate::game::object::Object;
+use crate::{game::object::Object, physics::collision::BackgroundLevel};
 
 #[derive(Reflect, Component, Clone)]
 #[reflect(Object, Component)]
@@ -13,6 +13,7 @@ impl Object for SignStand {
 
     fn add_physics_components(&self, commands: &mut EntityCommands) {
         commands.insert((
+            BackgroundLevel,
             RigidBody::Dynamic,
             RigidBodyDisabled,
             Collider::rectangle(28.0, 26.0),
