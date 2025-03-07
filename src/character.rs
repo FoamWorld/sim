@@ -69,7 +69,7 @@ pub fn setup_character(
 }
 
 pub fn setup_inventory(mut commands: Commands, world: &World, actors: Query<Entity, With<Actor>>) {
-    let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
+    let type_registry = world.resource::<AppTypeRegistry>();
     let actor = actors.single();
     let storage = world.entity(actor).get::<ItemStorage>().unwrap();
     let size = storage.size();
@@ -116,7 +116,7 @@ pub fn setup_attached_image(
 ) {
     let actor = actors.single();
     let storage = q_st.get(actor).unwrap();
-    let chosen = world.get_resource::<SelectedSlot>().unwrap().0;
+    let chosen = world.resource::<SelectedSlot>().0;
     if let Some(item) = storage.get_index(chosen) {
         commands
             .entity(actor)
@@ -132,7 +132,7 @@ pub fn setup_item_sprite(
     parent: &mut ChildBuilder,
     q_obj: Query<&IsObject>,
 ) {
-    let registry = world.get_resource::<AppTypeRegistry>().unwrap();
+    let registry = world.resource::<AppTypeRegistry>();
     let it = q_obj.get(item).unwrap();
     let mut ec = parent.spawn((
         Transform::from_translation(CHARACTER_LEFT_HAND_OFFSET.extend(CHARACTER_HOLD_OFFSET)),

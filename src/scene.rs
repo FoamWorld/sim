@@ -110,7 +110,7 @@ pub fn process_loaded_scene(
     mut commands: Commands,
     query: Query<(Entity, &IsObject)>,
 ) {
-    let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
+    let type_registry = world.resource::<AppTypeRegistry>();
     for (entity, marker) in query.iter() {
         let mut ec = commands.entity(entity);
         marker.add_components(
@@ -147,11 +147,11 @@ pub fn save_scene_system(world: &mut World) {
         scene_builder.extract_entities(query.iter(&world)).build()
     };
 
-    let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
+    let type_registry = world.resource::<AppTypeRegistry>();
     let binding = type_registry.read();
     let serialized_scene = scene.serialize(&binding).unwrap();
 
-    let info = world.get_resource::<StorageSlotInfo>().unwrap();
+    let info = world.resource::<StorageSlotInfo>();
 
     let dist = "saved/".to_string() + info.0.as_str() + "/scenes/1.scn.ron";
 

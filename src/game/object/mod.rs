@@ -125,7 +125,7 @@ impl IsObject {
             obj.add_physics_components(ec);
         }
         if let Some(visual_type) = config.visual {
-            let rpg_folder = world.get_resource::<RpgTextures>().unwrap();
+            let rpg_folder = world.resource::<RpgTextures>();
             obj.add_visual_components(ec, rpg_folder, visual_type);
         }
         if config.extra {

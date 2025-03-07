@@ -15,6 +15,7 @@ pub enum ControlCode {
     MoveDown,
     Use,
     Modify,
+    Throw,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -67,6 +68,10 @@ impl Default for ControlSettings {
                 ControlCode::Modify,
                 InputDetectionType::JustPressed(KeyCode::KeyI),
             ),
+            (
+                ControlCode::Throw,
+                InputDetectionType::JustPressed(KeyCode::KeyQ),
+            )
         ];
         let map: HashMap<_, _> = list.into_iter().collect();
         Self(map)
@@ -75,7 +80,7 @@ impl Default for ControlSettings {
 
 impl ControlSettings {
     /// May support combined key inputs in the future.
-    pub fn check(&self, control_code: ControlCode, input: &Res<ButtonInput<KeyCode>>) -> bool {
+    pub fn check(&self, control_code: ControlCode, input: &ButtonInput<KeyCode>) -> bool {
         if let Some(key_code) = self.0.get(&control_code) {
             match *key_code {
                 InputDetectionType::Pressed(x) => input.pressed(x),
