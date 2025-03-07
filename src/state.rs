@@ -6,6 +6,7 @@ use bevy::{asset::*, prelude::*};
 pub enum AppState {
     Initialize,
     Menu,
+    ModeSelection,
     InGame,
 }
 
@@ -61,6 +62,10 @@ impl Plugin for AppStatePlugin {
         app.add_systems(OnEnter(AppState::Menu), start_menu)
             .add_systems(OnExit(AppState::Menu), finish_ui);
 
+        // AppState::ModeSelection
+        app.add_systems(OnEnter(AppState::ModeSelection), start_mode_selection)
+            .add_systems(OnExit(AppState::ModeSelection), finish_ui);
+
         // AppState::InGame
         app.init_resource::<SelectedSlot>();
         app.add_systems(Update, toggle_pause.in_set(InGameSet::Input));
@@ -111,7 +116,7 @@ fn enter_pause(
 fn exit_pause(
     commands: Commands,
     mut time: ResMut<Time<Physics>>,
-    query: Query<Entity, With<WillDestroy>>,
+    query: Query<Entity, With<UiOnce>>,
 ) {
     time.unpause();
     finish_ui(commands, query);
