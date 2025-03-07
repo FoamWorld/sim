@@ -1,4 +1,4 @@
-use crate::{assets::*, character::*, control::*, game::mob::health::*, physics::collision::*, ui::*};
+use crate::{assets::*, character::*, control::*, ui::*};
 use avian2d::prelude::*;
 use bevy::{asset::*, prelude::*};
 
@@ -77,20 +77,8 @@ impl Plugin for AppStatePlugin {
             ).in_set(InGameSet::Logic),
         ); */
 
-        app.add_systems(
-            PostProcessCollisions,
-            (touch_detection.before(crash_detection), crash_detection)
-                .run_if(in_state(AppState::InGame)),
-        );
-
-        app.add_event::<CrashEvent>()
-            .add_event::<HealthClearedEvent>();
         app.add_systems(OnEnter(GameState::Running), exit_pause)
-            .add_systems(OnExit(GameState::Running), enter_pause)
-            .add_systems(
-                Update,
-                (read_crash, read_health_cleared).run_if(in_state(AppState::InGame)),
-            );
+            .add_systems(OnExit(GameState::Running), enter_pause);
     }
 }
 

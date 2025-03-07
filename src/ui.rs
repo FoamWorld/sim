@@ -5,6 +5,10 @@ use bevy::{
     winit::cursor::CursorIcon,
 };
 
+const UI_CLEAR_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
+const UI_CLOTH_COLOR: Color = Color::srgba(1.0, 1.0, 1.0, 0.75);
+const UI_TEXT_COLOR: Color = Color::srgb(0.73, 0.49, 0.17);
+
 #[derive(Component)]
 pub struct UiOnce;
 
@@ -22,7 +26,7 @@ pub fn set_cursor(mut commands: Commands, q_window: Query<Entity, With<PrimaryWi
 pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
     with_background(
         &mut commands,
-        Color::srgb(0.9, 0.9, 0.9),
+        UI_CLEAR_COLOR,
         |parent: &mut ChildBuilder<'_>| {
             parent.spawn((
                 Text::new(PROJECT_TITLE),
@@ -44,7 +48,7 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                         font_size: 16.0,
                         ..default()
                     },
-                    TextColor(Color::srgb_u8(0xb9, 0x7c, 0x2c)),
+                    TextColor(UI_TEXT_COLOR),
                     TextLayout {
                         justify: JustifyText::Center,
                         ..default()
@@ -68,7 +72,7 @@ pub fn start_mode_selection(mut commands: Commands, asset_server: Res<AssetServe
 
     with_background(
         &mut commands,
-        Color::srgb(0.9, 0.9, 0.9),
+        UI_CLEAR_COLOR,
         |parent: &mut ChildBuilder<'_>| {
             for mode in mode_list {
                 parent
@@ -81,7 +85,7 @@ pub fn start_mode_selection(mut commands: Commands, asset_server: Res<AssetServe
                             font_size: 16.0,
                             ..default()
                         },
-                        TextColor(Color::srgb_u8(0xb9, 0x7c, 0x2c)),
+                        TextColor(UI_TEXT_COLOR),
                         TextLayout {
                             justify: JustifyText::Center,
                             ..default()
@@ -99,7 +103,7 @@ pub fn start_mode_selection(mut commands: Commands, asset_server: Res<AssetServe
 }
 
 pub fn start_pause(mut commands: Commands, asset_server: Res<AssetServer>) {
-    with_background(&mut commands, Color::srgba(1.0, 1.0, 1.0, 0.75), |parent| {
+    with_background(&mut commands, UI_CLOTH_COLOR, |parent| {
         parent
             .spawn((
                 Button,
@@ -110,7 +114,7 @@ pub fn start_pause(mut commands: Commands, asset_server: Res<AssetServer>) {
                     font_size: 16.0,
                     ..default()
                 },
-                TextColor(Color::BLACK),
+                TextColor(UI_TEXT_COLOR),
                 TextLayout {
                     justify: JustifyText::Center,
                     ..default()
@@ -131,7 +135,7 @@ pub fn start_pause(mut commands: Commands, asset_server: Res<AssetServer>) {
                     font_size: 16.0,
                     ..default()
                 },
-                TextColor(Color::BLACK),
+                TextColor(UI_TEXT_COLOR),
                 TextLayout {
                     justify: JustifyText::Center,
                     ..default()

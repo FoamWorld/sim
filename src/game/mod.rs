@@ -1,6 +1,19 @@
-use crate::{assets::RpgTextures, character::*, constants::*, control::*};
+use crate::{assets::RpgTextures, character::*, constants::*, control::*, state::*};
 use bevy::prelude::*;
 use item::*;
+
+pub struct GamePlugin;
+
+impl Plugin for GamePlugin {
+    fn build(&self, app: &mut App) {
+        app.add_event::<mob::health::HealthClearedEvent>();
+
+        app.add_systems(
+            FixedUpdate,
+            mob::health::read_health_cleared.run_if(in_state(AppState::InGame)),
+        );
+    }
+}
 
 pub mod item;
 pub mod mob;

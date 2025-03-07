@@ -53,6 +53,7 @@ fn main() {
         message::MessagePlugin,
         scene::RegisteryPlugin,
         statistics::StatisticsPlugin,
+        game::GamePlugin,
     ));
     app.insert_resource(Gravity(Vec2::NEG_Y * 628.0));
     app.run();

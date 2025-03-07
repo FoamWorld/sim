@@ -1,4 +1,5 @@
 use crate::state::*;
+use avian2d::prelude::*;
 use bevy::prelude::*;
 use camera::*;
 use collision::*;
@@ -15,7 +16,7 @@ impl Plugin for GamePhysicsPlugin {
                 follow_actor: false,
                 with_offset: Vec2::new(0.0, 0.0),
             });
-        app.add_event::<TouchEvent>();
+        app.add_event::<CrashEvent>().add_event::<TouchEvent>();
 
         app.add_systems(Startup, |mut commands: Commands| {
             commands.spawn((
@@ -28,9 +29,16 @@ impl Plugin for GamePhysicsPlugin {
                 PrimaryCamera,
             ));
         });
+
+        app.add_systems(
+            PostProcessCollisions,
+            (touch_detection.before(crash_detection), crash_detection)
+                .run_if(in_state(AppState::InGame)),
+        );
+
         app.add_systems(
             Update,
-            (translate_cursor_position, rotate_with_mouse).in_set(InGameSet::Logic),
+            (translate_cursor_position, rotate_with_mouse, read_crash).in_set(InGameSet::Logic),
         );
     }
 }
