@@ -5,17 +5,12 @@ use crate::{
     game::{
         item::{debug_wand::DebugWand, *},
         object::*,
+        Inventory,
     },
 };
 use avian2d::prelude::*;
 use bevy::prelude::*;
 use std::any::Any;
-
-#[derive(Resource, Default)]
-pub struct SelectedSlot(pub usize);
-
-#[derive(Component)]
-pub struct Inventory;
 
 #[derive(Component)]
 pub struct IsActive;
@@ -38,8 +33,8 @@ impl Actor {
 
 pub fn setup_character(
     mut commands: Commands,
-    // asset_server: Res<AssetServer>,
     rpg_folder: Res<RpgTextures>,
+    mut inventory: ResMut<Inventory>,
 ) {
     let launcher = {
         let debug_wand = DebugWand { mode: 3 };
@@ -50,6 +45,8 @@ pub fn setup_character(
 
     let mut storage = ItemStorage::with_capacity(4);
     storage.force_give(0, launcher);
+    inventory.size = 4;
+    inventory.bind = Some(commands.spawn(storage).id());
 
     commands.spawn((
         Sprite {
@@ -64,28 +61,26 @@ pub fn setup_character(
         Mass(70.0),
         MovementSpeed(100.0),
         Actor(ActorFacing::Right),
-        storage,
     ));
 }
 
-pub fn setup_inventory(mut commands: Commands, world: &World, actors: Query<Entity, With<Actor>>) {
+pub fn setup_inventory(mut commands: Commands, world: &World, inventory: Res<Inventory>) {
     let type_registry = world.resource::<AppTypeRegistry>();
-    let actor = actors.single();
-    let storage = world.entity(actor).get::<ItemStorage>().unwrap();
-    let size = storage.size();
-    let mut inventory = commands.spawn((
-        Inventory,
-        Node {
-            position_type: PositionType::Absolute,
-            height: Val::Px(GRID_SIZE),
-            bottom: Val::Px(4.0),
-            justify_self: JustifySelf::Center,
-            justify_items: JustifyItems::Center,
-            flex_direction: FlexDirection::Row,
-            ..default()
-        },
-    ));
-    inventory.with_children(|builder| {
+    let storage = world
+        .entity(inventory.bind.unwrap())
+        .get::<ItemStorage>()
+        .unwrap();
+    let size = inventory.size;
+    let mut ui = commands.spawn((Node {
+        position_type: PositionType::Absolute,
+        height: Val::Px(GRID_SIZE),
+        bottom: Val::Px(4.0),
+        justify_self: JustifySelf::Center,
+        justify_items: JustifyItems::Center,
+        flex_direction: FlexDirection::Row,
+        ..default()
+    },));
+    ui.with_children(|builder| {
         for ind in 0..size {
             let mut ec = builder.spawn((
                 Node {
@@ -109,15 +104,14 @@ pub fn setup_inventory(mut commands: Commands, world: &World, actors: Query<Enti
 pub fn setup_attached_image(
     mut commands: Commands,
     world: &World,
-    // asset_server: Res<AssetServer>,
+    inventory: Res<Inventory>,
     actors: Query<Entity, With<Actor>>,
-    q_st: Query<&ItemStorage>,
     q_obj: Query<&IsObject>,
 ) {
     let actor = actors.single();
-    let storage = q_st.get(actor).unwrap();
-    let chosen = world.resource::<SelectedSlot>().0;
-    if let Some(item) = storage.get_index(chosen) {
+    let inv = inventory.bind.unwrap();
+    let storage = world.entity(inv).get::<ItemStorage>().unwrap();
+    if let Some(item) = storage.get_index(inventory.selected) {
         commands
             .entity(actor)
             .with_children(|parent: &mut ChildBuilder<'_>| {

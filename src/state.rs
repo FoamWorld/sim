@@ -1,4 +1,4 @@
-use crate::{assets::*, character::*, control::*, ui::*};
+use crate::{assets::*, control::*, ui::*};
 use avian2d::prelude::*;
 use bevy::{asset::*, prelude::*};
 
@@ -67,17 +67,8 @@ impl Plugin for AppStatePlugin {
             .add_systems(OnExit(AppState::ModeSelection), finish_ui);
 
         // AppState::InGame
-        app.init_resource::<SelectedSlot>();
-        app.add_systems(Update, toggle_pause.in_set(InGameSet::Input));
-
-        /* app.add_systems(
-            FixedUpdate,
-            (
-                // add game logic here
-            ).in_set(InGameSet::Logic),
-        ); */
-
-        app.add_systems(OnEnter(GameState::Running), exit_pause)
+        app.add_systems(Update, toggle_pause.in_set(InGameSet::Input))
+            .add_systems(OnEnter(GameState::Running), exit_pause)
             .add_systems(OnExit(GameState::Running), enter_pause);
     }
 }
