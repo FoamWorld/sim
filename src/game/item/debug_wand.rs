@@ -19,7 +19,7 @@ impl Object for DebugWand {
         Anchor::Custom(Vec2::new(-0.4, -0.4))
     }
 
-    fn add_extra_components(&self, commands: &mut EntityCommands) {
+    fn add_active_components(&self, commands: &mut EntityCommands) {
         commands.insert(crate::physics::camera::RotateWithMouse(
             Quat::from_rotation_z(-std::f32::consts::PI * 0.25),
         ));

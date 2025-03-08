@@ -32,6 +32,14 @@ impl ItemStorage {
         self.storage.len()
     }
 
+    pub fn view_count(&self, index: usize) -> f32 {
+        if self.storage[index].is_none() {
+            0.0
+        } else {
+            self.count[index]
+        }
+    }
+
     pub fn get_index(&self, index: usize) -> Option<Entity> {
         self.storage[index]
     }
@@ -79,7 +87,7 @@ pub trait Item {
 /// * (unique) lying on the ground:
 /// contains `#type`, `#is-tags`, `#physics`, `#visual`
 /// * (unique) in storage:
-/// contains `#type`, `#is-tags`, `ItemAmount (inserted)`
+/// contains `#type`, `#is-tags`
 /// * (clone) sprite in storage display:
 /// contains `#visual`
 /// * (clone) active entity attached to the character:

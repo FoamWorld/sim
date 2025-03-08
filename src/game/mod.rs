@@ -1,4 +1,5 @@
 use crate::{assets::RpgTextures, character::*, constants::*, control::*, state::*};
+use avian2d::prelude::*;
 use bevy::prelude::*;
 use item::*;
 
@@ -82,13 +83,18 @@ fn inputs_throw(mut commands: Commands, world: &World, mut actors: Query<Entity,
     let keys = world.resource::<ButtonInput<KeyCode>>();
     if control_settings.check(ControlCode::Throw, keys) {
         let actor = actors.single();
+        let storage = world.entity(actor).get::<ItemStorage>().unwrap();
+        if storage.view_count(0) < 1.0 {
+            return;
+        }
         commands.entity(actor).queue(|mut entity: EntityWorldMut| {
             let mut storage = entity.get_mut::<ItemStorage>().unwrap();
-            if let Some(item) = storage.extract_one(0) {
-            } else {
-                return;
-            };
+            storage.extract_one(0);
         });
+        commands.spawn((
+            // clone item here
+            RigidBody::Dynamic,
+        ));
     }
 }
 

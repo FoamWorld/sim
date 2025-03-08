@@ -24,26 +24,26 @@ pub struct AdditionConfig {
     // pub attached_tags: bool,
     pub physics: bool,
     pub visual: Option<VisualType>,
-    pub extra: bool,
+    pub active: bool,
 }
 
 impl AdditionConfig {
     pub const IN_SCENE: Self = Self {
         physics: true,
         visual: Some(VisualType::Simple),
-        extra: false,
+        active: false,
     };
 
     pub const IN_GRID: Self = Self {
         physics: false,
         visual: Some(VisualType::Grid),
-        extra: false,
+        active: false,
     };
 
     pub const CHARACTER_ATTACH: Self = Self {
         physics: false,
         visual: Some(VisualType::Active),
-        extra: true,
+        active: true,
     };
 }
 
@@ -97,7 +97,7 @@ pub trait Object {
     }
 
     /// Mechanics when it's active.
-    fn add_extra_components(&self, _commands: &mut EntityCommands) {}
+    fn add_active_components(&self, _commands: &mut EntityCommands) {}
 }
 
 /// Added when the entity is a game object.
@@ -128,8 +128,8 @@ impl IsObject {
             let rpg_folder = world.resource::<RpgTextures>();
             obj.add_visual_components(ec, rpg_folder, visual_type);
         }
-        if config.extra {
-            obj.add_extra_components(ec);
+        if config.active {
+            obj.add_active_components(ec);
         }
     }
 }
