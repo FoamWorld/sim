@@ -27,7 +27,6 @@ impl Plugin for GamePhysicsPlugin {
                 },
                 Camera2d,
                 PrimaryCamera,
-                WontRemove,
             ));
         });
 

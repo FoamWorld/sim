@@ -32,7 +32,9 @@ pub enum InGameSet {
 }
 
 #[derive(Component)]
-pub struct WontRemove;
+/// Marks entities that will be removed while exiting [`AppState::InGame`].
+/// Game objects and temporary ui elements are automatically included.
+pub struct WillRemove;
 
 pub struct AppStatePlugin;
 
@@ -74,6 +76,7 @@ impl Plugin for AppStatePlugin {
             OnExit(AppState::InGame),
             (
                 remove_all,
+                finish_ui,
                 |mut next_state: ResMut<NextState<GameState>>| {
                     next_state.set(GameState::Locked);
                 },
@@ -116,7 +119,14 @@ fn exit_pause(
 
 fn remove_all(
     world: &mut World,
-    query: &mut QueryState<Entity, (Without<WontRemove>, Without<Window>)>,
+    query: &mut QueryState<
+        Entity,
+        Or<(
+            With<WillRemove>,
+            // With<UiOnce>,
+            With<crate::game::object::IsObject>,
+        )>,
+    >,
 ) {
     let mut vec: Vec<Entity> = vec![];
     for entity in query.iter_mut(world) {
@@ -125,4 +135,5 @@ fn remove_all(
     for entity in vec {
         world.despawn(entity);
     }
+    world.clear_trackers();
 }

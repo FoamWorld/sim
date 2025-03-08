@@ -7,6 +7,7 @@ use crate::{
         object::*,
         Inventory,
     },
+    state::WillRemove,
 };
 use avian2d::prelude::*;
 use bevy::prelude::*;
@@ -46,7 +47,7 @@ pub fn setup_character(
     let mut storage = ItemStorage::with_capacity(4);
     storage.force_give(0, launcher);
     inventory.size = 4;
-    inventory.bind = Some(commands.spawn(storage).id());
+    inventory.bind = Some(commands.spawn((storage, WillRemove)).id());
 
     commands.spawn((
         Sprite {
@@ -61,6 +62,7 @@ pub fn setup_character(
         Mass(70.0),
         MovementSpeed(100.0),
         Actor(ActorFacing::Right),
+        WillRemove,
     ));
 }
 
@@ -94,6 +96,7 @@ pub fn setup_inventory(mut commands: Commands, world: &World, inventory: Res<Inv
                 },
                 Outline::new(Val::Px(1.0), Val::ZERO, Color::BLACK),
                 UiGrid(ind),
+                WillRemove,
             ));
             if let Some(item) = storage.storage[ind] {
                 let object = world.entity(item).get::<IsObject>().unwrap();
@@ -135,6 +138,7 @@ pub fn setup_item_sprite(
     let mut ec = parent.spawn((
         Transform::from_translation(CHARACTER_LEFT_HAND_OFFSET.extend(CHARACTER_HOLD_OFFSET)),
         IsActive,
+        WillRemove,
     ));
     it.add_components(
         world,
