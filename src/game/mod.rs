@@ -34,6 +34,8 @@ impl Plugin for GamePlugin {
                 .in_set(InGameSet::Input),
         );
 
+        app.add_systems(Update, move_outline.in_set(InGameSet::PostInput));
+
         app.add_systems(
             FixedUpdate,
             mob::health::read_health_cleared.in_set(InGameSet::Logic),
@@ -166,5 +168,15 @@ fn inputs_number(keys: Res<ButtonInput<KeyCode>>, mut inventory: ResMut<Inventor
     };
     if number < inventory.size {
         inventory.selected = number;
+    }
+}
+
+fn move_outline(inventory: Res<Inventory>, mut query_grid: Query<(&UiGrid, &mut Outline)>) {
+    for (grid, mut outline) in query_grid.iter_mut() {
+        if grid.0 == inventory.selected {
+            outline.color = Color::WHITE;
+        } else {
+            outline.color = Color::BLACK;
+        }
     }
 }
