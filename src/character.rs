@@ -64,6 +64,9 @@ pub fn setup_character(
     ));
 }
 
+#[derive(Component)]
+pub struct UiGrid(pub usize);
+
 pub fn setup_inventory(mut commands: Commands, world: &World, inventory: Res<Inventory>) {
     let type_registry = world.resource::<AppTypeRegistry>();
     let storage = world
@@ -89,7 +92,8 @@ pub fn setup_inventory(mut commands: Commands, world: &World, inventory: Res<Inv
                     margin: UiRect::horizontal(Val::Px(4.0)),
                     ..default()
                 },
-                Outline::new(Val::Px(1.0), Val::ZERO, Color::WHITE),
+                Outline::new(Val::Px(1.0), Val::ZERO, Color::BLACK),
+                UiGrid(ind),
             ));
             if let Some(item) = storage.storage[ind] {
                 let object = world.entity(item).get::<IsObject>().unwrap();

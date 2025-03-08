@@ -1,6 +1,8 @@
 ## Fonts
-- `OPEN SANS`
-- `Quattrocento`
+- `open-sans`: `Open Sans` (Apache v2.0)
+	- `-regular`: Normal, Weight: 400, Stretch: 100%
+- `quattrocento`: `Quattrocento` (OFL)
+	- `-bold`: Normal, Weight: 700, Stretch: 100%
 
 ## Images
 ### My Original

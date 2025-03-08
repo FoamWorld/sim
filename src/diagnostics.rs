@@ -43,7 +43,6 @@ fn setup_diagnostics_text(mut commands: Commands, asset_server: Res<AssetServer>
     commands.spawn((
         Text::new(""),
         TextFont {
-            // weight: 300
             font: asset_server.load("fonts/open-sans.regular.ttf"),
             font_size: 10.0,
             ..default()

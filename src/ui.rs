@@ -31,8 +31,7 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
             parent.spawn((
                 Text::new(PROJECT_TITLE),
                 TextFont {
-                    // weight:700
-                    font: asset_server.load("fonts/quattrocento.regular.ttf"),
+                    font: asset_server.load("fonts/quattrocento.bold.ttf"),
                     font_size: 25.0,
                     ..default()
                 },
@@ -43,7 +42,6 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                     Button,
                     Text::new("Start"),
                     TextFont {
-                        // weight: 700
                         font: asset_server.load("fonts/open-sans.regular.ttf"),
                         font_size: 16.0,
                         ..default()
@@ -70,82 +68,54 @@ pub fn start_mode_selection(mut commands: Commands, asset_server: Res<AssetServe
         "Sandbox",
     ];
 
+    let font = TextFont {
+        font: asset_server.load("fonts/open-sans.regular.ttf"),
+        font_size: 16.0,
+        ..default()
+    };
+
     with_background(
         &mut commands,
         UI_CLEAR_COLOR,
         |parent: &mut ChildBuilder<'_>| {
             for mode in mode_list {
-                parent
-                    .spawn((
-                        Button,
-                        Text::new(mode),
-                        TextFont {
-                            // weight: 700
-                            font: asset_server.load("fonts/open-sans.regular.ttf"),
-                            font_size: 16.0,
-                            ..default()
-                        },
-                        TextColor(UI_TEXT_COLOR),
-                        TextLayout {
-                            justify: JustifyText::Center,
-                            ..default()
-                        },
-                    ))
-                    .observe(
-                        |_: Trigger<Pointer<Click>>,
-                         mut next_state: ResMut<NextState<AppState>>| {
-                            next_state.set(AppState::InGame);
-                        },
-                    );
+                add_button(
+                    parent,
+                    mode,
+                    font.clone(),
+                    |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<AppState>>| {
+                        next_state.set(AppState::InGame);
+                    },
+                );
             }
         },
     );
 }
 
 pub fn start_pause(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let font = TextFont {
+        font: asset_server.load("fonts/open-sans.regular.ttf"),
+        font_size: 16.0,
+        ..default()
+    };
+
     with_background(&mut commands, UI_CLOTH_COLOR, |parent| {
-        parent
-            .spawn((
-                Button,
-                Text::new("back"),
-                TextFont {
-                    // open sans, weight: 300
-                    font: asset_server.load("fonts/open-sans.regular.ttf"),
-                    font_size: 16.0,
-                    ..default()
-                },
-                TextColor(UI_TEXT_COLOR),
-                TextLayout {
-                    justify: JustifyText::Center,
-                    ..default()
-                },
-            ))
-            .observe(
-                |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<GameState>>| {
-                    next_state.set(GameState::Running);
-                },
-            );
-        parent
-            .spawn((
-                Button,
-                Text::new("save"),
-                TextFont {
-                    // open sans, weight: 300
-                    font: asset_server.load("fonts/open-sans.regular.ttf"),
-                    font_size: 16.0,
-                    ..default()
-                },
-                TextColor(UI_TEXT_COLOR),
-                TextLayout {
-                    justify: JustifyText::Center,
-                    ..default()
-                },
-            ))
-            .observe(
-                |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<ProcessState>>| {
-                    next_state.set(ProcessState::PreSaveScene);
-                },
-            );
+        add_button(
+            parent,
+            "resume",
+            font.clone(),
+            |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<GameState>>| {
+                next_state.set(GameState::Running);
+            },
+        );
+        add_button(
+            parent,
+            "save",
+            font.clone(),
+            |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<ProcessState>>| {
+                next_state.set(ProcessState::PreSaveScene);
+            },
+        );
     });
 }
 
@@ -170,4 +140,24 @@ fn with_background(commands: &mut Commands, color: Color, f: impl FnOnce(&mut Ch
             UiOnce,
         ))
         .with_children(f);
+}
+
+fn add_button<E: Event, B: Bundle, M>(
+    parent: &mut ChildBuilder,
+    name: &str,
+    font: TextFont,
+    observer: impl bevy::ecs::system::IntoObserverSystem<E, B, M>,
+) {
+    parent
+        .spawn((
+            Button,
+            Text::new(name),
+            font,
+            TextColor(UI_TEXT_COLOR),
+            TextLayout {
+                justify: JustifyText::Center,
+                ..default()
+            },
+        ))
+        .observe(observer);
 }
