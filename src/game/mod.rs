@@ -13,6 +13,7 @@ impl Plugin for GamePlugin {
             (
                 inputs_use,
                 inputs_modify,
+                inputs_throw,
                 // add input handling here
             )
                 .in_set(InGameSet::Input),
@@ -29,7 +30,7 @@ pub mod item;
 pub mod mob;
 pub mod object;
 
-pub fn inputs_use(
+fn inputs_use(
     mut commands: Commands,
     world: &World,
     keys: Res<ButtonInput<KeyCode>>,
@@ -39,8 +40,8 @@ pub fn inputs_use(
     actors: Query<Entity, With<Actor>>,
     rpg_folder: Res<RpgTextures>,
 ) {
-    let actor = actors.single();
     if click.just_pressed(MouseButton::Left) || control_settings.check(ControlCode::Use, &keys) {
+        let actor = actors.single();
         reach_inventory_item_then(world, actor, 0, |guarded, item| {
             if guarded.check_can_use() {
                 let transform = world.entity(actor).get::<Transform>().unwrap();
@@ -57,7 +58,7 @@ pub fn inputs_use(
     }
 }
 
-pub fn inputs_modify(
+fn inputs_modify(
     mut commands: Commands,
     world: &World,
     keys: Res<ButtonInput<KeyCode>>,
@@ -65,9 +66,9 @@ pub fn inputs_modify(
     control_settings: Res<ControlSettings>,
     actors: Query<Entity, With<Actor>>,
 ) {
-    let actor = actors.single();
     if click.just_pressed(MouseButton::Right) || control_settings.check(ControlCode::Modify, &keys)
     {
+        let actor = actors.single();
         reach_inventory_item_then(world, actor, 0, |guarded, item| {
             if guarded.check_can_modify() {
                 guarded.item_modify(&mut commands, item);
@@ -76,7 +77,22 @@ pub fn inputs_modify(
     }
 }
 
-pub fn reach_inventory_item_then<F>(world: &World, actor: Entity, ind: usize, f: F)
+fn inputs_throw(mut commands: Commands, world: &World, mut actors: Query<Entity, With<Actor>>) {
+    let control_settings = world.resource::<ControlSettings>();
+    let keys = world.resource::<ButtonInput<KeyCode>>();
+    if control_settings.check(ControlCode::Throw, keys) {
+        let actor = actors.single();
+        commands.entity(actor).queue(|mut entity: EntityWorldMut| {
+            let mut storage = entity.get_mut::<ItemStorage>().unwrap();
+            if let Some(item) = storage.extract_one(0) {
+            } else {
+                return;
+            };
+        });
+    }
+}
+
+fn reach_inventory_item_then<F>(world: &World, actor: Entity, ind: usize, f: F)
 where
     F: FnOnce(&dyn Item, Entity) -> (),
 {
@@ -87,7 +103,7 @@ where
         return;
     };
 
-    let type_registry = world.get_resource::<AppTypeRegistry>().unwrap();
+    let type_registry = world.resource::<AppTypeRegistry>();
     IsItem::inspect_then(world, item, type_registry, |guarded| {
         f(guarded, item);
     });

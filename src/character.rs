@@ -49,7 +49,7 @@ pub fn setup_character(
     };
 
     let mut storage = ItemStorage::with_capacity(4);
-    storage.force_give(&mut commands, launcher);
+    storage.force_give(0, launcher);
 
     commands.spawn((
         Sprite {

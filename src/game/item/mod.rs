@@ -2,12 +2,11 @@ use super::object::*;
 use crate::assets::RpgTextures;
 use bevy::prelude::*;
 
-/// Added when the clone is inside an item container.
+/// Used in item containers.
 /// Field `.0` stores the number/amount stacked. This works for non-unique solids, liquids and gases.
 /// Using `f32` is acceptable since it rarely happens someone takes 8 out of 1e10, say.
 /// And when that happens, it can count as a feature.
-#[derive(Component)]
-pub struct ItemAmount(pub f32);
+type ItemAmount = f32;
 
 /// Component for item containers. This may include: the characters two hands (and back (and pockets?)?).
 #[derive(Reflect, Component)]
@@ -16,6 +15,7 @@ pub struct ItemAmount(pub f32);
 pub struct ItemStorage {
     // (?) todo: volume limit
     pub limit: f32, // weight limit
+    pub count: Vec<ItemAmount>,
     pub storage: Vec<Option<Entity>>,
 }
 
@@ -23,6 +23,7 @@ impl ItemStorage {
     pub fn with_capacity(length: usize) -> Self {
         Self {
             limit: f32::INFINITY,
+            count: vec![0.0; length],
             storage: vec![None; length],
         }
     }
@@ -35,9 +36,21 @@ impl ItemStorage {
         self.storage[index]
     }
 
-    pub fn force_give(&mut self, commands: &mut Commands, entity: Entity) {
-        self.storage[0] = Some(entity);
-        commands.entity(entity).insert(ItemAmount(1.0));
+    pub fn force_give(&mut self, index: usize, entity: Entity) {
+        self.count[index] = 1.0;
+        self.storage[index] = Some(entity);
+    }
+
+    pub fn extract_one(&mut self, index: usize) -> Option<Entity> {
+        if let Some(entity) = self.storage[index] {
+            self.count[index] -= 1.0;
+            if self.count[index] < 1e-3 {
+                self.storage[index] = None;
+            }
+            Some(entity)
+        } else {
+            None
+        }
     }
 }
 
@@ -77,12 +90,8 @@ pub trait Item {
 pub struct IsItem;
 
 impl IsItem {
-    pub fn inspect_then<F>(
-        world: &World,
-        entity: Entity,
-        type_registry: &AppTypeRegistry,
-        f: F,
-    ) where
+    pub fn inspect_then<F>(world: &World, entity: Entity, type_registry: &AppTypeRegistry, f: F)
+    where
         F: FnOnce(&dyn Item) -> (),
     {
         let id = world.entity(entity).get::<IsObject>().unwrap().0;
