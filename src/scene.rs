@@ -11,7 +11,12 @@ use std::{fs::File, io::Write};
 pub struct StorageSlotInfo(pub String);
 
 #[derive(SystemSet, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct ProcessSet;
+pub enum ProcessSet {
+    Early,
+    Middle,
+    Late,
+    TransitState,
+}
 
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProcessState {
@@ -30,14 +35,20 @@ impl Plugin for RegisteryPlugin {
 
         app.configure_sets(
             Update,
-            ProcessSet
+            (
+                ProcessSet::Early,
+                ProcessSet::Middle,
+                ProcessSet::Late,
+                ProcessSet::TransitState,
+            )
+                .chain()
                 .run_if(in_state(GameState::Locked))
                 .run_if(in_state(AppState::InGame)),
         );
 
         app.add_systems(
             OnEnter(AppState::InGame),
-            load_scene_system.in_set(ProcessSet),
+            load_scene_system.in_set(ProcessSet::Early),
         );
 
         app.add_systems(
@@ -49,21 +60,18 @@ impl Plugin for RegisteryPlugin {
                 },
             )
                 .chain()
-                .in_set(ProcessSet),
+                .in_set(ProcessSet::Early),
         );
 
         app.add_systems(
             OnEnter(ProcessState::PreEnterGame),
             (
-                setup_character,
-                setup_attached_image,
-                setup_inventory,
-                |mut next_state: ResMut<NextState<GameState>>| {
+                setup_character.in_set(ProcessSet::Middle),
+                (|mut next_state: ResMut<NextState<GameState>>| {
                     next_state.set(GameState::Running);
-                },
-            )
-                .chain()
-                .in_set(ProcessSet),
+                })
+                .in_set(ProcessSet::TransitState),
+            ),
         );
 
         app.add_systems(OnEnter(ProcessState::PreSaveScene), save_scene_system);

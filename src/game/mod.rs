@@ -1,14 +1,11 @@
-use crate::{assets::RpgTextures, character::*, constants::*, control::*, state::*};
+use crate::{assets::RpgTextures, character::*, constants::*, control::*, scene::*, state::*};
 use avian2d::prelude::*;
 use bevy::prelude::*;
+
 use item::*;
 
-#[derive(Resource)]
-pub struct Inventory {
-    pub size: usize,
-    pub selected: usize,
-    pub bind: Option<Entity>,
-}
+pub mod inventory;
+use inventory::*;
 
 pub struct GamePlugin;
 
@@ -20,7 +17,21 @@ impl Plugin for GamePlugin {
             bind: None,
         });
 
-        app.add_event::<mob::health::HealthClearedEvent>();
+        app.add_event::<InventorySelectedUpdateEvent>()
+            .add_event::<mob::health::HealthClearedEvent>();
+
+        app.add_systems(
+            OnEnter(ProcessState::PreEnterGame),
+            (
+                setup_inventory,
+                setup_inventory_ui,
+                |mut writer: EventWriter<InventorySelectedUpdateEvent>| {
+                    writer.send(InventorySelectedUpdateEvent);
+                },
+            )
+                .chain()
+                .in_set(ProcessSet::Late),
+        );
 
         app.add_systems(
             Update,
@@ -34,7 +45,10 @@ impl Plugin for GamePlugin {
                 .in_set(InGameSet::Input),
         );
 
-        app.add_systems(Update, move_outline.in_set(InGameSet::PostInput));
+        app.add_systems(
+            Update,
+            (move_outline, setup_attached_image).in_set(InGameSet::PostInput),
+        );
 
         app.add_systems(
             FixedUpdate,
@@ -46,6 +60,8 @@ impl Plugin for GamePlugin {
 pub mod item;
 pub mod mob;
 pub mod object;
+
+/* Handling inputs. */
 
 fn inputs_use(
     mut commands: Commands,
@@ -142,7 +158,11 @@ where
     });
 }
 
-fn inputs_number(keys: Res<ButtonInput<KeyCode>>, mut inventory: ResMut<Inventory>) {
+fn inputs_number(
+    keys: Res<ButtonInput<KeyCode>>,
+    mut inventory: ResMut<Inventory>,
+    mut writer: EventWriter<InventorySelectedUpdateEvent>,
+) {
     let number: usize = if keys.pressed(KeyCode::Digit0) {
         0
     } else if keys.pressed(KeyCode::Digit1) {
@@ -168,15 +188,6 @@ fn inputs_number(keys: Res<ButtonInput<KeyCode>>, mut inventory: ResMut<Inventor
     };
     if number < inventory.size {
         inventory.selected = number;
-    }
-}
-
-fn move_outline(inventory: Res<Inventory>, mut query_grid: Query<(&UiGrid, &mut Outline)>) {
-    for (grid, mut outline) in query_grid.iter_mut() {
-        if grid.0 == inventory.selected {
-            outline.color = Color::WHITE;
-        } else {
-            outline.color = Color::BLACK;
-        }
+        writer.send(InventorySelectedUpdateEvent);
     }
 }
