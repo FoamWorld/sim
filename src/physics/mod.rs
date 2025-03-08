@@ -32,8 +32,7 @@ impl Plugin for GamePhysicsPlugin {
 
         app.add_systems(
             PostProcessCollisions,
-            (touch_detection.before(crash_detection), crash_detection)
-                .run_if(in_state(AppState::InGame)),
+            inspect_collisions.in_set(InGameSet::Logic),
         );
 
         app.add_systems(

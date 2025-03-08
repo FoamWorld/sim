@@ -12,18 +12,59 @@ pub struct BackgroundLevel;
 #[derive(Event)]
 pub struct CrashEvent(pub Entity, pub Entity);
 
-pub fn crash_detection(
-    query_sufferer: Query<Entity, With<Health>>,
+#[derive(Event)]
+pub struct TouchEvent(pub Entity);
+
+pub fn inspect_collisions(
+    query_player: Query<&Actor, With<RigidBody>>,
+    query_background: Query<&BackgroundLevel, With<RigidBody>>,
+    query_health: Query<&Health>,
     mut collisions: ResMut<Collisions>,
-    mut writer: EventWriter<CrashEvent>,
+    mut writer_touch: EventWriter<TouchEvent>,
+    mut writer_crash: EventWriter<CrashEvent>,
 ) {
     collisions.retain(|contacts| {
-        if query_sufferer.contains(contacts.entity1) {
-            writer.send(CrashEvent(contacts.entity1, contacts.entity2));
-        } else if query_sufferer.contains(contacts.entity2) {
-            writer.send(CrashEvent(contacts.entity2, contacts.entity1));
+        let e1 = contacts.entity1;
+        let e2 = contacts.entity2;
+        let bg1 = query_background.contains(e1);
+        let bg2 = query_background.contains(e2);
+
+        if bg1 && bg2 {
+            return false;
         }
-        true
+
+        // Already collided.
+        let any_penetrating = contacts.manifolds.iter().any(|manifold| {
+            manifold
+                .contacts
+                .iter()
+                .any(|contact| contact.penetration > 0.0)
+        });
+        if any_penetrating {
+            return !bg1 && !bg2;
+        }
+
+        // Check crash.
+        if query_health.contains(e1) && !bg2 {
+            writer_crash.send(CrashEvent(e1, e2));
+        }
+        if query_health.contains(e2) && !bg1 {
+            writer_crash.send(CrashEvent(e2, e1));
+        }
+
+        // Check touch.
+        let (pillow, other_entity) = if bg1 {
+            (e1, e2)
+        } else if bg2 {
+            (e2, e1)
+        } else {
+            return true;
+        };
+        if !query_player.contains(other_entity) {
+            return true;
+        }
+        writer_touch.send(TouchEvent(pillow));
+        false
     });
 }
 
@@ -41,43 +82,6 @@ pub fn read_crash(
             }
         }
     }
-}
-
-#[derive(Event)]
-pub struct TouchEvent(pub Entity);
-
-pub fn touch_detection(
-    mut query_player: Query<Entity, (With<Actor>, With<RigidBody>)>,
-    mut query_pillow: Query<Entity, (With<RigidBody>, With<BackgroundLevel>)>,
-    mut collisions: ResMut<Collisions>,
-    mut writer: EventWriter<TouchEvent>,
-) {
-    collisions.retain(|contacts| {
-        // Already collided.
-        let any_penetrating = contacts.manifolds.iter().any(|manifold| {
-            manifold
-                .contacts
-                .iter()
-                .any(|contact| contact.penetration > 0.0)
-        });
-        if any_penetrating {
-            return true;
-        }
-
-        // Check touch.
-        let (pillow, other_entity) = if let Ok(pillow) = query_pillow.get_mut(contacts.entity1) {
-            (pillow, contacts.entity2)
-        } else if let Ok(pillow) = query_pillow.get_mut(contacts.entity2) {
-            (pillow, contacts.entity1)
-        } else {
-            return true;
-        };
-        if Ok(other_entity) != query_player.get_mut(other_entity) {
-            return true;
-        }
-        writer.send(TouchEvent(pillow));
-        false
-    });
 }
 
 #[derive(Reflect, Component)]
