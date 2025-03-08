@@ -31,6 +31,9 @@ pub enum InGameSet {
     Ui,
 }
 
+#[derive(Component)]
+pub struct WontRemove;
+
 pub struct AppStatePlugin;
 
 impl Plugin for AppStatePlugin {
@@ -52,7 +55,7 @@ impl Plugin for AppStatePlugin {
         );
 
         // AppState::Initialize
-        app.add_systems(Startup, (load_textures, set_cursor))
+        app.add_systems(PostStartup, (load_textures, set_cursor))
             .add_systems(
                 Update,
                 check_textures.run_if(in_state(AppState::Initialize)),
@@ -67,9 +70,19 @@ impl Plugin for AppStatePlugin {
             .add_systems(OnExit(AppState::ModeSelection), finish_ui);
 
         // AppState::InGame
-        app.add_systems(Update, toggle_pause.in_set(InGameSet::Input))
-            .add_systems(OnEnter(GameState::Running), exit_pause)
-            .add_systems(OnExit(GameState::Running), enter_pause);
+        app.add_systems(
+            OnExit(AppState::InGame),
+            (
+                remove_all,
+                |mut next_state: ResMut<NextState<GameState>>| {
+                    next_state.set(GameState::Locked);
+                },
+            )
+                .chain(),
+        )
+        .add_systems(Update, toggle_pause.in_set(InGameSet::Input))
+        .add_systems(OnEnter(GameState::Running), exit_pause)
+        .add_systems(OnExit(GameState::Running), enter_pause);
     }
 }
 
@@ -99,4 +112,17 @@ fn exit_pause(
 ) {
     time.unpause();
     finish_ui(commands, query);
+}
+
+fn remove_all(
+    world: &mut World,
+    query: &mut QueryState<Entity, (Without<WontRemove>, Without<Window>)>,
+) {
+    let mut vec: Vec<Entity> = vec![];
+    for entity in query.iter_mut(world) {
+        vec.push(entity);
+    }
+    for entity in vec {
+        world.despawn(entity);
+    }
 }

@@ -116,6 +116,22 @@ pub fn start_pause(mut commands: Commands, asset_server: Res<AssetServer>) {
                 next_state.set(ProcessState::PreSaveScene);
             },
         );
+        add_button(
+            parent,
+            "back to menu",
+            font.clone(),
+            |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<AppState>>| {
+                next_state.set(AppState::Menu);
+            },
+        );
+        add_button(
+            parent,
+            "quit",
+            font.clone(),
+            |_: Trigger<Pointer<Click>>, mut writer: EventWriter<AppExit>| {
+                writer.send(AppExit::Success);
+            },
+        );
     });
 }
 
@@ -137,6 +153,7 @@ fn with_background(commands: &mut Commands, color: Color, f: impl FnOnce(&mut Ch
                 ..default()
             },
             BackgroundColor(color),
+            ZIndex(1),
             UiOnce,
         ))
         .with_children(f);

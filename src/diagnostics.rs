@@ -16,6 +16,7 @@ impl Plugin for DiagnosticsTextPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(FrameTimeDiagnosticsPlugin);
         app.insert_state(DiagnosticsState::Off);
+
         app.add_systems(OnEnter(DiagnosticsState::On), setup_diagnostics_text)
             .add_systems(
                 OnExit(DiagnosticsState::On),
@@ -33,6 +34,13 @@ impl Plugin for DiagnosticsTextPlugin {
                 )
                     .in_set(InGameSet::Logic),
             );
+
+        app.add_systems(
+            OnExit(AppState::InGame),
+            |mut next_state: ResMut<NextState<DiagnosticsState>>| {
+                next_state.set(DiagnosticsState::Off);
+            },
+        );
     }
 }
 
