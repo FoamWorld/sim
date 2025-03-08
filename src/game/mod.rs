@@ -1,8 +1,11 @@
-use crate::{assets::RpgTextures, character::*, constants::*, control::*, scene::*, state::*};
+use crate::{assets::RpgTextures, character::*, control::*, scene::*, state::*};
 use avian2d::prelude::*;
 use bevy::prelude::*;
 
 use item::*;
+
+pub mod character;
+use character::*;
 
 pub mod inventory;
 use inventory::*;
@@ -15,7 +18,8 @@ impl Plugin for GamePlugin {
             size: 0,
             selected: 0,
             bind: None,
-        });
+        })
+        .init_resource::<ActorPosition>();
 
         app.add_event::<InventorySelectedUpdateEvent>()
             .add_event::<mob::health::HealthClearedEvent>();
@@ -52,7 +56,7 @@ impl Plugin for GamePlugin {
 
         app.add_systems(
             FixedUpdate,
-            mob::health::read_health_cleared.in_set(InGameSet::Logic),
+            (update_actor_position, mob::health::read_health_cleared).in_set(InGameSet::Logic),
         );
     }
 }
@@ -70,22 +74,19 @@ fn inputs_use(
     click: Res<ButtonInput<MouseButton>>,
     control_settings: Res<ControlSettings>,
     inventory: Res<Inventory>,
+    position: Res<ActorPosition>,
     coords: Res<crate::physics::camera::CursorCoords>,
-    actors: Query<Entity, With<Actor>>,
     rpg_folder: Res<RpgTextures>,
 ) {
     if click.just_pressed(MouseButton::Left) || control_settings.check(ControlCode::Use, &keys) {
-        let actor = actors.single();
         let inv = inventory.bind.unwrap();
         let index = inventory.selected;
         reach_inventory_item_then(world, inv, index, |guarded, item| {
             if guarded.check_can_use() {
-                let transform = world.entity(actor).get::<Transform>().unwrap();
-                let hold_point = transform.translation.truncate() + CHARACTER_LEFT_HAND_OFFSET;
                 guarded.item_use(
                     &mut commands,
                     item,
-                    hold_point,
+                    position.center + position.primary_hand_offset,
                     coords.0,
                     rpg_folder.as_ref(),
                 );

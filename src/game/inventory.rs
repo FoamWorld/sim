@@ -88,6 +88,7 @@ pub fn setup_attached_image(
     inventory: Res<Inventory>,
     actors: Query<Entity, With<Actor>>,
     mut reader: EventReader<InventorySelectedUpdateEvent>,
+    position: Res<ActorPosition>,
 ) {
     if reader.is_empty() {
         return;
@@ -101,16 +102,21 @@ pub fn setup_attached_image(
         commands
             .entity(actor)
             .with_children(|parent: &mut ChildBuilder<'_>| {
-                setup_item_sprite(world, item, parent);
+                setup_item_sprite(world, item, parent, position);
             });
     };
 }
 
-fn setup_item_sprite(world: &World, item: Entity, parent: &mut ChildBuilder) {
+fn setup_item_sprite(
+    world: &World,
+    item: Entity,
+    parent: &mut ChildBuilder,
+    position: Res<ActorPosition>,
+) {
     let registry = world.resource::<AppTypeRegistry>();
     let it = world.entity(item).get::<IsObject>().unwrap();
     let mut ec = parent.spawn((
-        Transform::from_translation(CHARACTER_LEFT_HAND_OFFSET.extend(CHARACTER_HOLD_OFFSET)),
+        Transform::from_translation(position.primary_hand_offset.extend(1.0)),
         IsActive,
         WillRemove,
     ));
