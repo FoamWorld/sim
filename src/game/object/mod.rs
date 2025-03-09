@@ -106,9 +106,9 @@ pub trait Object {
 #[reflect(SerializeWithRegistry, DeserializeWithRegistry)]
 #[component(storage = "Table")]
 #[type_path = "sim::core"]
-pub struct IsObject(pub TypeId);
+pub struct ObjectRef(pub TypeId);
 
-impl IsObject {
+impl ObjectRef {
     pub fn add_components(
         &self,
         world: &World,
@@ -134,7 +134,7 @@ impl IsObject {
     }
 }
 
-impl SerializeWithRegistry for IsObject {
+impl SerializeWithRegistry for ObjectRef {
     fn serialize<S>(&self, serializer: S, registry: &TypeRegistry) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -147,7 +147,7 @@ impl SerializeWithRegistry for IsObject {
     }
 }
 
-impl<'de> DeserializeWithRegistry<'de> for IsObject {
+impl<'de> DeserializeWithRegistry<'de> for ObjectRef {
     fn deserialize<D>(deserializer: D, registry: &TypeRegistry) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -175,7 +175,7 @@ impl<'de> DeserializeWithRegistry<'de> for IsObject {
 
         deserializer
             .deserialize_str(MyVisitor { registry })
-            .map(IsObject)
+            .map(ObjectRef)
     }
 }
 

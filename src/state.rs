@@ -124,7 +124,7 @@ fn remove_all(
         Or<(
             With<WillRemove>,
             // With<UiOnce>,
-            With<crate::game::object::IsObject>,
+            With<crate::game::object::ObjectRef>,
         )>,
     >,
 ) {

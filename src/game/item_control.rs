@@ -14,7 +14,7 @@ where
     };
 
     let type_registry = world.resource::<AppTypeRegistry>();
-    IsItem::inspect_then(world, item, type_registry, |guarded| {
+    ItemRef::apply_to_item(world, item, type_registry, |guarded| {
         f(guarded, item);
     });
 }
@@ -67,6 +67,6 @@ pub fn item_throw(mut commands: Commands, world: &World, inventory: Res<Inventor
 
     let it = world
         .entity(storage.get_index(index).unwrap())
-        .get::<IsObject>()
+        .get::<ObjectRef>()
         .unwrap();
 }

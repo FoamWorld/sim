@@ -6,11 +6,11 @@ use bevy::sprite::Anchor;
 #[derive(Reflect, Component, Clone, Copy)]
 #[reflect(Component, Object, Item)]
 #[type_path = "sim::item"]
-pub struct DebugWand {
+pub struct Wand {
     pub mode: usize,
 }
 
-impl Object for DebugWand {
+impl Object for Wand {
     fn texture_info(&self) -> Option<(&str, Option<usize>)> {
         Some(("items", Some(0)))
     }
@@ -26,7 +26,7 @@ impl Object for DebugWand {
     }
 }
 
-impl Item for DebugWand {
+impl Item for Wand {
     fn item_use(
         &self,
         commands: &mut Commands,
@@ -64,7 +64,7 @@ impl Item for DebugWand {
         let mode = if self.mode == 3 { 0 } else { self.mode + 1 };
         commands
             .entity(entity)
-            .entry::<DebugWand>()
+            .entry::<Wand>()
             .and_modify(move |mut wand| {
                 wand.mode = mode;
             });

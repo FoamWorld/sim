@@ -8,7 +8,7 @@
           rotation: (0.0, 0.0, -0.0, 1.0),
           scale: (1.0, 1.0, 1.0),
         ),
-        "sim::core::IsObject": "sim::object::Barrier",
+        "sim::core::ObjectRef": "sim::object::Barrier",
         "sim::object::Barrier": (
           x_length: 500.0,
           y_length: 40.0,
@@ -22,7 +22,7 @@
           rotation: (0.0, 0.0, -0.0, 1.0),
           scale: (2.0, 2.0, 1.0),
         ),
-        "sim::core::IsObject": "sim::object::NonUnique",
+        "sim::core::ObjectRef": "sim::object::NonUnique",
         "sim::object::NonUnique": (
           "hints",
           Some(0),
@@ -36,7 +36,7 @@
           rotation: (0.0, 0.0, -0.0, 1.0),
           scale: (1.0, 1.0, 1.0),
         ),
-        "sim::core::IsObject": "sim::object::SignStand",
+        "sim::core::ObjectRef": "sim::object::SignStand",
         "sim::object::SignStand": (1),
         "sim::utils::Sign": ("Message test.")
       }
@@ -48,7 +48,7 @@
           rotation: (0.0, 0.0, -0.0, 1.0),
           scale: (2.0, 2.0, 1.0),
         ),
-        "sim::core::IsObject": "sim::object::Door",
+        "sim::core::ObjectRef": "sim::object::Door",
         "sim::object::Door": (
           is_open: false,
         ),

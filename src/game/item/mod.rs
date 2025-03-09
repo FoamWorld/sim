@@ -84,10 +84,10 @@ pub trait Item {
 
 /// Added when the entity can work as an item.
 /// The different status of an item entity:
-/// * (unique) lying on the ground:
-/// contains `#type`, `#is-tags`, `#physics`, `#visual`
-/// * (unique) in storage:
-/// contains `#type`, `#is-tags`
+/// * (unique) lying in the scene:
+/// contains `#type`, `#refs`, `#physics`, `#visual`
+/// * (unique) in storage (inventory, etc.):
+/// contains `#type`, `#refs`
 /// * (clone) sprite in storage display:
 /// contains `#visual`
 /// * (clone) active entity attached to the character:
@@ -95,14 +95,14 @@ pub trait Item {
 #[derive(Reflect, Component, Clone)]
 #[reflect(Component)]
 #[type_path = "sim::item"]
-pub struct IsItem;
+pub struct ItemRef;
 
-impl IsItem {
-    pub fn inspect_then<F>(world: &World, entity: Entity, type_registry: &AppTypeRegistry, f: F)
+impl ItemRef {
+    pub fn apply_to_item<F>(world: &World, entity: Entity, type_registry: &AppTypeRegistry, f: F)
     where
         F: FnOnce(&dyn Item) -> (),
     {
-        let id = world.entity(entity).get::<IsObject>().unwrap().0;
+        let id = world.entity(entity).get::<ObjectRef>().unwrap().0;
         let comp = world.get_reflect(entity, id).unwrap();
         let guard = type_registry.0.read();
         let refl = guard.get_type_data::<ReflectItem>(id).unwrap();
@@ -113,4 +113,4 @@ impl IsItem {
 
 /* List of items. */
 
-pub mod debug_wand;
+pub mod wand;

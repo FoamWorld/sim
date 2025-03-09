@@ -42,11 +42,10 @@ impl Plugin for GamePlugin {
         app.add_systems(
             Update,
             (
-                inputs_use,
-                inputs_modify,
-                inputs_throw,
-                inputs_number,
-                // add input handling here
+                detect_input_use,
+                detect_input_modify,
+                detect_input_throw,
+                detect_input_choose,
             )
                 .in_set(InGameSet::Input),
         );
@@ -65,7 +64,7 @@ impl Plugin for GamePlugin {
 
 /* Handling inputs. */
 
-fn inputs_use(
+fn detect_input_use(
     commands: Commands,
     world: &World,
     keys: Res<ButtonInput<KeyCode>>,
@@ -78,7 +77,7 @@ fn inputs_use(
     }
 }
 
-fn inputs_modify(
+fn detect_input_modify(
     commands: Commands,
     world: &World,
     keys: Res<ButtonInput<KeyCode>>,
@@ -92,7 +91,7 @@ fn inputs_modify(
     }
 }
 
-fn inputs_throw(
+fn detect_input_throw(
     commands: Commands,
     world: &World,
     keys: Res<ButtonInput<KeyCode>>,
@@ -104,7 +103,7 @@ fn inputs_throw(
     }
 }
 
-fn inputs_number(
+fn detect_input_choose(
     keys: Res<ButtonInput<KeyCode>>,
     mut inventory: ResMut<Inventory>,
     mut writer: EventWriter<InventorySelectedUpdateEvent>,

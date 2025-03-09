@@ -108,14 +108,14 @@ impl Plugin for RegisteryPlugin {
             .register_type::<ItemStorage>()
             .register_type::<Sign>()
             // objects
-            .register_type::<IsObject>()
+            .register_type::<ObjectRef>()
             .register_type::<Barrier>()
             .register_type::<NonUnique>()
             .register_type::<sign::SignStand>()
             .register_type::<door::Door>()
             // items
-            .register_type::<IsItem>()
-            .register_type::<debug_wand::DebugWand>()
+            .register_type::<ItemRef>()
+            .register_type::<wand::Wand>()
             // mobs
             .register_type::<health::Health>();
     }
@@ -140,7 +140,7 @@ pub fn load_scene_system(
 pub fn process_loaded_scene(
     world: &World,
     mut commands: Commands,
-    query: Query<(Entity, &IsObject)>,
+    query: Query<(Entity, &ObjectRef)>,
 ) {
     let type_registry = world.resource::<AppTypeRegistry>();
     for (entity, marker) in query.iter() {
@@ -157,7 +157,7 @@ pub fn process_loaded_scene(
 
 pub fn save_scene_system(world: &mut World) {
     let scene = {
-        let mut query = world.query_filtered::<Entity, With<IsObject>>();
+        let mut query = world.query_filtered::<Entity, With<ObjectRef>>();
         let scene_builder = DynamicSceneBuilder::from_world(&world)
             .deny_all()
             // core
@@ -165,15 +165,15 @@ pub fn save_scene_system(world: &mut World) {
             // utils
             .allow_component::<Sign>()
             // objects
-            .allow_component::<IsObject>()
+            .allow_component::<ObjectRef>()
             .allow_component::<Barrier>()
             .allow_component::<NonUnique>()
             .allow_component::<sign::SignStand>()
             .allow_component::<door::Door>()
             // items
-            .allow_component::<IsItem>()
+            .allow_component::<ItemRef>()
             .allow_component::<ItemStorage>()
-            .allow_component::<debug_wand::DebugWand>()
+            .allow_component::<wand::Wand>()
             // mobs
             .allow_component::<health::Health>();
         scene_builder.extract_entities(query.iter(&world)).build()

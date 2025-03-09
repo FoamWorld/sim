@@ -1,5 +1,5 @@
 use super::{
-    item::{debug_wand::DebugWand, *},
+    item::{wand::Wand, *},
     object::*,
 };
 use crate::{character::*, constants::*, state::WillRemove};
@@ -21,9 +21,9 @@ pub struct UiGrid(pub usize);
 
 pub fn setup_inventory(mut commands: Commands, mut inventory: ResMut<Inventory>) {
     let launcher = {
-        let debug_wand = DebugWand { mode: 3 };
+        let debug_wand = Wand { mode: 3 };
         commands
-            .spawn((debug_wand, IsObject(debug_wand.type_id()), IsItem))
+            .spawn((debug_wand, ObjectRef(debug_wand.type_id()), ItemRef))
             .id()
     };
 
@@ -63,7 +63,7 @@ pub fn setup_inventory_ui(mut commands: Commands, world: &World, inventory: Res<
                 WillRemove,
             ));
             if let Some(item) = storage.storage[ind] {
-                let object = world.entity(item).get::<IsObject>().unwrap();
+                let object = world.entity(item).get::<ObjectRef>().unwrap();
                 object.add_components(world, &mut ec, item, type_registry, AdditionConfig::IN_GRID);
             } else {
                 ec.insert(ImageNode::solid_color(Color::NONE));
@@ -116,7 +116,7 @@ fn setup_item_sprite(
     position: Res<ActorPosition>,
 ) {
     let registry = world.resource::<AppTypeRegistry>();
-    let it = world.entity(item).get::<IsObject>().unwrap();
+    let it = world.entity(item).get::<ObjectRef>().unwrap();
     let mut ec = parent.spawn((
         Transform::from_translation(position.primary_hand_offset.extend(1.0)),
         IsActive,
