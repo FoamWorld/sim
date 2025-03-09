@@ -72,7 +72,8 @@ fn detect_input_use(
     control_settings: Res<ControlSettings>,
     inventory: Res<Inventory>,
 ) {
-    if click.just_pressed(MouseButton::Left) || control_settings.check(ControlCode::Use, &keys) {
+    if click.just_pressed(MouseButton::Left) || control_settings.check(ControlCode::Activate, &keys)
+    {
         item_use(commands, world, inventory);
     }
 }

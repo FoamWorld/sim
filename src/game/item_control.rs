@@ -28,15 +28,13 @@ pub fn item_use(mut commands: Commands, world: &World, inventory: Res<Inventory>
     let position = world.resource::<ActorPosition>();
     let target = world.resource::<crate::physics::camera::CursorCoords>();
     reach_inventory_item_then(world, inv, index, |guarded, item| {
-        if guarded.check_can_use() {
-            guarded.item_use(
-                &mut commands,
-                item,
-                position.center + position.primary_hand_offset,
-                target.0,
-                rpg_folder,
-            );
-        }
+        guarded.activate(
+            &mut commands,
+            item,
+            position.center + position.primary_hand_offset,
+            target.0,
+            rpg_folder,
+        );
     });
 }
 
@@ -44,9 +42,7 @@ pub fn item_modify(mut commands: Commands, world: &World, inventory: Res<Invento
     let inv = inventory.bind.unwrap();
     let index = inventory.selected;
     reach_inventory_item_then(world, inv, index, |guarded, item| {
-        if guarded.check_can_modify() {
-            guarded.item_modify(&mut commands, item);
-        }
+        guarded.modify(&mut commands, item);
     });
 }
 

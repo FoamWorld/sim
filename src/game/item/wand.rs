@@ -27,7 +27,7 @@ impl Object for Wand {
 }
 
 impl Item for Wand {
-    fn item_use(
+    fn activate(
         &self,
         commands: &mut Commands,
         _: Entity,
@@ -57,10 +57,8 @@ impl Item for Wand {
             crate::game::mob::health::Health::fragile(),
         ));
     }
-    fn check_can_modify(&self) -> bool {
-        true
-    }
-    fn item_modify(&self, commands: &mut Commands, entity: Entity) {
+
+    fn modify(&self, commands: &mut Commands, entity: Entity) {
         let mode = if self.mode == 3 { 0 } else { self.mode + 1 };
         commands
             .entity(entity)

@@ -13,7 +13,7 @@ pub enum ControlCode {
     MoveRight,
     MoveUp,
     MoveDown,
-    Use,
+    Activate,
     Modify,
     Throw,
 }
@@ -61,7 +61,7 @@ impl Default for ControlSettings {
                 InputDetectionType::EitherPressed(KeyCode::KeyS, KeyCode::ArrowDown),
             ),
             (
-                ControlCode::Use,
+                ControlCode::Activate,
                 InputDetectionType::JustPressed(KeyCode::KeyT),
             ),
             (

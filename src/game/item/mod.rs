@@ -65,10 +65,7 @@ impl ItemStorage {
 /// Trait for implementing how an item works.
 #[reflect_trait]
 pub trait Item {
-    fn check_can_use(&self) -> bool {
-        true
-    }
-    fn item_use(
+    fn activate(
         &self,
         commands: &mut Commands,
         entity: Entity,
@@ -76,10 +73,8 @@ pub trait Item {
         target: Option<Vec2>,
         rpg_folder: &RpgTextures,
     );
-    fn check_can_modify(&self) -> bool {
-        false
-    }
-    fn item_modify(&self, commands: &mut Commands, entity: Entity);
+
+    fn modify(&self, _commands: &mut Commands, _entity: Entity) {}
 }
 
 /// Added when the entity can work as an item.
