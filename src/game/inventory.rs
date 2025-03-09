@@ -82,7 +82,7 @@ pub fn move_outline(inventory: Res<Inventory>, mut query_grid: Query<(&UiGrid, &
     }
 }
 
-pub fn setup_attached_image(
+pub fn update_attached_image(
     mut commands: Commands,
     world: &World,
     inventory: Res<Inventory>,
@@ -96,6 +96,8 @@ pub fn setup_attached_image(
     reader.clear();
 
     let actor = actors.single();
+    commands.entity(actor).despawn_descendants();
+
     let inv = inventory.bind.unwrap();
     let storage = world.entity(inv).get::<ItemStorage>().unwrap();
     if let Some(item) = storage.get_index(inventory.selected) {

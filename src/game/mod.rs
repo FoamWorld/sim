@@ -51,7 +51,7 @@ impl Plugin for GamePlugin {
 
         app.add_systems(
             Update,
-            (move_outline, setup_attached_image).in_set(InGameSet::PostInput),
+            (move_outline, update_attached_image).in_set(InGameSet::PostInput),
         );
 
         app.add_systems(
