@@ -34,7 +34,7 @@ impl Plugin for RegisteryPlugin {
         app.insert_state(ProcessState::None);
 
         app.configure_sets(
-            Update,
+            FixedUpdate,
             (
                 ProcessSet::Early,
                 ProcessSet::Middle,
