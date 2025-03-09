@@ -8,7 +8,30 @@ use bevy::{prelude::*, scene::*, tasks::IoTaskPool};
 use std::{fs::File, io::Write};
 
 #[derive(Resource)]
-pub struct StorageSlotInfo(pub String);
+pub struct GameSave {
+    base_path: String,
+    current_slot: Option<String>,
+}
+
+impl GameSave {
+    fn new() -> Self {
+        GameSave {
+            base_path: "saved".to_string(),
+            current_slot: Some("default".into()),
+        }
+    }
+
+    fn initialize(&self) {}
+
+    fn get_scene_path(&self, scene_name: &str) -> String {
+        self.base_path.clone()
+            + "/"
+            + self.current_slot.clone().unwrap().as_str()
+            + "/scenes/"
+            + scene_name
+            + ".scn.ron"
+    }
+}
 
 #[derive(SystemSet, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ProcessSet {
@@ -31,6 +54,8 @@ pub struct RegisteryPlugin;
 
 impl Plugin for RegisteryPlugin {
     fn build(&self, app: &mut App) {
+        app.insert_resource(GameSave::new());
+
         app.insert_state(ProcessState::None);
 
         app.configure_sets(
@@ -76,7 +101,6 @@ impl Plugin for RegisteryPlugin {
 
         app.add_systems(OnEnter(ProcessState::PreSaveScene), save_scene_system);
 
-        app.insert_resource(StorageSlotInfo("slot1".to_string()));
         app
             // core
             // utils
@@ -159,9 +183,8 @@ pub fn save_scene_system(world: &mut World) {
     let binding = type_registry.read();
     let serialized_scene = scene.serialize(&binding).unwrap();
 
-    let info = world.resource::<StorageSlotInfo>();
-
-    let dist = "saved/".to_string() + info.0.as_str() + "/scenes/1.scn.ron";
+    let info = world.resource::<GameSave>();
+    let dist = info.get_scene_path("debug");
 
     IoTaskPool::get()
         .spawn(async move {
