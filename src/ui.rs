@@ -24,6 +24,12 @@ pub fn set_cursor(mut commands: Commands, q_window: Query<Entity, With<PrimaryWi
 }
 
 pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let font = TextFont {
+        font: asset_server.load("fonts/open-sans.regular.ttf"),
+        font_size: 17.3,
+        ..default()
+    };
+
     with_background(
         &mut commands,
         UI_CLEAR_COLOR,
@@ -44,7 +50,7 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
             parent.spawn((
                 Text::new(PROJECT_SUBTITLE),
                 TextFont {
-                    font: asset_server.load("fonts/open-sans.regular.ttf"),
+                    font: asset_server.load("fonts/open-sans.light-italic.ttf"),
                     font_size: 16.0,
                     ..default()
                 },
@@ -54,26 +60,22 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                     ..default()
                 },
             ));
-            parent
-                .spawn((
-                    Button,
-                    Text::new("Start"),
-                    TextFont {
-                        font: asset_server.load("fonts/open-sans.regular.ttf"),
-                        font_size: 17.3,
-                        ..default()
-                    },
-                    TextColor(UI_TEXT_COLOR),
-                    TextLayout {
-                        justify: JustifyText::Center,
-                        ..default()
-                    },
-                ))
-                .observe(
-                    |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<AppState>>| {
-                        next_state.set(AppState::ModeSelection);
-                    },
-                );
+            add_button(
+                parent,
+                "Start",
+                font.clone(),
+                |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<AppState>>| {
+                    next_state.set(AppState::ModeSelection);
+                },
+            );
+            add_button(
+                parent,
+                "Quit",
+                font.clone(),
+                |_: Trigger<Pointer<Click>>, mut writer: EventWriter<AppExit>| {
+                    writer.send(AppExit::Success);
+                },
+            );
         },
     );
 }
@@ -133,22 +135,7 @@ pub fn start_pause(mut commands: Commands, asset_server: Res<AssetServer>) {
                 next_state.set(ProcessState::PreSaveScene);
             },
         );
-        add_button(
-            parent,
-            "back to menu",
-            font.clone(),
-            |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<AppState>>| {
-                next_state.set(AppState::Menu);
-            },
-        );
-        add_button(
-            parent,
-            "quit",
-            font.clone(),
-            |_: Trigger<Pointer<Click>>, mut writer: EventWriter<AppExit>| {
-                writer.send(AppExit::Success);
-            },
-        );
+        add_back_to_menu_button(parent, font);
     });
 }
 
@@ -194,4 +181,15 @@ fn add_button<E: Event, B: Bundle, M>(
             },
         ))
         .observe(observer);
+}
+
+fn add_back_to_menu_button(parent: &mut ChildBuilder, font: TextFont) {
+    add_button(
+        parent,
+        "back to menu",
+        font,
+        |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<AppState>>| {
+            next_state.set(AppState::Menu);
+        },
+    );
 }
