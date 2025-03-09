@@ -1,4 +1,4 @@
-use crate::{constants::PROJECT_TITLE, scene::*, state::*};
+use crate::{constants::*, scene::*, state::*};
 use bevy::{
     prelude::*,
     window::{PrimaryWindow, SystemCursorIcon},
@@ -36,6 +36,23 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                     ..default()
                 },
                 TextColor(Color::BLACK),
+                Node {
+                    padding: UiRect::bottom(Val::Px(10.0)),
+                    ..default()
+                },
+            ));
+            parent.spawn((
+                Text::new(PROJECT_SUBTITLE),
+                TextFont {
+                    font: asset_server.load("fonts/open-sans.regular.ttf"),
+                    font_size: 16.0,
+                    ..default()
+                },
+                TextColor(Color::srgb_u8(0xb0, 0xb0, 0xb0)),
+                Node {
+                    padding: UiRect::bottom(Val::Px(48.0)),
+                    ..default()
+                },
             ));
             parent
                 .spawn((
@@ -43,7 +60,7 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                     Text::new("Start"),
                     TextFont {
                         font: asset_server.load("fonts/open-sans.regular.ttf"),
-                        font_size: 16.0,
+                        font_size: 17.3,
                         ..default()
                     },
                     TextColor(UI_TEXT_COLOR),

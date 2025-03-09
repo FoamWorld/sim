@@ -1,6 +1,7 @@
 use avian2d::math::*;
 
 pub const PROJECT_TITLE: &str = "Mercury & Milfoil";
+pub const PROJECT_SUBTITLE: &str = "by Rratic";
 
 pub const VIEWPORT_WIDTH: Scalar = 500.0;
 pub const VIEWPORT_HEIGHT: Scalar = 375.0;
