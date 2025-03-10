@@ -1,5 +1,4 @@
 use super::object::*;
-use crate::assets::RpgTextures;
 use bevy::prelude::*;
 
 /// Used in item containers.
@@ -65,14 +64,7 @@ impl ItemStorage {
 /// Trait for implementing how an item works.
 #[reflect_trait]
 pub trait Item {
-    fn activate(
-        &self,
-        commands: &mut Commands,
-        entity: Entity,
-        source: Vec2,
-        target: Option<Vec2>,
-        rpg_folder: &RpgTextures,
-    );
+    fn activate(&self, commands: &mut Commands, entity: Entity, source: Vec2, target: Option<Vec2>);
 
     fn modify(&self, _commands: &mut Commands, _entity: Entity) {}
 }
@@ -101,8 +93,8 @@ impl ItemRef {
         let comp = world.get_reflect(entity, id).unwrap();
         let guard = type_registry.0.read();
         let refl = guard.get_type_data::<ReflectItem>(id).unwrap();
-        let it = refl.get(&*comp).unwrap();
-        f(it);
+        let item = refl.get(&*comp).unwrap();
+        f(item);
     }
 }
 

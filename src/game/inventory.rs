@@ -116,13 +116,13 @@ fn setup_item_sprite(
     position: Res<ActorPosition>,
 ) {
     let registry = world.resource::<AppTypeRegistry>();
-    let it = world.entity(item).get::<ObjectRef>().unwrap();
+    let obj = world.entity(item).get::<ObjectRef>().unwrap();
     let mut ec = parent.spawn((
         Transform::from_translation(position.primary_hand_offset.extend(1.0)),
         IsActive,
         WillRemove,
     ));
-    it.add_components(
+    obj.add_components(
         world,
         &mut ec,
         item,

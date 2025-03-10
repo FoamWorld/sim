@@ -26,27 +26,24 @@ impl Object for Wand {
     }
 }
 
-impl Item for Wand {
-    fn activate(
-        &self,
-        commands: &mut Commands,
-        _: Entity,
-        source: Vec2,
-        target: Option<Vec2>,
-        rpg_folder: &RpgTextures,
-    ) {
-        let ray = if let Some(tar) = target {
+struct LaunchMagic {
+    id: usize,
+    source: Vec2,
+    target: Option<Vec2>,
+}
+
+impl Command for LaunchMagic {
+    fn apply(self, world: &mut World) {
+        let source = self.source;
+        let ray = if let Some(tar) = self.target {
             tar - source
         } else {
             Vec2::new(1.0, 0.0)
         };
         let unit = ray / ray.length();
 
-        commands.spawn((
-            Sprite::from_atlas_image(
-                rpg_folder.get_image_handle("spells"),
-                rpg_folder.get_texture_atlas("spells", self.mode),
-            ),
+        let mut commands = world.commands();
+        let mut ammo = commands.spawn((
             Transform::from_xyz(source.x + unit.x * 24.0, source.y + unit.y * 24.0, 0.0),
             RigidBody::Dynamic,
             Collider::circle(6.0),
@@ -56,6 +53,27 @@ impl Item for Wand {
             GravityScale(0.01),
             crate::game::mob::health::Health::fragile(),
         ));
+
+        ammo.queue(move |mut entity: EntityWorldMut<'_>| {
+            let sprite = {
+                let rpg_folder = entity.world().resource::<RpgTextures>();
+                Sprite::from_atlas_image(
+                    rpg_folder.get_image_handle("spells"),
+                    rpg_folder.get_texture_atlas("spells", self.id),
+                )
+            };
+            entity.insert(sprite);
+        });
+    }
+}
+
+impl Item for Wand {
+    fn activate(&self, commands: &mut Commands, _: Entity, source: Vec2, target: Option<Vec2>) {
+        commands.queue(LaunchMagic {
+            id: self.mode,
+            source,
+            target,
+        });
     }
 
     fn modify(&self, commands: &mut Commands, entity: Entity) {

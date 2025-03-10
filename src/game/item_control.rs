@@ -1,5 +1,5 @@
 use super::{inventory::*, item::*, object::*};
-use crate::{assets::*, character::*};
+use crate::character::*;
 use bevy::prelude::*;
 
 fn reach_inventory_item_then<F>(world: &World, inv: Entity, index: usize, f: F)
@@ -23,8 +23,6 @@ pub fn item_use(mut commands: Commands, world: &World, inventory: Res<Inventory>
     let inv = inventory.bind.unwrap();
     let index = inventory.selected;
 
-    let rpg_folder = world.resource::<RpgTextures>();
-
     let position = world.resource::<ActorPosition>();
     let target = world.resource::<crate::physics::camera::CursorCoords>();
     reach_inventory_item_then(world, inv, index, |guarded, item| {
@@ -33,7 +31,6 @@ pub fn item_use(mut commands: Commands, world: &World, inventory: Res<Inventory>
             item,
             position.center + position.primary_hand_offset,
             target.0,
-            rpg_folder,
         );
     });
 }
@@ -61,8 +58,10 @@ pub fn item_throw(mut commands: Commands, world: &World, inventory: Res<Inventor
             storage.extract_one(index.clone());
         });
 
-    let it = world
+    let obj = world
         .entity(storage.get_index(index).unwrap())
         .get::<ObjectRef>()
         .unwrap();
+
+    commands.spawn((obj.clone(),));
 }
