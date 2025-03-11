@@ -78,7 +78,7 @@ pub trait Item {
 /// * (clone) sprite in storage display:
 /// contains `#visual`
 /// * (clone) active entity attached to the character:
-/// contains `#visual`, `#extra (?RotateWithMouse)`
+/// contains `#visual`, `#active (?RotateWithMouse)`
 #[derive(Reflect, Component, Clone)]
 #[reflect(Component)]
 #[type_path = "sim::item"]
@@ -100,4 +100,5 @@ impl ItemRef {
 
 /* List of items. */
 
+pub mod piece;
 pub mod wand;

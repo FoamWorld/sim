@@ -1,5 +1,5 @@
 use super::*;
-use crate::{assets::RpgTextures, game::object::Object};
+use crate::assets::RpgTextures;
 use avian2d::prelude::*;
 use bevy::sprite::Anchor;
 
