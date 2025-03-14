@@ -22,6 +22,7 @@ impl RpgTextures {
             named_atlases_layout: HashMap::<_, _>::new(),
         }
     }
+
     fn process(
         &mut self,
         loaded_folders: Res<Assets<LoadedFolder>>,
@@ -33,7 +34,7 @@ impl RpgTextures {
             // Gets file name.
             let asset_path = handle.path().unwrap();
             let file_name = asset_path.path().file_stem().unwrap();
-            let string = std::ffi::OsString::from(file_name).into_string().unwrap();
+            let string = file_name.to_str().unwrap().to_string();
 
             // Gets image handle.
             let id = handle.id().typed_unchecked::<Image>();
@@ -64,10 +65,12 @@ impl RpgTextures {
             }
         }
     }
+
     pub fn get_image_handle(&self, name: &str) -> Handle<Image> {
         let handle = self.named_images.get(name.into()).unwrap();
         handle.clone_weak()
     }
+
     pub fn get_texture_atlas(&self, name: &str, index: usize) -> TextureAtlas {
         let handle = self.named_atlases_layout.get(name.into()).unwrap();
         TextureAtlas {
@@ -82,10 +85,10 @@ pub fn load_textures(mut commands: Commands, asset_server: Res<AssetServer>) {
         // todo: add "notexture" fallback
         ("character".into(), None),
         ("door".into(), Some((16, 32, 2, 2))),
+        ("hints".into(), Some((13, 13, 6, 5))),
+        ("items".into(), Some((16, 16, 3, 1))),
         ("sign".into(), Some((32, 32, 3, 5))),
         ("spells".into(), Some((16, 16, 4, 1))),
-        ("items".into(), Some((16, 16, 3, 1))),
-        ("hints".into(), Some((13, 13, 6, 5))),
     ];
     commands.insert_resource(RpgTextures::new(
         asset_server.load_folder("textures"),
