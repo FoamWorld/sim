@@ -13,6 +13,7 @@ default = [
 	# ref: https://docs.rs/bevy/latest/bevy/#cargo-features
 	# Default Features
 	"bevy/bevy_asset",
+	"bevy/bevy_picking",
 	"bevy/bevy_render",
 	"bevy/bevy_scene",
 	"bevy/bevy_sprite",
@@ -44,6 +45,6 @@ codegen-units = 1
 lto = "thin"
 
 [dependencies]
-avian2d = "0.2"
-bevy = { version = "0.15", default-features = false }
+avian2d = "0.3"
+bevy = { version = "0.16", default-features = false }
 serde = "1"

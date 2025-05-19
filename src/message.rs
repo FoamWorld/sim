@@ -68,7 +68,7 @@ fn message_timer(
     mut commands: Commands,
     mut query: Query<(Entity, &mut MessageText)>,
 ) {
-    if let Ok((entity, mut text)) = query.get_single_mut() {
+    if let Ok((entity, mut text)) = query.single_mut() {
         text.0.tick(time.delta());
 
         if text.0.finished() {

@@ -14,7 +14,7 @@ pub struct DiagnosticsTextPlugin;
 
 impl Plugin for DiagnosticsTextPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(FrameTimeDiagnosticsPlugin);
+        app.add_plugins(FrameTimeDiagnosticsPlugin::default());
         app.insert_state(DiagnosticsState::Off);
 
         app.add_systems(OnEnter(DiagnosticsState::On), setup_diagnostics_text)

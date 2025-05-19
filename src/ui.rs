@@ -13,7 +13,7 @@ const UI_TEXT_COLOR: Color = Color::srgb(0.73, 0.49, 0.17);
 pub struct UiOnce;
 
 pub fn set_cursor(mut commands: Commands, q_window: Query<Entity, With<PrimaryWindow>>) {
-    let window = if let Ok(window) = q_window.get_single() {
+    let window = if let Ok(window) = q_window.single() {
         window
     } else {
         return;
@@ -33,7 +33,7 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
     with_background(
         &mut commands,
         UI_CLEAR_COLOR,
-        |parent: &mut ChildBuilder<'_>| {
+        |parent: &mut ChildSpawnerCommands| {
             parent.spawn((
                 Text::new(PROJECT_TITLE),
                 TextFont {
@@ -73,7 +73,7 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                 "Quit",
                 font.clone(),
                 |_: Trigger<Pointer<Click>>, mut writer: EventWriter<AppExit>| {
-                    writer.send(AppExit::Success);
+                    writer.write(AppExit::Success);
                 },
             );
         },
@@ -96,7 +96,7 @@ pub fn start_mode_selection(mut commands: Commands, asset_server: Res<AssetServe
     with_background(
         &mut commands,
         UI_CLEAR_COLOR,
-        |parent: &mut ChildBuilder<'_>| {
+        |parent: &mut ChildSpawnerCommands| {
             for mode in mode_list {
                 add_button(
                     parent,
@@ -141,11 +141,15 @@ pub fn start_pause(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 pub fn finish_ui(mut commands: Commands, query: Query<Entity, With<UiOnce>>) {
     for entity in query.iter() {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 
-fn with_background(commands: &mut Commands, color: Color, f: impl FnOnce(&mut ChildBuilder<'_>)) {
+fn with_background(
+    commands: &mut Commands,
+    color: Color,
+    f: impl FnOnce(&mut ChildSpawnerCommands),
+) {
     commands
         .spawn((
             Node {
@@ -164,7 +168,7 @@ fn with_background(commands: &mut Commands, color: Color, f: impl FnOnce(&mut Ch
 }
 
 fn add_button<E: Event, B: Bundle, M>(
-    parent: &mut ChildBuilder,
+    parent: &mut ChildSpawnerCommands,
     name: &str,
     font: TextFont,
     observer: impl bevy::ecs::system::IntoObserverSystem<E, B, M>,
@@ -183,7 +187,7 @@ fn add_button<E: Event, B: Bundle, M>(
         .observe(observer);
 }
 
-fn add_back_to_menu_button(parent: &mut ChildBuilder, font: TextFont) {
+fn add_back_to_menu_button(parent: &mut ChildSpawnerCommands, font: TextFont) {
     add_button(
         parent,
         "back to menu",

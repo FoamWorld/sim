@@ -21,8 +21,8 @@ pub fn translate_cursor_position(
     q_window: Query<&Window, With<PrimaryWindow>>,
     q_camera: Query<(&Camera, &GlobalTransform), With<PrimaryCamera>>,
 ) {
-    let (camera, camera_transform) = q_camera.single();
-    let window = if let Ok(window) = q_window.get_single() {
+    let (camera, camera_transform) = q_camera.single().unwrap();
+    let window = if let Ok(window) = q_window.single() {
         window
     } else {
         return;

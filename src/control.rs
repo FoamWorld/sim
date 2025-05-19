@@ -71,7 +71,7 @@ impl Default for ControlSettings {
             (
                 ControlCode::Throw,
                 InputDetectionType::JustPressed(KeyCode::KeyQ),
-            )
+            ),
         ];
         let map: HashMap<_, _> = list.into_iter().collect();
         Self(map)
@@ -118,7 +118,7 @@ pub fn inputs_wait(
 pub struct MovementSpeed(pub Scalar);
 
 pub fn change_facing(mut actors: Query<(&mut Actor, &mut Sprite), Changed<Actor>>) {
-    if let Ok((actor, mut sprite)) = actors.get_single_mut() {
+    if let Ok((actor, mut sprite)) = actors.single_mut() {
         sprite.flip_x = match actor.0 {
             ActorFacing::Left => true,
             ActorFacing::Right => false,
@@ -131,18 +131,19 @@ pub fn inputs_move(
     control_settings: Res<ControlSettings>,
     mut actors: Query<(&mut LinearVelocity, &mut Actor, &MovementSpeed)>,
 ) {
-    let (mut linear_velocity, mut actor, movement_speed) = actors.single_mut();
-    let to_left = control_settings.check(ControlCode::MoveLeft, &keys);
-    let to_right = control_settings.check(ControlCode::MoveRight, &keys);
-    // let yneg = control_settings.check(ControlCode::MoveDown, &keys);
-    let jump = control_settings.check(ControlCode::MoveUp, &keys);
-    if to_left {
-        actor.set_facing(ActorFacing::Left);
-    } else if to_right {
-        actor.set_facing(ActorFacing::Right);
-    }
-    linear_velocity.x = (to_right as i8 - to_left as i8) as Scalar * movement_speed.0;
-    if linear_velocity.y.abs() < 0.1 && jump {
-        linear_velocity.y = 100.0;
+    if let Ok((mut linear_velocity, mut actor, movement_speed)) = actors.single_mut() {
+        let to_left = control_settings.check(ControlCode::MoveLeft, &keys);
+        let to_right = control_settings.check(ControlCode::MoveRight, &keys);
+        // let yneg = control_settings.check(ControlCode::MoveDown, &keys);
+        let jump = control_settings.check(ControlCode::MoveUp, &keys);
+        if to_left {
+            actor.set_facing(ActorFacing::Left);
+        } else if to_right {
+            actor.set_facing(ActorFacing::Right);
+        }
+        linear_velocity.x = (to_right as i8 - to_left as i8) as Scalar * movement_speed.0;
+        if linear_velocity.y.abs() < 0.1 && jump {
+            linear_velocity.y = 100.0;
+        }
     }
 }

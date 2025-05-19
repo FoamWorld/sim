@@ -6,7 +6,7 @@ pub struct HealthClearedEvent(pub Entity);
 pub fn read_health_cleared(mut commands: Commands, mut reader: EventReader<HealthClearedEvent>) {
     for health_cleared in reader.read() {
         let entity = health_cleared.0;
-        if let Some(mut ec) = commands.get_entity(entity) {
+        if let Ok(mut ec) = commands.get_entity(entity) {
             ec.despawn();
         }
     }
