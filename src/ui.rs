@@ -12,6 +12,39 @@ const UI_TEXT_COLOR: Color = Color::srgb(0.73, 0.49, 0.17);
 #[derive(Component)]
 pub struct UiOnce;
 
+#[derive(Component)]
+pub enum ButtonType {
+    Start,
+    Quit,
+    ToGame,
+    Resume,
+    Save,
+    BackToMenu,
+}
+
+pub fn button_system(
+    query: Query<(&Interaction, &ButtonType), Changed<Interaction>>,
+    mut next_app_state: ResMut<NextState<AppState>>,
+    mut next_game_state: ResMut<NextState<GameState>>,
+    mut next_process_state: ResMut<NextState<ProcessState>>,
+    mut writer_exit: EventWriter<AppExit>,
+) {
+    for (interaction, btn_type) in &query {
+        if *interaction == Interaction::Pressed {
+            match btn_type {
+                ButtonType::Start => next_app_state.set(AppState::ModeSelection),
+                ButtonType::Quit => {
+                    writer_exit.write(AppExit::Success);
+                }
+                ButtonType::ToGame => next_app_state.set(AppState::InGame),
+                ButtonType::Resume => next_game_state.set(GameState::Running),
+                ButtonType::Save => next_process_state.set(ProcessState::PreSaveScene),
+                ButtonType::BackToMenu => next_app_state.set(AppState::Menu),
+            }
+        }
+    }
+}
+
 pub fn set_cursor(mut commands: Commands, q_window: Query<Entity, With<PrimaryWindow>>) {
     let window = if let Ok(window) = q_window.single() {
         window
@@ -60,22 +93,8 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                     ..default()
                 },
             ));
-            add_button(
-                parent,
-                "Start",
-                font.clone(),
-                |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<AppState>>| {
-                    next_state.set(AppState::ModeSelection);
-                },
-            );
-            add_button(
-                parent,
-                "Quit",
-                font.clone(),
-                |_: Trigger<Pointer<Click>>, mut writer: EventWriter<AppExit>| {
-                    writer.write(AppExit::Success);
-                },
-            );
+            add_button(parent, "Start", font.clone(), ButtonType::Start);
+            add_button(parent, "Quit", font.clone(), ButtonType::Quit);
         },
     );
 }
@@ -98,14 +117,7 @@ pub fn start_mode_selection(mut commands: Commands, asset_server: Res<AssetServe
         UI_CLEAR_COLOR,
         |parent: &mut ChildSpawnerCommands| {
             for mode in mode_list {
-                add_button(
-                    parent,
-                    mode,
-                    font.clone(),
-                    |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<AppState>>| {
-                        next_state.set(AppState::InGame);
-                    },
-                );
+                add_button(parent, mode, font.clone(), ButtonType::ToGame);
             }
         },
     );
@@ -119,22 +131,8 @@ pub fn start_pause(mut commands: Commands, asset_server: Res<AssetServer>) {
     };
 
     with_background(&mut commands, UI_CLOTH_COLOR, |parent| {
-        add_button(
-            parent,
-            "resume",
-            font.clone(),
-            |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<GameState>>| {
-                next_state.set(GameState::Running);
-            },
-        );
-        add_button(
-            parent,
-            "save",
-            font.clone(),
-            |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<ProcessState>>| {
-                next_state.set(ProcessState::PreSaveScene);
-            },
-        );
+        add_button(parent, "resume", font.clone(), ButtonType::Resume);
+        add_button(parent, "save", font.clone(), ButtonType::Save);
         add_back_to_menu_button(parent, font);
     });
 }
@@ -167,33 +165,20 @@ fn with_background(
         .with_children(f);
 }
 
-fn add_button<E: Event, B: Bundle, M>(
-    parent: &mut ChildSpawnerCommands,
-    name: &str,
-    font: TextFont,
-    observer: impl bevy::ecs::system::IntoObserverSystem<E, B, M>,
-) {
-    parent
-        .spawn((
-            Button,
-            Text::new(name),
-            font,
-            TextColor(UI_TEXT_COLOR),
-            TextLayout {
-                justify: JustifyText::Center,
-                ..default()
-            },
-        ))
-        .observe(observer);
+fn add_button(parent: &mut ChildSpawnerCommands, name: &str, font: TextFont, but_type: ButtonType) {
+    parent.spawn((
+        Button,
+        but_type,
+        Text::new(name),
+        font,
+        TextColor(UI_TEXT_COLOR),
+        TextLayout {
+            justify: JustifyText::Center,
+            ..default()
+        },
+    ));
 }
 
 fn add_back_to_menu_button(parent: &mut ChildSpawnerCommands, font: TextFont) {
-    add_button(
-        parent,
-        "back to menu",
-        font,
-        |_: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<AppState>>| {
-            next_state.set(AppState::Menu);
-        },
-    );
+    add_button(parent, "back to menu", font, ButtonType::BackToMenu);
 }

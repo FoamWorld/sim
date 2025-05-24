@@ -1,6 +1,6 @@
 use crate::{
     character::*,
-    game::{item::*, mob::*, object::*},
+    game::{ecs::*, item::*, item_storage::*, mob::*, object::*},
     physics::collision::*,
     state::*,
 };
@@ -78,12 +78,9 @@ impl Plugin for RegisteryPlugin {
 
         app.add_systems(
             OnEnter(ProcessState::PostLoadScene),
-            (
-                process_loaded_scene,
-                |mut next_state: ResMut<NextState<ProcessState>>| {
-                    next_state.set(ProcessState::PreEnterGame);
-                },
-            )
+            (|mut next_state: ResMut<NextState<ProcessState>>| {
+                next_state.set(ProcessState::PreEnterGame);
+            },)
                 .chain()
                 .in_set(ProcessSet::Early),
         );
@@ -102,20 +99,13 @@ impl Plugin for RegisteryPlugin {
         app.add_systems(OnEnter(ProcessState::PreSaveScene), save_scene_system);
 
         app
-            // core
+            // model
+            .register_type::<barrier::BarrierModel>()
+            .register_type::<wand::WandModel>()
             // utils
             .register_type::<Actor>()
             .register_type::<ItemStorage>()
             .register_type::<Sign>()
-            // objects
-            .register_type::<ObjectRef>()
-            .register_type::<Barrier>()
-            .register_type::<NonUnique>()
-            .register_type::<sign::SignStand>()
-            .register_type::<door::Door>()
-            // items
-            .register_type::<ItemRef>()
-            .register_type::<wand::Wand>()
             // mobs
             .register_type::<health::Health>();
     }
@@ -137,43 +127,16 @@ pub fn load_scene_system(
         );
 }
 
-pub fn process_loaded_scene(
-    world: &World,
-    mut commands: Commands,
-    query: Query<(Entity, &ObjectRef)>,
-) {
-    let type_registry = world.resource::<AppTypeRegistry>();
-    for (entity, marker) in query.iter() {
-        let mut ec = commands.entity(entity);
-        marker.add_components(
-            world,
-            &mut ec,
-            entity,
-            type_registry,
-            AdditionConfig::IN_SCENE,
-        );
-    }
-}
-
 pub fn save_scene_system(world: &mut World) {
     let scene = {
-        let mut query = world.query_filtered::<Entity, With<ObjectRef>>();
+        let mut query = world.query_filtered::<Entity, With<Eidos>>();
         let scene_builder = DynamicSceneBuilder::from_world(&world)
             .deny_all()
             // core
             .allow_component::<Transform>()
             // utils
             .allow_component::<Sign>()
-            // objects
-            .allow_component::<ObjectRef>()
-            .allow_component::<Barrier>()
-            .allow_component::<NonUnique>()
-            .allow_component::<sign::SignStand>()
-            .allow_component::<door::Door>()
-            // items
-            .allow_component::<ItemRef>()
             .allow_component::<ItemStorage>()
-            .allow_component::<wand::Wand>()
             // mobs
             .allow_component::<health::Health>();
         scene_builder.extract_entities(query.iter(&world)).build()

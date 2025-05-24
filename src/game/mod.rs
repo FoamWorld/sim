@@ -2,9 +2,11 @@ use crate::{character::*, control::*, scene::*, state::*};
 use bevy::prelude::*;
 
 pub mod character;
+pub mod ecs;
 pub mod inventory;
 pub mod item;
 pub mod item_control;
+pub mod item_storage;
 pub mod mob;
 pub mod object;
 
@@ -32,11 +34,19 @@ impl Plugin for GamePlugin {
                 setup_inventory,
                 setup_inventory_ui,
                 |mut writer: EventWriter<InventorySelectedUpdateEvent>| {
-                    writer.send(InventorySelectedUpdateEvent);
+                    writer.write(InventorySelectedUpdateEvent);
                 },
             )
                 .chain()
                 .in_set(ProcessSet::Late),
+        );
+
+        app.add_systems(
+            Update,
+            (
+                object::barrier::setup_barrier_model,
+                item::wand::setup_wand_model,
+            ),
         );
 
         app.add_systems(
@@ -134,6 +144,6 @@ fn detect_input_choose(
     };
     if number < inventory.size {
         inventory.selected = number;
-        writer.send(InventorySelectedUpdateEvent);
+        writer.write(InventorySelectedUpdateEvent);
     }
 }

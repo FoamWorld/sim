@@ -56,6 +56,8 @@ impl Plugin for AppStatePlugin {
                 .run_if(in_state(AppState::InGame)),
         );
 
+        app.add_systems(Update, button_system);
+
         // AppState::Initialize
         app.add_systems(PostStartup, (load_textures, set_cursor))
             .add_systems(
@@ -124,7 +126,7 @@ fn remove_all(
         Or<(
             With<WillRemove>,
             // With<UiOnce>,
-            With<crate::game::object::ObjectRef>,
+            With<crate::game::ecs::Eidos>,
         )>,
     >,
 ) {

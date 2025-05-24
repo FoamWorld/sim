@@ -1,10 +1,6 @@
-use super::{
-    item::{wand::Wand, *},
-    object::*,
-};
-use crate::{character::*, constants::*, state::WillRemove};
+use super::{ecs::*, item::wand::WandModel, item_storage::*};
+use crate::{assets::RpgTextures, character::*, constants::*, state::WillRemove};
 use bevy::prelude::*;
-use std::any::Any;
 
 #[derive(Resource)]
 pub struct Inventory {
@@ -20,12 +16,7 @@ pub struct InventorySelectedUpdateEvent;
 pub struct UiGrid(pub usize);
 
 pub fn setup_inventory(mut commands: Commands, mut inventory: ResMut<Inventory>) {
-    let launcher = {
-        let debug_wand = Wand { mode: 3 };
-        commands
-            .spawn((debug_wand, ObjectRef(debug_wand.type_id()), ItemRef))
-            .id()
-    };
+    let launcher = commands.spawn(WandModel { mode: 3 }).id();
 
     let mut storage = ItemStorage::with_capacity(4);
     storage.force_give(0, launcher);
@@ -34,7 +25,6 @@ pub fn setup_inventory(mut commands: Commands, mut inventory: ResMut<Inventory>)
 }
 
 pub fn setup_inventory_ui(mut commands: Commands, world: &World, inventory: Res<Inventory>) {
-    let type_registry = world.resource::<AppTypeRegistry>();
     let storage = world
         .entity(inventory.bind.unwrap())
         .get::<ItemStorage>()
@@ -63,8 +53,11 @@ pub fn setup_inventory_ui(mut commands: Commands, world: &World, inventory: Res<
                 WillRemove,
             ));
             if let Some(item) = storage.storage[ind] {
-                let object = world.entity(item).get::<ObjectRef>().unwrap();
-                object.add_components(world, &mut ec, item, type_registry, AdditionConfig::IN_GRID);
+                if let Some(icon) = world.entity(item).get::<IconImage>() {
+                    icon.inserts_image(&mut ec, world.resource::<RpgTextures>());
+                } else {
+                    ec.insert(ImageNode::solid_color(Color::BLACK));
+                };
             } else {
                 ec.insert(ImageNode::solid_color(Color::NONE));
             }
@@ -95,15 +88,15 @@ pub fn update_attached_image(
     }
     reader.clear();
 
-    let actor = actors.single();
-    commands.entity(actor).despawn_descendants();
+    let actor = actors.single().unwrap();
+    commands.entity(actor).despawn_related::<Children>();
 
     let inv = inventory.bind.unwrap();
     let storage = world.entity(inv).get::<ItemStorage>().unwrap();
     if let Some(item) = storage.get_index(inventory.selected) {
         commands
             .entity(actor)
-            .with_children(|parent: &mut ChildBuilder<'_>| {
+            .with_children(|parent: &mut ChildSpawnerCommands| {
                 setup_item_sprite(world, item, parent, position);
             });
     };
@@ -112,21 +105,15 @@ pub fn update_attached_image(
 fn setup_item_sprite(
     world: &World,
     item: Entity,
-    parent: &mut ChildBuilder,
+    parent: &mut ChildSpawnerCommands,
     position: Res<ActorPosition>,
 ) {
-    let registry = world.resource::<AppTypeRegistry>();
-    let obj = world.entity(item).get::<ObjectRef>().unwrap();
-    let mut ec = parent.spawn((
+    let rpg_folder = world.resource::<RpgTextures>();
+    let mut commands = parent.spawn((
         Transform::from_translation(position.primary_hand_offset.extend(1.0)),
         IsActive,
-        WillRemove,
     ));
-    obj.add_components(
-        world,
-        &mut ec,
-        item,
-        registry,
-        AdditionConfig::CHARACTER_ATTACH,
-    );
+    if let Some(icon) = world.entity(item).get::<IconImage>() {
+        icon.inserts_sprite(&mut commands, rpg_folder);
+    }
 }

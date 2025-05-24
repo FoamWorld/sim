@@ -1,22 +1,10 @@
-use super::{inventory::*, item::*, object::*};
+use super::{ecs::*, inventory::*, item_storage::*};
 use crate::character::*;
 use bevy::prelude::*;
 
-fn reach_inventory_item_then<F>(world: &World, inv: Entity, index: usize, f: F)
-where
-    F: FnOnce(&dyn Item, Entity) -> (),
-{
+fn reach_inventory_item(world: &World, inv: Entity, index: usize) -> Option<Entity> {
     let storage = world.entity(inv).get::<ItemStorage>().unwrap();
-    let item = if let Some(item) = storage.get_index(index) {
-        item
-    } else {
-        return;
-    };
-
-    let type_registry = world.resource::<AppTypeRegistry>();
-    ItemRef::apply_to_item(world, item, type_registry, |guarded| {
-        f(guarded, item);
-    });
+    storage.get_index(index)
 }
 
 pub fn item_use(mut commands: Commands, world: &World, inventory: Res<Inventory>) {
@@ -24,23 +12,27 @@ pub fn item_use(mut commands: Commands, world: &World, inventory: Res<Inventory>
     let index = inventory.selected;
 
     let position = world.resource::<ActorPosition>();
-    let target = world.resource::<crate::physics::camera::CursorCoords>();
-    reach_inventory_item_then(world, inv, index, |guarded, item| {
-        guarded.activate(
-            &mut commands,
-            item,
-            position.center + position.primary_hand_offset,
-            target.0,
-        );
-    });
+    let source = position.center + position.primary_hand_offset;
+
+    let cursor_coords = world.resource::<crate::physics::camera::CursorCoords>();
+    let target = cursor_coords.0.unwrap_or(source + position.facing_offset);
+
+    if let Some(item) = reach_inventory_item(world, inv, index) {
+        if let Some(cmd) = world.entity(item).get::<ActivateCommand>() {
+            cmd.execute(&mut commands, world, item, source, target);
+        }
+    }
 }
 
 pub fn item_modify(mut commands: Commands, world: &World, inventory: Res<Inventory>) {
     let inv = inventory.bind.unwrap();
     let index = inventory.selected;
-    reach_inventory_item_then(world, inv, index, |guarded, item| {
-        guarded.modify(&mut commands, item);
-    });
+
+    if let Some(item) = reach_inventory_item(world, inv, index) {
+        if let Some(cmd) = world.entity(item).get::<ModifyCommand>() {
+            cmd.execute(&mut commands, item);
+        }
+    }
 }
 
 pub fn item_throw(mut commands: Commands, world: &World, inventory: Res<Inventory>) {
@@ -57,11 +49,4 @@ pub fn item_throw(mut commands: Commands, world: &World, inventory: Res<Inventor
             let mut storage = entity.get_mut::<ItemStorage>().unwrap();
             storage.extract_one(index.clone());
         });
-
-    let obj = world
-        .entity(storage.get_index(index).unwrap())
-        .get::<ObjectRef>()
-        .unwrap();
-
-    commands.spawn((obj.clone(),));
 }
