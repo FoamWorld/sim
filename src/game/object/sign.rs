@@ -1,23 +1,35 @@
 use super::*;
-use crate::{game::object::Object, physics::collision::BackgroundLevel};
+use crate::physics::collision::BackgroundLevel;
 
-#[derive(Reflect, Component, Clone)]
-#[reflect(Object, Component)]
-#[type_path = "sim::object"]
-pub struct SignStand(usize);
+#[derive(Reflect, Component, Clone, Copy)]
+#[reflect(Component)]
+#[type_path = "sim::model"]
+pub struct SignModel(usize);
 
-impl Object for SignStand {
-    fn texture_info(&self) -> Option<(&str, Option<usize>)> {
-        Some(("sign", Some(self.0)))
-    }
-
-    fn add_physics_components(&self, commands: &mut EntityCommands) {
-        commands.insert((
-            BackgroundLevel,
-            RigidBody::Dynamic,
-            RigidBodyDisabled,
-            Collider::rectangle(28.0, 26.0),
-            Mass(40.0),
-        ));
+pub fn setup_door_model(
+    mut commands: Commands,
+    query: Query<(Entity, &SignModel), Added<SignModel>>,
+) {
+    for (entity, model) in &query {
+        let sign = commands
+            .spawn((
+                Methexis(entity),
+                RigidBody::Fixed,
+                RigidBodyDisabled,
+                BackgroundLevel,
+                Collider::cuboid(28.0, 26.0),
+                ColliderMassProperties::Mass(40.0),
+            ))
+            .id();
+        commands
+            .entity(entity)
+            .insert(IconImage {
+                sheet: "sign".to_string(),
+                index: Some(model.0),
+            })
+            .clone_with(sign, |builder| {
+                builder.deny_all().allow::<Transform>();
+            })
+            .remove::<SignModel>();
     }
 }

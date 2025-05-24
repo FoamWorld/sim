@@ -1,6 +1,6 @@
-use crate::{character::*, state::*};
-use avian2d::{math::*, prelude::*};
+use crate::{character::*, constants::Scalar, state::*};
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 use std::collections::HashMap;
 
 #[derive(Debug, Hash, Ord, PartialOrd, PartialEq, Eq, Clone, Copy)]
@@ -105,7 +105,7 @@ impl Plugin for ControlPlugin {
 }
 
 pub fn inputs_wait(
-    mut time: ResMut<Time<Physics>>,
+    mut time: ResMut<Time<Fixed>>,
     keys: Res<ButtonInput<KeyCode>>,
     control_settings: Res<ControlSettings>,
 ) {
@@ -129,9 +129,9 @@ pub fn change_facing(mut actors: Query<(&mut Actor, &mut Sprite), Changed<Actor>
 pub fn inputs_move(
     keys: Res<ButtonInput<KeyCode>>,
     control_settings: Res<ControlSettings>,
-    mut actors: Query<(&mut LinearVelocity, &mut Actor, &MovementSpeed)>,
+    mut actors: Query<(&mut Velocity, &mut Actor, &MovementSpeed)>,
 ) {
-    if let Ok((mut linear_velocity, mut actor, movement_speed)) = actors.single_mut() {
+    if let Ok((mut velocity, mut actor, movement_speed)) = actors.single_mut() {
         let to_left = control_settings.check(ControlCode::MoveLeft, &keys);
         let to_right = control_settings.check(ControlCode::MoveRight, &keys);
         // let yneg = control_settings.check(ControlCode::MoveDown, &keys);
@@ -141,9 +141,9 @@ pub fn inputs_move(
         } else if to_right {
             actor.set_facing(ActorFacing::Right);
         }
-        linear_velocity.x = (to_right as i8 - to_left as i8) as Scalar * movement_speed.0;
-        if linear_velocity.y.abs() < 0.1 && jump {
-            linear_velocity.y = 100.0;
+        velocity.linvel.x = (to_right as i8 - to_left as i8) as Scalar * movement_speed.0;
+        if velocity.linvel.y.abs() < 0.1 && jump {
+            velocity.linvel.y = 100.0;
         }
     }
 }

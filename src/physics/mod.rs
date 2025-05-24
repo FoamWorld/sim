@@ -1,6 +1,6 @@
 use crate::state::*;
-use avian2d::prelude::*;
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 use camera::*;
 use collision::*;
 
@@ -30,10 +30,12 @@ impl Plugin for GamePhysicsPlugin {
             ));
         });
 
+        /*
         app.add_systems(
             PostProcessCollisions,
             inspect_collisions.in_set(InGameSet::Logic),
         );
+        */
 
         app.add_systems(
             Update,

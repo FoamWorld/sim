@@ -1,6 +1,5 @@
 use super::*;
 use crate::assets::RpgTextures;
-use avian2d::prelude::*;
 
 #[derive(Reflect, Component, Clone, Copy)]
 #[reflect(Component)]
@@ -65,10 +64,10 @@ impl Command for LaunchMagic {
         let mut ammo = commands.spawn((
             Transform::from_xyz(source.x + unit.x * 24.0, source.y + unit.y * 24.0, 0.0),
             RigidBody::Dynamic,
-            Collider::circle(6.0),
+            Collider::ball(6.0),
+            ColliderMassProperties::Mass(1.0),
             LockedAxes::ROTATION_LOCKED,
-            LinearVelocity(unit * 40.0),
-            Mass(1.0),
+            Velocity::linear(unit * 40.0),
             GravityScale(0.01),
             crate::game::mob::health::Health::fragile(),
         ));

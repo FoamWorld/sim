@@ -1,4 +1,5 @@
-use avian2d::math::*;
+pub type Scalar = f32;
+pub const PI: Scalar = std::f32::consts::PI;
 
 pub const PROJECT_TITLE: &str = "Mercury & Milfoil";
 pub const PROJECT_SUBTITLE: &str = "by Rratic";

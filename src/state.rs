@@ -1,5 +1,4 @@
 use crate::{assets::*, control::*, ui::*};
-use avian2d::prelude::*;
 use bevy::{asset::*, prelude::*};
 
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
@@ -103,7 +102,7 @@ fn toggle_pause(
 
 fn enter_pause(
     commands: Commands,
-    mut time: ResMut<Time<Physics>>,
+    mut time: ResMut<Time<Virtual>>,
     asset_server: Res<AssetServer>,
 ) {
     time.pause();
@@ -112,7 +111,7 @@ fn enter_pause(
 
 fn exit_pause(
     commands: Commands,
-    mut time: ResMut<Time<Physics>>,
+    mut time: ResMut<Time<Virtual>>,
     query: Query<Entity, With<UiOnce>>,
 ) {
     time.unpause();

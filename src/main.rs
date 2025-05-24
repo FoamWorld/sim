@@ -1,14 +1,14 @@
 #![allow(dead_code, reason = "developing period")]
 
-extern crate avian2d;
 extern crate bevy;
+extern crate bevy_rapier2d;
 extern crate serde;
 
-use avian2d::prelude::*;
 use bevy::{
     prelude::*,
     window::{EnabledButtons, WindowResolution},
 };
+use bevy_rapier2d::prelude::*;
 
 mod assets;
 mod character;
@@ -45,7 +45,7 @@ fn main() {
             primary_window: Some(window),
             ..default()
         }),
-        PhysicsPlugins::default().with_length_unit(UNIT_PER_METER),
+        RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(UNIT_PER_METER),
         state::AppStatePlugin,
         diagnostics::DiagnosticsTextPlugin,
         control::ControlPlugin,
@@ -55,6 +55,5 @@ fn main() {
         statistics::StatisticsPlugin,
         game::GamePlugin,
     ));
-    app.insert_resource(Gravity(Vec2::NEG_Y * 628.0));
     app.run();
 }

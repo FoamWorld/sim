@@ -1,6 +1,6 @@
 use crate::{assets::RpgTextures, constants::*, control::*, state::WillRemove};
-use avian2d::prelude::*;
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 #[derive(Component)]
 pub struct IsActive;
@@ -52,9 +52,9 @@ pub fn setup_character(mut commands: Commands, rpg_folder: Res<RpgTextures>) {
         },
         Transform::from_xyz(0.0, 0.0, CHARACTER_LAYER),
         RigidBody::Dynamic,
-        Collider::rectangle(CHARACTER_X_LENGTH, CHARACTER_Y_LENGTH),
+        Collider::cuboid(CHARACTER_X_LENGTH, CHARACTER_Y_LENGTH),
+        ColliderMassProperties::Mass(70.0),
         LockedAxes::ROTATION_LOCKED,
-        Mass(70.0),
         MovementSpeed(100.0),
         Actor(ActorFacing::Right),
         WillRemove,

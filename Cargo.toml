@@ -13,6 +13,7 @@ default = [
 	# ref: https://docs.rs/bevy/latest/bevy/#cargo-features
 	# Default Features
 	"bevy/bevy_asset",
+	"bevy/bevy_log",
 	"bevy/bevy_picking",
 	"bevy/bevy_render",
 	"bevy/bevy_scene",
@@ -28,6 +29,9 @@ default = [
 	# Optional Features
 	"bevy/dynamic_linking",
 	"bevy/serialize",
+
+	# Rapier
+	"bevy_rapier2d/serde-serialize"
 ]
 
 devtools = ["default"]
@@ -45,6 +49,6 @@ codegen-units = 1
 lto = "thin"
 
 [dependencies]
-avian2d = "0.3"
 bevy = { version = "0.16", default-features = false }
+bevy_rapier2d = "0.30.0"
 serde = "1"

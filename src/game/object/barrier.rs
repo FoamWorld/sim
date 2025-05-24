@@ -1,4 +1,5 @@
 use super::*;
+use crate::constants::Scalar;
 
 #[derive(Reflect, Component, Clone, Copy)]
 #[reflect(Component)]
@@ -20,8 +21,8 @@ pub fn setup_barrier_model(
                     bevy::color::palettes::basic::GRAY,
                     Vec2::new(model.x_length, model.y_length),
                 ),
-                RigidBody::Static,
-                Collider::rectangle(model.x_length, model.y_length),
+                RigidBody::Fixed,
+                Collider::cuboid(model.x_length, model.y_length),
             ))
             .id();
         commands

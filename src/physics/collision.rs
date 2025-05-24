@@ -3,8 +3,8 @@ use crate::{
     game::mob::health::{Health, HealthClearedEvent},
     message::MessageEvent,
 };
-use avian2d::prelude::*;
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 #[derive(Component)]
 pub struct BackgroundLevel;
@@ -19,10 +19,11 @@ pub fn inspect_collisions(
     query_player: Query<&Actor, With<RigidBody>>,
     query_background: Query<&BackgroundLevel, With<RigidBody>>,
     query_health: Query<&Health>,
-    mut collisions: ResMut<Collisions>,
+    mut collisions: EventReader<CollisionEvent>,
     mut writer_touch: EventWriter<TouchEvent>,
     mut writer_crash: EventWriter<CrashEvent>,
 ) {
+    /*
     collisions.retain(|contacts| {
         let e1 = contacts.entity1;
         let e2 = contacts.entity2;
@@ -46,10 +47,10 @@ pub fn inspect_collisions(
 
         // Check crash.
         if query_health.contains(e1) && !bg2 {
-            writer_crash.send(CrashEvent(e1, e2));
+            writer_crash.write(CrashEvent(e1, e2));
         }
         if query_health.contains(e2) && !bg1 {
-            writer_crash.send(CrashEvent(e2, e1));
+            writer_crash.write(CrashEvent(e2, e1));
         }
 
         // Check touch.
@@ -63,9 +64,10 @@ pub fn inspect_collisions(
         if !query_player.contains(other_entity) {
             return true;
         }
-        writer_touch.send(TouchEvent(pillow));
+        writer_touch.write(TouchEvent(pillow));
         false
     });
+    */
 }
 
 pub fn read_crash(
@@ -78,7 +80,7 @@ pub fn read_crash(
         if let Ok(mut health) = q_h.get_mut(sufferer) {
             health.shift(-1.0);
             if !health.is_alive() {
-                writer.send(HealthClearedEvent(sufferer));
+                writer.write(HealthClearedEvent(sufferer));
             }
         }
     }
@@ -98,7 +100,7 @@ pub fn read_touch_sign(
         let result = query_sign.get(ev.0);
         if result.is_ok() {
             let sign = result.unwrap();
-            writer.send(MessageEvent::info(sign.0.as_str()));
+            writer.write(MessageEvent::info(sign.0.as_str()));
         }
     }
 }

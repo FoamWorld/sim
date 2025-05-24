@@ -1,6 +1,6 @@
 use super::ecs::*;
-use avian2d::{math::*, prelude::*};
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 pub mod barrier;
 pub mod door;

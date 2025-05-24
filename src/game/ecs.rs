@@ -1,5 +1,5 @@
 use crate::assets::RpgTextures;
-use avian2d::math::Scalar;
+use crate::constants::*;
 use bevy::prelude::*;
 
 /* Relation */
@@ -39,11 +39,7 @@ impl HoldsConfig {
     pub fn get_rotate_range(&self) -> (Scalar, Scalar, Scalar) {
         match self {
             HoldsConfig::Default => (0.0, 0.0, 0.0),
-            HoldsConfig::Wand => (
-                -std::f32::consts::PI * 0.25,
-                0.0,
-                std::f32::consts::PI * 0.4,
-            ),
+            HoldsConfig::Wand => (-PI * 0.25, 0.0, PI * 0.4),
             HoldsConfig::Custom((_, tuple)) => tuple.clone(),
         }
     }
