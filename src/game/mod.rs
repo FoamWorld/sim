@@ -3,6 +3,7 @@ use bevy::prelude::*;
 
 pub mod character;
 pub mod ecs;
+pub mod feed;
 pub mod inventory;
 pub mod item;
 pub mod item_control;

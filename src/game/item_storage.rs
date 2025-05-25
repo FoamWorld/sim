@@ -44,8 +44,8 @@ impl ItemStorage {
         self.storage[index]
     }
 
-    pub fn force_give(&mut self, index: usize, entity: Entity) {
-        self.count[index] = 1.0;
+    pub fn force_give(&mut self, index: usize, entity: Entity, count: ItemAmount) {
+        self.count[index] = count;
         self.storage[index] = Some(entity);
     }
 

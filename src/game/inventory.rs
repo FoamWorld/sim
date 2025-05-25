@@ -28,7 +28,7 @@ pub fn setup_inventory(mut commands: Commands, mut inventory: ResMut<Inventory>)
             entity_world_mut
                 .get_mut::<ItemStorage>()
                 .unwrap()
-                .force_give(0, launcher);
+                .force_give(0, launcher, 4.0);
         });
 }
 
@@ -118,25 +118,13 @@ pub fn update_attached_image(
     let inv = inventory.bind.unwrap();
     let storage = world.entity(inv).get::<ItemStorage>().unwrap();
     if let Some(item) = storage.get_index(inventory.selected) {
-        let mut ec = commands.spawn((
+        let ec = commands.spawn((
             Methexis(item),
             ChildOf(actor),
             Transform::from_translation(position.primary_hand_offset.extend(1.0)),
             IsActive,
         ));
 
-        let entity = world.entity(item);
-
-        if let Some(icon) = entity.get::<IconImage>() {
-            let rpg_folder = world.resource::<RpgTextures>();
-            icon.inserts_sprite(&mut ec, rpg_folder);
-        }
-
-        if let Some(holds) = entity.get::<HoldsConfig>() {
-            ec.insert((
-                bevy::sprite::Anchor::Custom(holds.get_offset()),
-                crate::physics::camera::RotateWithMouse::new(holds.get_rotate_range()),
-            ));
-        }
+        super::feed::feed_to_attach(item, world, ec);
     };
 }

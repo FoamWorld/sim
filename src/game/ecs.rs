@@ -32,7 +32,7 @@ impl HoldsConfig {
         match self {
             HoldsConfig::Default => Vec2::ZERO,
             HoldsConfig::Wand => Vec2::splat(-0.4),
-            HoldsConfig::Custom((vec, _)) => vec.clone(),
+            HoldsConfig::Custom((vec, _)) => *vec,
         }
     }
 
@@ -40,7 +40,7 @@ impl HoldsConfig {
         match self {
             HoldsConfig::Default => (0.0, 0.0, 0.0),
             HoldsConfig::Wand => (-PI * 0.25, 0.0, PI * 0.4),
-            HoldsConfig::Custom((_, tuple)) => tuple.clone(),
+            HoldsConfig::Custom((_, tuple)) => *tuple,
         }
     }
 }

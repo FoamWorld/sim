@@ -1,6 +1,7 @@
 use super::{ecs::*, inventory::*, item_storage::*};
 use crate::character::*;
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 fn reach_inventory_item(world: &World, inv: Entity, index: usize) -> Option<Entity> {
     let storage = world.entity(inv).get::<ItemStorage>().unwrap();
@@ -49,7 +50,9 @@ pub fn item_throw(mut commands: Commands, world: &World, inventory: Res<Inventor
         return;
     }
 
-    let another = if storage.more_than_one(index) {
+    // Use existing `Entity` to avoid panic.
+    let chosen = storage.storage[index].unwrap();
+    if storage.more_than_one(index) {
         commands
             .entity(inv)
             .queue(move |mut entity: EntityWorldMut| {
@@ -57,10 +60,7 @@ pub fn item_throw(mut commands: Commands, world: &World, inventory: Res<Inventor
                 storage.count[index.clone()] -= 1.0;
             });
 
-        commands
-            .entity(storage.storage[index].unwrap())
-            .clone_and_spawn()
-            .id()
+        commands.entity(chosen).clone_and_spawn();
     } else {
         commands
             .entity(inv)
@@ -68,13 +68,13 @@ pub fn item_throw(mut commands: Commands, world: &World, inventory: Res<Inventor
                 let mut storage = entity.get_mut::<ItemStorage>().unwrap();
                 storage.storage[index.clone()] = None;
             });
-
-        storage.storage[index].unwrap()
     };
 
     let (source, target) = get_source_target(world);
-    commands.spawn((
-        Methexis(another),
+    let ec = commands.spawn((
+        Methexis(chosen),
         Transform::from_translation(source.extend(0.0)),
+        Velocity::linear(target - source),
     ));
+    super::feed::feed_to_concrete(chosen, world, ec);
 }
