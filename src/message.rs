@@ -85,7 +85,7 @@ fn message_timer(
                 font_size: 20.0,
                 ..default()
             },
-            TextColor(Color::linear_rgb(0.8, 0.8, 0.8)),
+            TextColor(Color::srgb(0.8, 0.8, 0.8)),
             Node {
                 position_type: PositionType::Absolute,
                 top: Val::Px(5.0),

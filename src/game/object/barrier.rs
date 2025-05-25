@@ -7,6 +7,7 @@ use crate::constants::Scalar;
 pub struct BarrierModel {
     pub x_length: Scalar,
     pub y_length: Scalar,
+    pub color: (f32, f32, f32, f32),
 }
 
 pub fn setup_barrier_model(
@@ -14,11 +15,12 @@ pub fn setup_barrier_model(
     query: Query<(Entity, &BarrierModel), Added<BarrierModel>>,
 ) {
     for (entity, model) in &query {
+        let (red, green, blue, alpha) = model.color;
         let barrier = commands
             .spawn((
                 Methexis(entity),
                 Sprite::from_color(
-                    bevy::color::palettes::basic::GRAY,
+                    Color::srgba(red, green, blue, alpha),
                     Vec2::new(model.x_length, model.y_length),
                 ),
                 RigidBody::Fixed,
