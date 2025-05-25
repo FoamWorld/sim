@@ -71,17 +71,17 @@ pub fn update_grid_images(
 ) {
     if let Ok(storage) = item_storage.single() {
         for (entity, grid) in query {
-            let mut ec = commands.entity(entity);
-            if let Some(item) = storage.storage[grid.0] {
+            let image_node = if let Some(item) = storage.storage[grid.0] {
                 if let Some(icon) = world.entity(item).get::<IconImage>() {
                     let rpg_folder = world.resource::<RpgTextures>();
-                    icon.inserts_image(&mut ec, rpg_folder);
+                    icon.image_node(rpg_folder)
                 } else {
-                    ec.insert(ImageNode::solid_color(Color::BLACK));
-                };
+                    ImageNode::solid_color(Color::BLACK)
+                }
             } else {
-                ec.insert(ImageNode::solid_color(Color::NONE));
-            }
+                ImageNode::solid_color(Color::NONE)
+            };
+            commands.entity(entity).insert(image_node);
         }
     }
 }

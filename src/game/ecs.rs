@@ -54,24 +54,24 @@ pub struct IconImage {
 }
 
 impl IconImage {
-    pub fn inserts_image(&self, commands: &mut EntityCommands, rpg_folder: &RpgTextures) {
-        commands.insert(ImageNode {
+    pub fn image_node(&self, rpg_folder: &RpgTextures) -> ImageNode {
+        ImageNode {
             image: rpg_folder.get_image_handle(self.sheet.as_str()),
             texture_atlas: self
                 .index
                 .and_then(|x| Some(rpg_folder.get_texture_atlas(self.sheet.as_str(), x))),
             ..default()
-        });
+        }
     }
 
-    pub fn inserts_sprite(&self, commands: &mut EntityCommands, rpg_folder: &RpgTextures) {
-        commands.insert(Sprite {
+    pub fn sprite(&self, rpg_folder: &RpgTextures) -> Sprite {
+        Sprite {
             image: rpg_folder.get_image_handle(self.sheet.as_str()),
             texture_atlas: self
                 .index
                 .and_then(|x| Some(rpg_folder.get_texture_atlas(self.sheet.as_str(), x))),
             ..default()
-        });
+        }
     }
 }
 
