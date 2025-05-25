@@ -8,7 +8,10 @@ pub struct WandModel {
     pub mode: usize,
 }
 
-pub fn setup_wand_model(mut commands: Commands, query: Query<(Entity, &WandModel), Added<WandModel>>) {
+pub fn setup_wand_model(
+    mut commands: Commands,
+    query: Query<(Entity, &WandModel), Added<WandModel>>,
+) {
     for (entity, model) in &query {
         commands
             .entity(entity)
@@ -38,7 +41,7 @@ pub fn setup_wand_model(mut commands: Commands, query: Query<(Entity, &WandModel
                 }),
                 HoldsConfig::Wand,
                 IconImage {
-                    sheet: "items".to_string(),
+                    sheet: "wands".to_string(),
                     index: Some(0),
                 },
                 Mode(model.mode),

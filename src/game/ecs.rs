@@ -31,7 +31,7 @@ impl HoldsConfig {
     pub fn get_offset(&self) -> Vec2 {
         match self {
             HoldsConfig::Default => Vec2::ZERO,
-            HoldsConfig::Wand => Vec2::splat(-0.4),
+            HoldsConfig::Wand => Vec2::new(-0.4, 0.0),
             HoldsConfig::Custom((vec, _)) => *vec,
         }
     }
@@ -39,7 +39,7 @@ impl HoldsConfig {
     pub fn get_rotate_range(&self) -> (Scalar, Scalar, Scalar) {
         match self {
             HoldsConfig::Default => (0.0, 0.0, 0.0),
-            HoldsConfig::Wand => (-PI * 0.25, 0.0, PI * 0.4),
+            HoldsConfig::Wand => (0.0, 0.0, PI * 0.4),
             HoldsConfig::Custom((_, tuple)) => *tuple,
         }
     }

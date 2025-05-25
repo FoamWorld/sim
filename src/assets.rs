@@ -86,7 +86,7 @@ pub fn load_textures(mut commands: Commands, asset_server: Res<AssetServer>) {
         ("character".into(), None),
         ("door".into(), Some((16, 32, 2, 2))),
         ("hints".into(), Some((13, 13, 6, 5))),
-        ("items".into(), Some((16, 16, 3, 1))),
+        ("wands".into(), Some((15, 7, 3, 1))),
         ("sign".into(), Some((32, 32, 3, 5))),
         ("spells".into(), Some((16, 16, 4, 1))),
     ];

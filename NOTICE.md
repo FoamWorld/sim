@@ -20,7 +20,7 @@ My original. (MIT)
 ## Images
 ### My Original
 - `assets/textures/hints.png`
-- `assets/textures/items.png`
+- `assets/textures/wands.png`
 
 ### OpenGameArt
 [Sign Pack](https://opengameart.org/content/sign-pack) (CC-BY-SA 3.0) (Modified: relocated regions)
