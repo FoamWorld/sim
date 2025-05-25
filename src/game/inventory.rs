@@ -13,48 +13,69 @@ pub struct Inventory {
 pub struct InventorySelectedUpdateEvent;
 
 #[derive(Component)]
-pub struct UiGrid(pub usize);
+pub struct InventoryGrid(pub usize);
 
 pub fn setup_inventory(mut commands: Commands, mut inventory: ResMut<Inventory>) {
     let launcher = commands.spawn(WandModel { mode: 3 }).id();
 
-    let mut storage = ItemStorage::with_capacity(4);
-    storage.force_give(0, launcher);
+    let storage = commands.spawn(ItemStorage::with_capacity(4)).id();
     inventory.size = 4;
-    inventory.bind = Some(commands.spawn((storage, WillRemove)).id());
+    inventory.bind = Some(storage);
+
+    commands
+        .entity(storage)
+        .queue(move |mut entity_world_mut: EntityWorldMut| {
+            entity_world_mut
+                .get_mut::<ItemStorage>()
+                .unwrap()
+                .force_give(0, launcher);
+        });
 }
 
-pub fn setup_inventory_ui(mut commands: Commands, world: &World, inventory: Res<Inventory>) {
-    let storage = world
-        .entity(inventory.bind.unwrap())
-        .get::<ItemStorage>()
-        .unwrap();
+pub fn setup_inventory_ui(mut commands: Commands, inventory: Res<Inventory>) {
     let size = inventory.size;
-    let mut ui = commands.spawn((Node {
-        position_type: PositionType::Absolute,
-        height: Val::Px(GRID_SIZE),
-        bottom: Val::Px(4.0),
-        justify_self: JustifySelf::Center,
-        justify_items: JustifyItems::Center,
-        flex_direction: FlexDirection::Row,
-        ..default()
-    },));
-    ui.with_children(|builder| {
-        for ind in 0..size {
-            let mut ec = builder.spawn((
-                Node {
-                    width: Val::Px(GRID_SIZE),
-                    height: Val::Px(GRID_SIZE),
-                    margin: UiRect::horizontal(Val::Px(4.0)),
-                    ..default()
-                },
-                Outline::new(Val::Px(1.0), Val::ZERO, Color::BLACK),
-                UiGrid(ind),
-                WillRemove,
-            ));
-            if let Some(item) = storage.storage[ind] {
+    let ui = commands
+        .spawn((
+            Node {
+                position_type: PositionType::Absolute,
+                height: Val::Px(GRID_SIZE),
+                bottom: Val::Px(4.0),
+                justify_self: JustifySelf::Center,
+                justify_items: JustifyItems::Center,
+                flex_direction: FlexDirection::Row,
+                ..default()
+            },
+            WillRemove,
+        ))
+        .id();
+    for ind in 0..size {
+        commands.spawn((
+            ChildOf(ui),
+            Node {
+                width: Val::Px(GRID_SIZE),
+                height: Val::Px(GRID_SIZE),
+                margin: UiRect::horizontal(Val::Px(4.0)),
+                ..default()
+            },
+            Outline::new(Val::Px(1.0), Val::ZERO, Color::BLACK),
+            InventoryGrid(ind),
+        ));
+    }
+}
+
+pub fn update_grid_images(
+    mut commands: Commands,
+    world: &World,
+    query: Query<(Entity, &InventoryGrid)>,
+    item_storage: Query<&ItemStorage, Changed<ItemStorage>>,
+) {
+    if let Ok(storage) = item_storage.single() {
+        for (entity, grid) in query {
+            let mut ec = commands.entity(entity);
+            if let Some(item) = storage.storage[grid.0] {
                 if let Some(icon) = world.entity(item).get::<IconImage>() {
-                    icon.inserts_image(&mut ec, world.resource::<RpgTextures>());
+                    let rpg_folder = world.resource::<RpgTextures>();
+                    icon.inserts_image(&mut ec, rpg_folder);
                 } else {
                     ec.insert(ImageNode::solid_color(Color::BLACK));
                 };
@@ -62,10 +83,13 @@ pub fn setup_inventory_ui(mut commands: Commands, world: &World, inventory: Res<
                 ec.insert(ImageNode::solid_color(Color::NONE));
             }
         }
-    });
+    }
 }
 
-pub fn move_outline(inventory: Res<Inventory>, mut query_grid: Query<(&UiGrid, &mut Outline)>) {
+pub fn move_outline(
+    inventory: Res<Inventory>,
+    mut query_grid: Query<(&InventoryGrid, &mut Outline)>,
+) {
     for (grid, mut outline) in query_grid.iter_mut() {
         if grid.0 == inventory.selected {
             outline.color = Color::WHITE;
@@ -94,26 +118,25 @@ pub fn update_attached_image(
     let inv = inventory.bind.unwrap();
     let storage = world.entity(inv).get::<ItemStorage>().unwrap();
     if let Some(item) = storage.get_index(inventory.selected) {
-        commands
-            .entity(actor)
-            .with_children(|parent: &mut ChildSpawnerCommands| {
-                setup_item_sprite(world, item, parent, position);
-            });
-    };
-}
+        let mut ec = commands.spawn((
+            Methexis(item),
+            ChildOf(actor),
+            Transform::from_translation(position.primary_hand_offset.extend(1.0)),
+            IsActive,
+        ));
 
-fn setup_item_sprite(
-    world: &World,
-    item: Entity,
-    parent: &mut ChildSpawnerCommands,
-    position: Res<ActorPosition>,
-) {
-    let rpg_folder = world.resource::<RpgTextures>();
-    let mut commands = parent.spawn((
-        Transform::from_translation(position.primary_hand_offset.extend(1.0)),
-        IsActive,
-    ));
-    if let Some(icon) = world.entity(item).get::<IconImage>() {
-        icon.inserts_sprite(&mut commands, rpg_folder);
-    }
+        let entity = world.entity(item);
+
+        if let Some(icon) = entity.get::<IconImage>() {
+            let rpg_folder = world.resource::<RpgTextures>();
+            icon.inserts_sprite(&mut ec, rpg_folder);
+        }
+
+        if let Some(holds) = entity.get::<HoldsConfig>() {
+            ec.insert((
+                bevy::sprite::Anchor::Custom(holds.get_offset()),
+                crate::physics::camera::RotateWithMouse::new(holds.get_rotate_range()),
+            ));
+        }
+    };
 }

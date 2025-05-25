@@ -38,7 +38,16 @@ pub fn translate_cursor_position(
 }
 
 #[derive(Component)]
-pub struct RotateWithMouse(pub Quat); // offset
+pub struct RotateWithMouse(pub Quat);
+
+impl RotateWithMouse {
+    pub fn new(tuple: (f32, f32, f32)) -> Self {
+        let (offset, mid, radius) = tuple;
+        Self {
+            0: Quat::from_rotation_z(offset)
+        }
+    }
+}
 
 pub fn rotate_with_mouse(
     coords: Res<CursorCoords>,

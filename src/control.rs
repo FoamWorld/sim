@@ -100,7 +100,7 @@ impl Plugin for ControlPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<ControlSettings>();
         app.add_systems(Update, (inputs_move, inputs_wait).in_set(InGameSet::Input));
-        app.add_systems(Update, change_facing.in_set(InGameSet::PostInput));
+        app.add_systems(FixedUpdate, change_facing.in_set(InGameSet::PostInput));
     }
 }
 
@@ -134,14 +134,17 @@ pub fn inputs_move(
     if let Ok((mut velocity, mut actor, movement_speed)) = actors.single_mut() {
         let to_left = control_settings.check(ControlCode::MoveLeft, &keys);
         let to_right = control_settings.check(ControlCode::MoveRight, &keys);
-        // let yneg = control_settings.check(ControlCode::MoveDown, &keys);
-        let jump = control_settings.check(ControlCode::MoveUp, &keys);
+
         if to_left {
             actor.set_facing(ActorFacing::Left);
+            velocity.linvel.x = -movement_speed.0;
         } else if to_right {
             actor.set_facing(ActorFacing::Right);
+            velocity.linvel.x = movement_speed.0;
         }
-        velocity.linvel.x = (to_right as i8 - to_left as i8) as Scalar * movement_speed.0;
+
+        // let yneg = control_settings.check(ControlCode::MoveDown, &keys);
+        let jump = control_settings.check(ControlCode::MoveUp, &keys);
         if velocity.linvel.y.abs() < 0.1 && jump {
             velocity.linvel.y = 100.0;
         }

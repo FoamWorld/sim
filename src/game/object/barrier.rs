@@ -22,7 +22,7 @@ pub fn setup_barrier_model(
                     Vec2::new(model.x_length, model.y_length),
                 ),
                 RigidBody::Fixed,
-                Collider::cuboid(model.x_length, model.y_length),
+                Collider::cuboid(model.x_length * 0.5, model.y_length * 0.5),
             ))
             .id();
         commands

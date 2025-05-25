@@ -52,10 +52,11 @@ pub fn setup_character(mut commands: Commands, rpg_folder: Res<RpgTextures>) {
         },
         Transform::from_xyz(0.0, 0.0, CHARACTER_LAYER),
         RigidBody::Dynamic,
-        Collider::cuboid(CHARACTER_X_LENGTH, CHARACTER_Y_LENGTH),
+        Collider::cuboid(CHARACTER_X_LENGTH * 0.5, CHARACTER_Y_LENGTH * 0.5),
         ColliderMassProperties::Mass(70.0),
         LockedAxes::ROTATION_LOCKED,
         MovementSpeed(100.0),
+        Velocity::zero(),
         Actor(ActorFacing::Right),
         WillRemove,
     ));

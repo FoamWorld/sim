@@ -49,15 +49,7 @@ impl ItemStorage {
         self.storage[index] = Some(entity);
     }
 
-    pub fn extract_one(&mut self, index: usize) -> Option<Entity> {
-        if let Some(entity) = self.storage[index] {
-            self.count[index] -= 1.0;
-            if self.count[index] < 1e-3 {
-                self.storage[index] = None;
-            }
-            Some(entity)
-        } else {
-            None
-        }
+    pub fn more_than_one(&self, index: usize) -> bool {
+        self.count[index] - 1.0 > 1e-3
     }
 }

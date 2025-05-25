@@ -62,7 +62,7 @@ impl Plugin for GamePlugin {
 
         app.add_systems(
             Update,
-            (move_outline, update_attached_image).in_set(InGameSet::PostInput),
+            (move_outline, update_grid_images, update_attached_image).in_set(InGameSet::PostInput),
         );
 
         app.add_systems(
@@ -116,9 +116,12 @@ fn detect_input_throw(
 
 fn detect_input_choose(
     keys: Res<ButtonInput<KeyCode>>,
+    scroll: Res<bevy::input::mouse::AccumulatedMouseScroll>,
     mut inventory: ResMut<Inventory>,
     mut writer: EventWriter<InventorySelectedUpdateEvent>,
 ) {
+    let sz = inventory.size;
+    let cu = inventory.selected;
     let number: usize = if keys.pressed(KeyCode::Digit0) {
         0
     } else if keys.pressed(KeyCode::Digit1) {
@@ -139,10 +142,22 @@ fn detect_input_choose(
         8
     } else if keys.pressed(KeyCode::Digit9) {
         9
+    } else if scroll.delta.y > 0.0 {
+        if cu == 0 {
+            return;
+        } else {
+            cu - 1
+        }
+    } else if scroll.delta.y < 0.0 {
+        if cu == sz - 1 {
+            return;
+        } else {
+            cu + 1
+        }
     } else {
         return;
     };
-    if number < inventory.size {
+    if number < sz {
         inventory.selected = number;
         writer.write(InventorySelectedUpdateEvent);
     }
