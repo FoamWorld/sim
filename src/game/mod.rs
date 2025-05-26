@@ -46,6 +46,7 @@ impl Plugin for GamePlugin {
             Update,
             (
                 object::barrier::setup_barrier_model,
+                object::barrier::setup_platform_room_model,
                 item::wand::setup_wand_model,
             ),
         );

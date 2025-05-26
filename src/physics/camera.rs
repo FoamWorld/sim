@@ -32,7 +32,7 @@ impl Default for CameraMoveConfig {
     fn default() -> Self {
         Self {
             stop_horizontal_border: true,
-            stop_vertical_border: false,
+            stop_vertical_border: true,
             follow_actor: true,
             follow_cursor: false,
         }
@@ -63,6 +63,18 @@ pub fn update_camera_position(
         let right_limit = scene_box.horizontal.y - VIEWPORT_WIDTH * 0.5;
         if vec3.x > right_limit {
             vec3.x = right_limit;
+        }
+    }
+
+    if move_config.stop_vertical_border {
+        let low_limit = scene_box.vertical.x + VIEWPORT_HEIGHT * 0.5;
+        if vec3.y < low_limit {
+            vec3.y = low_limit;
+        }
+
+        let high_limit = scene_box.vertical.y - VIEWPORT_HEIGHT * 0.5;
+        if vec3.y > high_limit {
+            vec3.y = high_limit;
         }
     }
 
