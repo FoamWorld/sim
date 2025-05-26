@@ -1,7 +1,7 @@
 use crate::{
     character::*,
     game::{ecs::*, item::*, item_storage::*, mob::*, object::*},
-    physics::collision::*,
+    physics::{camera::*, collision::*, *},
     state::*,
 };
 use bevy::{prelude::*, scene::*, tasks::IoTaskPool};
@@ -99,10 +99,19 @@ impl Plugin for RegisteryPlugin {
         app.add_systems(OnEnter(ProcessState::PreSaveScene), save_scene_system);
 
         app
+            // resource
+            .register_type::<SceneBox>()
+            .register_type::<CameraMoveConfig>()
             // model
             .register_type::<barrier::BarrierModel>()
             .register_type::<wand::WandModel>()
             // utils
+            .register_type::<Methexis>()
+            .register_type::<Eidos>()
+            .register_type::<HoldsConfig>()
+            .register_type::<IconImage>()
+            .register_type::<Mode>()
+            .register_type::<PhysicsConfig>()
             .register_type::<Actor>()
             .register_type::<ItemStorage>()
             .register_type::<Sign>()
@@ -129,17 +138,30 @@ pub fn load_scene_system(
 
 pub fn save_scene_system(world: &mut World) {
     let scene = {
-        let mut query = world.query_filtered::<Entity, With<Eidos>>();
+        let mut query = world.query_filtered::<Entity, Or<(With<Eidos>, With<Methexis>)>>();
         let scene_builder = DynamicSceneBuilder::from_world(&world)
             .deny_all()
+            // resource
+            .allow_resource::<SceneBox>()
+            .allow_resource::<CameraMoveConfig>()
             // core
             .allow_component::<Transform>()
             // utils
+            .allow_component::<Methexis>()
+            .allow_component::<Eidos>()
+            .allow_component::<HoldsConfig>()
+            .allow_component::<IconImage>()
+            .allow_component::<Mode>()
+            .allow_component::<PhysicsConfig>()
             .allow_component::<Sign>()
             .allow_component::<ItemStorage>()
             // mobs
             .allow_component::<health::Health>();
-        scene_builder.extract_entities(query.iter(&world)).build()
+
+        scene_builder
+            .extract_resources()
+            .extract_entities(query.iter(&world))
+            .build()
     };
 
     let type_registry = world.resource::<AppTypeRegistry>();

@@ -5,8 +5,8 @@ use crate::constants::Scalar;
 #[reflect(Component)]
 #[type_path = "sim::model"]
 pub struct BarrierModel {
-    pub x_length: Scalar,
-    pub y_length: Scalar,
+    pub x_half: Scalar,
+    pub y_half: Scalar,
     pub color: (f32, f32, f32, f32),
 }
 
@@ -21,10 +21,10 @@ pub fn setup_barrier_model(
                 Methexis(entity),
                 Sprite::from_color(
                     Color::srgba(red, green, blue, alpha),
-                    Vec2::new(model.x_length, model.y_length),
+                    Vec2::new(model.x_half, model.y_half),
                 ),
                 RigidBody::Fixed,
-                Collider::cuboid(model.x_length * 0.5, model.y_length * 0.5),
+                Collider::cuboid(model.x_half * 0.5, model.y_half * 0.5),
             ))
             .id();
         commands

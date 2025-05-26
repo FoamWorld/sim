@@ -1,4 +1,8 @@
-use crate::character::IsActive;
+use super::SceneBox;
+use crate::{
+    character::{Actor, IsActive},
+    constants::*,
+};
 use bevy::{prelude::*, window::PrimaryWindow};
 
 #[derive(Component)]
@@ -9,14 +13,65 @@ pub struct CursorCoords(pub Option<Vec2>);
 
 #[derive(Resource, Reflect)]
 #[reflect(Resource)]
+#[type_path = "sim::physics"]
 pub struct CameraMoveConfig {
-    // (?) todo: move with cursor
-    /// Whether camera follows player position.
+    /// Stops to move close [`SceneBox`] horizontally.
+    pub stop_horizontal_border: bool,
+
+    /// Stops to move close [`SceneBox`] vertically.
+    pub stop_vertical_border: bool,
+
+    /// Follows player position.
     pub follow_actor: bool,
-    pub with_offset: Vec2,
+
+    /// Follows cursor position.
+    pub follow_cursor: bool,
 }
 
-pub fn translate_cursor_position(
+impl Default for CameraMoveConfig {
+    fn default() -> Self {
+        Self {
+            stop_horizontal_border: true,
+            stop_vertical_border: false,
+            follow_actor: true,
+            follow_cursor: false,
+        }
+    }
+}
+
+pub fn update_camera_position(
+    scene_box: Res<SceneBox>,
+    move_config: Res<CameraMoveConfig>,
+    q_actor: Query<&GlobalTransform, With<Actor>>,
+    mut commands: Commands,
+    q_camera: Query<Entity, With<PrimaryCamera>>,
+) {
+    let camera = q_camera.single().unwrap();
+
+    let mut vec3 = if move_config.follow_actor {
+        q_actor.single().unwrap().translation()
+    } else {
+        return;
+    };
+
+    if move_config.stop_horizontal_border {
+        let left_limit = scene_box.horizontal.x + VIEWPORT_WIDTH * 0.5;
+        if vec3.x < left_limit {
+            vec3.x = left_limit;
+        }
+
+        let right_limit = scene_box.horizontal.y - VIEWPORT_WIDTH * 0.5;
+        if vec3.x > right_limit {
+            vec3.x = right_limit;
+        }
+    }
+
+    commands
+        .entity(camera)
+        .insert(Transform::from_translation(vec3));
+}
+
+pub fn update_cursor_position(
     mut coords: ResMut<CursorCoords>,
     q_window: Query<&Window, With<PrimaryWindow>>,
     q_camera: Query<(&Camera, &GlobalTransform), With<PrimaryCamera>>,
@@ -44,7 +99,7 @@ impl RotateWithMouse {
     pub fn new(tuple: (f32, f32, f32)) -> Self {
         let (offset, mid, radius) = tuple;
         Self {
-            0: Quat::from_rotation_z(offset)
+            0: Quat::from_rotation_z(offset),
         }
     }
 }

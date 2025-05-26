@@ -1,5 +1,10 @@
 (
-  resources: {},
+  resources: {
+    "sim::physics::SceneBox": (
+      horizontal: (-400.0, 400.0),
+      vertical: (-200.0, 200.0),
+    ),
+  },
   entities: {
     4294967296: (
       components: {
@@ -9,8 +14,8 @@
           scale: (1.0, 1.0, 1.0),
         ),
         "sim::model::BarrierModel": (
-          x_length: 500.0,
-          y_length: 40.0,
+          x_half: 400.0,
+          y_half: 20.0,
           color: (0.5, 0.5, 0.5, 1.0)
         ),
       },

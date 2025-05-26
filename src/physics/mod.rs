@@ -7,15 +7,21 @@ use collision::*;
 pub mod camera;
 pub mod collision;
 
+#[derive(Resource, Reflect, Default)]
+#[reflect(Resource)]
+#[type_path = "sim::physics"]
+pub struct SceneBox {
+    pub horizontal: Vec2,
+    pub vertical: Vec2,
+}
+
 pub struct GamePhysicsPlugin;
 
 impl Plugin for GamePhysicsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<CursorCoords>()
-            .insert_resource(CameraMoveConfig {
-                follow_actor: false,
-                with_offset: Vec2::new(0.0, 0.0),
-            });
+            .init_resource::<SceneBox>()
+            .init_resource::<CameraMoveConfig>();
         app.add_event::<CrashEvent>().add_event::<TouchEvent>();
 
         app.add_systems(Startup, |mut commands: Commands| {
@@ -39,7 +45,13 @@ impl Plugin for GamePhysicsPlugin {
 
         app.add_systems(
             Update,
-            (translate_cursor_position, rotate_with_mouse, read_crash).in_set(InGameSet::Logic),
+            (
+                update_camera_position,
+                update_cursor_position,
+                rotate_with_mouse,
+                read_crash,
+            )
+                .in_set(InGameSet::Logic),
         );
     }
 }
