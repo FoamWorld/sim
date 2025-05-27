@@ -1,6 +1,5 @@
 use crate::state::*;
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
 use camera::*;
 use collision::*;
 
@@ -22,6 +21,7 @@ impl Plugin for GamePhysicsPlugin {
         app.init_resource::<CursorCoords>()
             .init_resource::<SceneBox>()
             .init_resource::<CameraMoveConfig>();
+
         app.add_event::<CrashEvent>().add_event::<TouchEvent>();
 
         app.add_systems(Startup, |mut commands: Commands| {
@@ -36,12 +36,7 @@ impl Plugin for GamePhysicsPlugin {
             ));
         });
 
-        /*
-        app.add_systems(
-            PostProcessCollisions,
-            inspect_collisions.in_set(InGameSet::Logic),
-        );
-        */
+        app.add_systems(FixedUpdate, write_crash.in_set(InGameSet::Logic));
 
         app.add_systems(
             Update,

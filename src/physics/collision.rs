@@ -10,64 +10,35 @@ use bevy_rapier2d::prelude::*;
 pub struct BackgroundLevel;
 
 #[derive(Event)]
-pub struct CrashEvent(pub Entity, pub Entity);
+pub struct CrashEvent {
+    pub object: Entity,
+    pub force: f32,
+}
 
 #[derive(Event)]
 pub struct TouchEvent(pub Entity);
 
-pub fn inspect_collisions(
-    query_player: Query<&Actor, With<RigidBody>>,
-    query_background: Query<&BackgroundLevel, With<RigidBody>>,
+pub fn write_crash(
     query_health: Query<&Health>,
-    mut collisions: EventReader<CollisionEvent>,
-    mut writer_touch: EventWriter<TouchEvent>,
+    // mut collision_events: EventReader<CollisionEvent>,
+    mut contact_force_events: EventReader<ContactForceEvent>,
     mut writer_crash: EventWriter<CrashEvent>,
 ) {
-    /*
-    collisions.retain(|contacts| {
-        let e1 = contacts.entity1;
-        let e2 = contacts.entity2;
-        let bg1 = query_background.contains(e1);
-        let bg2 = query_background.contains(e2);
-
-        if bg1 && bg2 {
-            return false;
+    for event in contact_force_events.read() {
+        if query_health.contains(event.collider1) {
+            writer_crash.write(CrashEvent {
+                object: event.collider1,
+                force: event.total_force.length(),
+            });
         }
 
-        // Already collided.
-        let any_penetrating = contacts.manifolds.iter().any(|manifold| {
-            manifold
-                .contacts
-                .iter()
-                .any(|contact| contact.penetration > 0.0)
-        });
-        if any_penetrating {
-            return !bg1 && !bg2;
+        if query_health.contains(event.collider2) {
+            writer_crash.write(CrashEvent {
+                object: event.collider2,
+                force: event.total_force.length(),
+            });
         }
-
-        // Check crash.
-        if query_health.contains(e1) && !bg2 {
-            writer_crash.write(CrashEvent(e1, e2));
-        }
-        if query_health.contains(e2) && !bg1 {
-            writer_crash.write(CrashEvent(e2, e1));
-        }
-
-        // Check touch.
-        let (pillow, other_entity) = if bg1 {
-            (e1, e2)
-        } else if bg2 {
-            (e2, e1)
-        } else {
-            return true;
-        };
-        if !query_player.contains(other_entity) {
-            return true;
-        }
-        writer_touch.write(TouchEvent(pillow));
-        false
-    });
-    */
+    }
 }
 
 pub fn read_crash(
@@ -76,9 +47,9 @@ pub fn read_crash(
     mut q_h: Query<&mut Health>,
 ) {
     for crash in reader.read() {
-        let sufferer = crash.0;
+        let sufferer = crash.object;
         if let Ok(mut health) = q_h.get_mut(sufferer) {
-            health.shift(-1.0);
+            health.shift(-crash.force);
             if !health.is_alive() {
                 writer.write(HealthClearedEvent(sufferer));
             }

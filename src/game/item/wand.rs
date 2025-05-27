@@ -69,6 +69,7 @@ impl Command for LaunchMagic {
             RigidBody::Dynamic,
             Collider::ball(6.0),
             ColliderMassProperties::Mass(1.0),
+            ActiveEvents::CONTACT_FORCE_EVENTS,
             LockedAxes::ROTATION_LOCKED,
             Velocity::linear(unit * 40.0),
             GravityScale(0.01),
