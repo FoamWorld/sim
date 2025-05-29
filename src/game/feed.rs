@@ -14,7 +14,7 @@ pub fn feed_to_concrete(eidos: Entity, world: &World, mut ec: EntityCommands) {
     if let Some(physics) = entity_ref.get::<PhysicsConfig>() {
         ec.insert((
             RigidBody::Dynamic,
-            Collider::ball(1.0),
+            Collider::cuboid(physics.shape.x, physics.shape.y),
             ColliderMassProperties::Mass(physics.mass),
         ));
     }

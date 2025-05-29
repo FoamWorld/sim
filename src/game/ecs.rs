@@ -86,6 +86,7 @@ pub struct Mode(pub usize);
 pub struct PhysicsConfig {
     pub mass: Scalar,
     // center_of_mass
+    pub shape: Vec2,
 }
 
 // #[derive(Component)]

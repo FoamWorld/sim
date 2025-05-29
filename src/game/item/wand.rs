@@ -1,5 +1,5 @@
 use super::*;
-use crate::assets::RpgTextures;
+use crate::{assets::RpgTextures, game::summon::element_ball::*};
 
 #[derive(Reflect, Component, Clone, Copy)]
 #[reflect(Component)]
@@ -45,7 +45,10 @@ pub fn setup_wand_model(
                     index: Some(0),
                 },
                 Mode(model.mode),
-                PhysicsConfig { mass: 0.5 },
+                PhysicsConfig {
+                    mass: 0.5,
+                    shape: Vec2 { x: 7.0, y: 1.0 },
+                },
             ))
             .remove::<WandModel>();
     }
@@ -63,28 +66,22 @@ impl Command for LaunchMagic {
         let ray = self.target - source;
         let unit = ray / ray.length();
 
+        let sprite = {
+            let rpg_folder = world.resource::<RpgTextures>();
+            Sprite::from_atlas_image(
+                rpg_folder.get_image_handle("spells"),
+                rpg_folder.get_texture_atlas("spells", self.id),
+            )
+        };
+
         let mut commands = world.commands();
         let mut ammo = commands.spawn((
             Transform::from_xyz(source.x + unit.x * 24.0, source.y + unit.y * 24.0, 0.0),
-            RigidBody::Dynamic,
-            Collider::ball(6.0),
-            ColliderMassProperties::Mass(1.0),
-            ActiveEvents::CONTACT_FORCE_EVENTS,
-            LockedAxes::ROTATION_LOCKED,
-            Velocity::linear(unit * 40.0),
-            GravityScale(0.01),
-            crate::game::mob::health::Health::fragile(),
+            Velocity::linear(unit * 120.0),
+            sprite,
         ));
 
-        ammo.queue(move |mut entity: EntityWorldMut<'_>| {
-            let sprite = {
-                let rpg_folder = entity.world().resource::<RpgTextures>();
-                Sprite::from_atlas_image(
-                    rpg_folder.get_image_handle("spells"),
-                    rpg_folder.get_texture_atlas("spells", self.id),
-                )
-            };
-            entity.insert(sprite);
-        });
+        insert_middle_ball(&mut ammo);
+        insert_fire(&mut ammo);
     }
 }

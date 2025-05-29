@@ -5,8 +5,8 @@ use crate::constants::Scalar;
 #[reflect(Component)]
 #[type_path = "sim::model"]
 pub struct BarrierModel {
-    pub x_half: Scalar,
-    pub y_half: Scalar,
+    pub half_x: Scalar,
+    pub half_y: Scalar,
     pub color: (f32, f32, f32, f32),
 }
 
@@ -17,10 +17,10 @@ pub fn spawn_barrier(commands: &mut Commands, entity: Entity, model: &BarrierMod
             Methexis(entity),
             Sprite::from_color(
                 Color::srgba(red, green, blue, alpha),
-                Vec2::new(model.x_half * 2.0, model.y_half * 2.0),
+                Vec2::new(model.half_x * 2.0, model.half_y * 2.0),
             ),
             RigidBody::Fixed,
-            Collider::cuboid(model.x_half, model.y_half),
+            Collider::cuboid(model.half_x, model.half_y),
         ))
         .id();
     commands.entity(entity).clone_with(barrier, |builder| {
@@ -59,32 +59,32 @@ pub fn setup_platform_room_model(
             .insert(children![
                 (
                     BarrierModel {
-                        x_half: model.h,
-                        y_half: model.r,
+                        half_x: model.h,
+                        half_y: model.r,
                         color: silver,
                     },
                     Transform::from_xyz(0.0, -model.v, 0.0),
                 ),
                 (
                     BarrierModel {
-                        x_half: model.h,
-                        y_half: model.r,
+                        half_x: model.h,
+                        half_y: model.r,
                         color: transparent,
                     },
                     Transform::from_xyz(0.0, model.v, 0.0),
                 ),
                 (
                     BarrierModel {
-                        x_half: model.r,
-                        y_half: model.v - model.r * 2.0,
+                        half_x: model.r,
+                        half_y: model.v - model.r * 2.0,
                         color: transparent,
                     },
                     Transform::from_xyz(model.h, 0.0, 0.0),
                 ),
                 (
                     BarrierModel {
-                        x_half: model.r,
-                        y_half: model.v - model.r * 2.0,
+                        half_x: model.r,
+                        half_y: model.v - model.r * 2.0,
                         color: transparent,
                     },
                     Transform::from_xyz(-model.h, 0.0, 0.0),

@@ -10,6 +10,7 @@ pub mod item_control;
 pub mod item_storage;
 pub mod mob;
 pub mod object;
+pub mod summon;
 
 use character::*;
 use inventory::*;

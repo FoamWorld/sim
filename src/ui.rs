@@ -101,9 +101,9 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 pub fn start_mode_selection(mut commands: Commands, asset_server: Res<AssetServer>) {
     let mode_list = vec![
-        "Gallery",
+        // "Gallery", // not yet possible
         #[cfg(feature = "devtools")]
-        "Sandbox",
+        "Debug",
     ];
 
     let font = TextFont {
