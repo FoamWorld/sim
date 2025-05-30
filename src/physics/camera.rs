@@ -1,8 +1,5 @@
 use super::SceneBox;
-use crate::{
-    character::{Actor, IsActive},
-    constants::*,
-};
+use crate::{character::*, constants::*};
 use bevy::{prelude::*, window::PrimaryWindow};
 
 #[derive(Component)]
@@ -105,19 +102,21 @@ pub fn update_cursor_position(
 }
 
 #[derive(Component)]
-pub struct RotateWithMouse(pub Quat);
+pub struct RotateWithMouse {
+    pub mid: f32,
+    pub extent: f32,
+}
 
 impl RotateWithMouse {
-    pub fn new(tuple: (f32, f32, f32)) -> Self {
-        let (offset, mid, radius) = tuple;
-        Self {
-            0: Quat::from_rotation_z(offset),
-        }
+    pub fn new(tuple: (f32, f32)) -> Self {
+        let (mid, extent) = tuple;
+        Self { mid, extent }
     }
 }
 
 pub fn rotate_with_mouse(
     coords: Res<CursorCoords>,
+    status: Res<ActorPosition>,
     mut query: Query<(&mut Transform, &RotateWithMouse, &GlobalTransform), With<IsActive>>,
 ) {
     let dest = if let Some(dest) = coords.0 {
@@ -125,10 +124,32 @@ pub fn rotate_with_mouse(
     } else {
         return;
     };
-    for (mut transform, rotate_offset, global_transform) in query.iter_mut() {
+    for (mut transform, rotate_config, global_transform) in query.iter_mut() {
         let start = global_transform.translation().truncate();
         let ray = dest - start;
-        let rotation = Quat::from_rotation_z(ops::atan2(ray.y, ray.x)).mul_quat(rotate_offset.0);
+        let theta = ops::atan2(ray.y, ray.x);
+        let mid = if status.facing_right {
+            rotate_config.mid
+        } else {
+            PI - rotate_config.mid
+        };
+
+        let mut extent = theta - mid;
+        if extent > PI {
+            extent = extent - 2.0 * PI;
+        }
+        if extent < -PI {
+            extent = extent + 2.0 * PI;
+        }
+
+        let result = if extent > rotate_config.extent {
+            mid + rotate_config.extent
+        } else if extent < -rotate_config.extent {
+            mid - rotate_config.extent
+        } else {
+            theta
+        };
+        let rotation = Quat::from_rotation_z(result);
         transform.rotation = rotation;
     }
 }

@@ -15,6 +15,7 @@ pub mod summon;
 use character::*;
 use inventory::*;
 use item_control::*;
+use item_storage::*;
 
 pub struct GamePlugin;
 
@@ -32,13 +33,7 @@ impl Plugin for GamePlugin {
 
         app.add_systems(
             OnEnter(ProcessState::PreEnterGame),
-            (
-                setup_inventory,
-                setup_inventory_ui,
-                |mut writer: EventWriter<InventorySelectedUpdateEvent>| {
-                    writer.write(InventorySelectedUpdateEvent);
-                },
-            )
+            (setup_inventory, setup_inventory_ui)
                 .chain()
                 .in_set(ProcessSet::Late),
         );
@@ -66,13 +61,25 @@ impl Plugin for GamePlugin {
 
         app.add_systems(
             Update,
-            (move_outline, update_grid_images, update_attached_image).in_set(InGameSet::PostInput),
+            (move_outline, update_grid_images).in_set(InGameSet::PostInput),
         );
 
         app.add_systems(
             FixedUpdate,
-            (update_actor_position, mob::health::read_health_cleared).in_set(InGameSet::Logic),
+            (
+                update_actor_position,
+                mob::health::read_health_cleared,
+                |query: Query<(), Changed<ItemStorage>>,
+                 mut writer: EventWriter<InventorySelectedUpdateEvent>| {
+                    if !query.is_empty() {
+                        writer.write(InventorySelectedUpdateEvent);
+                    }
+                },
+            )
+                .in_set(InGameSet::Logic),
         );
+
+        app.add_systems(Update, update_attached_image.in_set(InGameSet::Ui));
     }
 }
 

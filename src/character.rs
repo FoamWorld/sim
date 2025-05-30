@@ -7,13 +7,14 @@ pub struct IsActive;
 
 #[derive(Resource, Default)]
 pub struct ActorPosition {
+    pub facing_right: bool,
     pub center: Vec2,
     pub facing_offset: Vec2,
     pub primary_hand_offset: Vec2,
     // pub secondary_hand: Vec2,
 }
 
-#[derive(Reflect)]
+#[derive(Reflect, PartialEq)]
 pub enum ActorFacing {
     Left,
     Right,

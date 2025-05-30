@@ -24,7 +24,7 @@ pub struct Eidos(Vec<Entity>);
 pub enum HoldsConfig {
     Default,
     Wand,
-    Custom((Vec2, (Scalar, Scalar, Scalar))),
+    Custom((Vec2, (Scalar, Scalar))),
 }
 
 impl HoldsConfig {
@@ -36,10 +36,10 @@ impl HoldsConfig {
         }
     }
 
-    pub fn get_rotate_range(&self) -> (Scalar, Scalar, Scalar) {
+    pub fn get_rotate_range(&self) -> (Scalar, Scalar) {
         match self {
-            HoldsConfig::Default => (0.0, 0.0, 0.0),
-            HoldsConfig::Wand => (0.0, 0.0, PI * 0.4),
+            HoldsConfig::Default => (0.0, 0.0),
+            HoldsConfig::Wand => (0.0, PI * 0.4),
             HoldsConfig::Custom((_, tuple)) => *tuple,
         }
     }
