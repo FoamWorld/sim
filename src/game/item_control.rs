@@ -78,3 +78,20 @@ pub fn item_throw(mut commands: Commands, world: &World, inventory: Res<Inventor
     ));
     super::feed::feed_to_concrete(chosen, world, ec);
 }
+
+pub fn item_pick(mut commands: Commands, world: &World, hover: Entity, inventory: Res<Inventory>) {
+    let entity = world.entity(hover);
+    if let Some(methexis) = entity.get::<Methexis>() {
+        let bind = inventory.bind.unwrap();
+        if let Some(index) = world.entity(bind).get::<ItemStorage>().unwrap().free_slot() {
+            let eidos = methexis.0;
+            commands.entity(hover).despawn();
+            commands
+                .entity(bind)
+                .entry::<ItemStorage>()
+                .and_modify(move |mut storage| {
+                    storage.force_give(index, eidos, 1.0);
+                });
+        }
+    }
+}

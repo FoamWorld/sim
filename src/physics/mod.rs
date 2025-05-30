@@ -2,9 +2,11 @@ use crate::state::*;
 use bevy::prelude::*;
 use camera::*;
 use collision::*;
+use picking::*;
 
 pub mod camera;
 pub mod collision;
+pub mod picking;
 
 #[derive(Resource, Reflect, Default)]
 #[reflect(Resource)]
@@ -20,7 +22,8 @@ impl Plugin for GamePhysicsPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<CursorCoords>()
             .init_resource::<SceneBox>()
-            .init_resource::<CameraMoveConfig>();
+            .init_resource::<CameraMoveConfig>()
+            .init_resource::<HoverEntity>();
 
         app.add_event::<CrashEvent>().add_event::<TouchEvent>();
 
@@ -36,17 +39,20 @@ impl Plugin for GamePhysicsPlugin {
             ));
         });
 
-        app.add_systems(FixedUpdate, write_crash.in_set(InGameSet::Logic));
+        app.add_systems(
+            FixedUpdate,
+            (write_crash, read_crash).chain().in_set(InGameSet::Logic),
+        );
 
         app.add_systems(
             Update,
             (
-                update_camera_position,
                 update_cursor_position,
-                rotate_with_mouse,
-                read_crash,
+                update_camera_position,
+                (rotate_with_mouse, physics_hover_detection),
             )
-                .in_set(InGameSet::Logic),
+                .chain()
+                .in_set(InGameSet::PostInput),
         );
     }
 }

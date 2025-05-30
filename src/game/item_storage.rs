@@ -49,6 +49,15 @@ impl ItemStorage {
         self.storage[index] = Some(entity);
     }
 
+    pub fn free_slot(&self) -> Option<usize> {
+        for i in 0..self.size() {
+            if self.storage[i].is_none() {
+                return Some(i);
+            }
+        }
+        return None;
+    }
+
     pub fn more_than_one(&self, index: usize) -> bool {
         self.count[index] - 1.0 > 1e-3
     }

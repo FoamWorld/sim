@@ -16,6 +16,7 @@ pub enum ControlCode {
     Activate,
     Modify,
     Throw,
+    Pick,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -71,6 +72,10 @@ impl Default for ControlSettings {
             (
                 ControlCode::Throw,
                 InputDetectionType::JustPressed(KeyCode::KeyQ),
+            ),
+            (
+                ControlCode::Pick,
+                InputDetectionType::JustPressed(KeyCode::KeyG),
             ),
         ];
         let map: HashMap<_, _> = list.into_iter().collect();

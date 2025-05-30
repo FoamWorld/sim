@@ -1,4 +1,4 @@
-use crate::{character::*, control::*, scene::*, state::*};
+use crate::{character::*, control::*, physics::picking::*, scene::*, state::*};
 use bevy::prelude::*;
 
 pub mod character;
@@ -59,6 +59,7 @@ impl Plugin for GamePlugin {
                 detect_input_modify,
                 detect_input_throw,
                 detect_input_choose,
+                detect_input_pick,
             )
                 .in_set(InGameSet::Input),
         );
@@ -163,5 +164,18 @@ fn detect_input_choose(
     if number < sz {
         inventory.selected = number;
         writer.write(InventorySelectedUpdateEvent);
+    }
+}
+
+fn detect_input_pick(
+    commands: Commands,
+    world: &World,
+    keys: Res<ButtonInput<KeyCode>>,
+    control_settings: Res<ControlSettings>,
+    hover: Res<HoverEntity>,
+    inventory: Res<Inventory>,
+) {
+    if control_settings.check(ControlCode::Pick, &keys) && hover.is_inside {
+        item_pick(commands, world, hover.closest.unwrap(), inventory);
     }
 }
