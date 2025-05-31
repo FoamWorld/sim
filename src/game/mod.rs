@@ -182,7 +182,7 @@ fn detect_input_pick(
     hover: Res<HoverEntity>,
     inventory: Res<Inventory>,
 ) {
-    if control_settings.check(ControlCode::Pick, &keys) && hover.is_inside {
+    if control_settings.check(ControlCode::Pick, &keys) && hover.is_legal {
         item_pick(commands, world, hover.closest.unwrap(), inventory);
     }
 }

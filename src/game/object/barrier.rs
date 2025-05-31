@@ -76,7 +76,7 @@ pub fn setup_platform_room_model(
                 (
                     BarrierModel {
                         half_x: model.r,
-                        half_y: model.v - model.r * 2.0,
+                        half_y: model.v - model.r,
                         color: transparent,
                     },
                     Transform::from_xyz(model.h, 0.0, 0.0),
@@ -84,7 +84,7 @@ pub fn setup_platform_room_model(
                 (
                     BarrierModel {
                         half_x: model.r,
-                        half_y: model.v - model.r * 2.0,
+                        half_y: model.v - model.r,
                         color: transparent,
                     },
                     Transform::from_xyz(-model.h, 0.0, 0.0),
