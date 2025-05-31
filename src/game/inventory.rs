@@ -16,7 +16,7 @@ pub struct InventorySelectedUpdateEvent;
 pub struct InventoryGrid(pub usize);
 
 pub fn setup_inventory(mut commands: Commands, mut inventory: ResMut<Inventory>) {
-    let launcher = commands.spawn(WandModel { mode: 3 }).id();
+    let launcher = commands.spawn(WandModel { mode: 0 }).id();
 
     let storage = commands.spawn(ItemStorage::with_capacity(4)).id();
     inventory.size = 4;

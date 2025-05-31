@@ -1,5 +1,5 @@
 use super::*;
-use crate::{assets::RpgTextures, game::summon::element_ball::*};
+use crate::{assets::RpgTextures, game::summon::elements::*};
 
 #[derive(Reflect, Component, Clone, Copy)]
 #[reflect(Component)]
@@ -36,7 +36,7 @@ pub fn setup_wand_model(
                         .entity(entity)
                         .entry::<Mode>()
                         .and_modify(|mut mode| {
-                            mode.0 = if mode.0 == 3 { 0 } else { mode.0 + 1 };
+                            mode.0 = if mode.0 == 1 { 0 } else { 1 };
                         });
                 }),
                 HoldsConfig::Wand,
@@ -75,13 +75,23 @@ impl Command for LaunchMagic {
         };
 
         let mut commands = world.commands();
-        let mut ammo = commands.spawn((
-            Transform::from_xyz(source.x + unit.x * 24.0, source.y + unit.y * 24.0, 0.0),
-            Velocity::linear(unit * 120.0),
-            sprite,
-        ));
+        let mut ammo = commands.spawn(sprite);
 
-        insert_middle_ball(&mut ammo);
-        insert_fire(&mut ammo);
+        if self.id == 0 {
+            ammo.insert((
+                Transform::from_xyz(source.x + unit.x * 24.0, source.y + unit.y * 24.0, 0.0),
+                Velocity::linear(unit * 120.0),
+            ));
+            insert_middle_ball(&mut ammo);
+            insert_fire(&mut ammo);
+        } else if self.id == 1 {
+            ammo.insert((
+                Transform::from_xyz(source.x + unit.x * 24.0, source.y + unit.y * 24.0, 0.0)
+                    .with_rotation(Quat::from_rotation_z(ops::atan2(unit.y, unit.x))),
+                Velocity::linear(unit * 1200.0),
+            ));
+            insert_middle_arrow(&mut ammo);
+            insert_ice(&mut ammo);
+        }
     }
 }

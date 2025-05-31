@@ -88,7 +88,7 @@ pub fn load_textures(mut commands: Commands, asset_server: Res<AssetServer>) {
         ("hints".into(), Some((13, 13, 6, 5))),
         ("wands".into(), Some((15, 7, 3, 1))),
         ("sign".into(), Some((32, 32, 3, 5))),
-        ("spells".into(), Some((16, 16, 4, 1))),
+        ("spells".into(), Some((15, 15, 2, 1))),
     ];
     commands.insert_resource(RpgTextures::new(
         asset_server.load_folder("textures"),
