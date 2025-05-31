@@ -1,13 +1,48 @@
 use crate::{
-    character::Actor,
+    character::Character,
     game::mob::health::{Health, HealthClearedEvent},
     message::MessageEvent,
 };
-use bevy::prelude::*;
+use bevy::{ecs::system::SystemParam, prelude::*};
 use bevy_rapier2d::prelude::*;
 
 #[derive(Component)]
 pub struct BackgroundLevel;
+
+#[derive(Component)]
+pub struct OneWayPlatform;
+
+#[derive(SystemParam)]
+pub struct MyPhysicsHooks<'w, 's> {
+    platforms: Query<'w, 's, &'static OneWayPlatform>,
+    users: Query<'w, 's, &'static Character>,
+    velocities: Query<'w, 's, &'static Velocity>,
+}
+
+impl BevyPhysicsHooks for MyPhysicsHooks<'_, '_> {
+    fn filter_contact_pair(&self, context: PairFilterContextView) -> Option<SolverFlags> {
+        let entity1 = context.collider1();
+        let entity2 = context.collider2();
+
+        let (platform_entity, user_entity) =
+            if self.platforms.contains(entity1) && self.users.contains(entity2) {
+                (entity1, entity2)
+            } else if self.platforms.contains(entity2) && self.users.contains(entity1) {
+                (entity2, entity1)
+            } else {
+                return Some(SolverFlags::COMPUTE_IMPULSES);
+            };
+
+        let user_vel = self.velocities.get(user_entity).unwrap();
+        let standing = user_vel.linvel.y < 0.0;
+
+        if standing {
+            Some(SolverFlags::COMPUTE_IMPULSES)
+        } else {
+            None
+        }
+    }
+}
 
 #[derive(Event)]
 pub struct CrashEvent {

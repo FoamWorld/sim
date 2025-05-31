@@ -2,6 +2,10 @@ use crate::{assets::RpgTextures, constants::*, control::*, state::WillRemove};
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
+/// For all entities that interact with physics like the player.
+#[derive(Component)]
+pub struct Character;
+
 #[derive(Component)]
 pub struct IsActive;
 
@@ -59,6 +63,7 @@ pub fn setup_character(mut commands: Commands, rpg_folder: Res<RpgTextures>) {
         MovementSpeed(100.0),
         Velocity::zero(),
         Actor(ActorFacing::Right),
+        Character,
         WillRemove,
     ));
 }

@@ -45,7 +45,7 @@ fn main() {
             primary_window: Some(window),
             ..default()
         }),
-        RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(UNIT_PER_METER),
+        RapierPhysicsPlugin::<physics::collision::MyPhysicsHooks>::pixels_per_meter(UNIT_PER_METER),
         state::AppStatePlugin,
         diagnostics::DiagnosticsTextPlugin,
         control::ControlPlugin,

@@ -151,7 +151,7 @@ pub fn inputs_move(
         // let yneg = control_settings.check(ControlCode::MoveDown, &keys);
         let jump = control_settings.check(ControlCode::MoveUp, &keys);
         if velocity.linvel.y.abs() < 0.1 && jump {
-            velocity.linvel.y = 100.0;
+            velocity.linvel.y = 120.0;
         }
     }
 }
