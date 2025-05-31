@@ -16,13 +16,16 @@ pub fn setup_cloth_model(
 ) {
     for (entity, model) in &query {
         let (r, g, b) = model.c;
-        commands.entity(entity).insert(children![(
-            Visibility::Visible,
-            Transform::from_xyz(0.0, 0.0, 0.0),
-            Sprite::from_color(
-                Color::srgb(r, g, b),
-                Vec2::new(2.0 * model.h, 2.0 * model.v)
-            ),
-        )]);
+        commands
+            .entity(entity)
+            .insert(children![(
+                Visibility::Visible,
+                Transform::from_xyz(0.0, 0.0, 0.0),
+                Sprite::from_color(
+                    Color::srgb(r, g, b),
+                    Vec2::new(2.0 * model.h, 2.0 * model.v)
+                ),
+            )])
+            .remove::<ClothModel>();
     }
 }

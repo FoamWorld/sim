@@ -25,7 +25,8 @@ impl Plugin for GamePhysicsPlugin {
             .init_resource::<CameraMoveConfig>()
             .init_resource::<HoverEntity>();
 
-        app.add_event::<CrashEvent>().add_event::<TouchEvent>();
+        app.add_event::<TouchStartedEvent>()
+            .add_event::<CrashEvent>();
 
         app.add_systems(Startup, |mut commands: Commands| {
             commands.spawn((

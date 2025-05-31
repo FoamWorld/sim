@@ -44,6 +44,7 @@ impl Plugin for GamePlugin {
                 object::barrier::setup_barrier_model,
                 object::barrier::setup_platform_room_model,
                 object::cloth::setup_cloth_model,
+                object::platform::setup_shelf_model,
                 item::wand::setup_wand_model,
             )
                 .in_set(InGameSet::Logic),

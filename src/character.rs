@@ -61,6 +61,7 @@ pub fn setup_character(mut commands: Commands, rpg_folder: Res<RpgTextures>) {
         ColliderMassProperties::Mass(70.0),
         LockedAxes::ROTATION_LOCKED,
         MovementSpeed(100.0),
+        MoveDownTimer(Timer::from_seconds(0.1, TimerMode::Once)),
         Velocity::zero(),
         Actor(ActorFacing::Right),
         Character,

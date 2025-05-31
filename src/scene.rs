@@ -106,6 +106,7 @@ impl Plugin for RegisteryPlugin {
             .register_type::<barrier::BarrierModel>()
             .register_type::<barrier::PlatformRoomModel>()
             .register_type::<cloth::ClothModel>()
+            .register_type::<platform::ShelfModel>()
             .register_type::<wand::WandModel>()
             // utils
             .register_type::<Methexis>()

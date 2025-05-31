@@ -1,5 +1,4 @@
 use super::*;
-use crate::physics::collision::BackgroundLevel;
 
 pub enum DoorStatus {
     Open,
@@ -23,7 +22,6 @@ pub fn setup_door_model(
                 Methexis(entity),
                 RigidBody::Fixed,
                 RigidBodyDisabled,
-                BackgroundLevel,
                 Collider::cuboid(16.0, 32.0),
                 ColliderMassProperties::Mass(10.0),
             ))

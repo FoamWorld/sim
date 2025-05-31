@@ -1,5 +1,4 @@
 use super::*;
-use crate::physics::collision::BackgroundLevel;
 
 #[derive(Reflect, Component, Clone, Copy)]
 #[reflect(Component)]
@@ -16,7 +15,6 @@ pub fn setup_door_model(
                 Methexis(entity),
                 RigidBody::Fixed,
                 RigidBodyDisabled,
-                BackgroundLevel,
                 Collider::cuboid(28.0, 26.0),
                 ColliderMassProperties::Mass(40.0),
             ))

@@ -25,5 +25,17 @@
         ),
       },
     ),
+    4294967297: (
+      components: {
+        "bevy_transform::components::transform::Transform": (
+          translation: (25.0, -140.0, 0.0),
+          rotation: (0.0, 0.0, -0.0, 1.0),
+          scale: (1.0, 1.0, 1.0),
+        ),
+        "sim::model::ShelfModel": (
+          half_x: 40.0,
+        ),
+      }
+    )
   },
 )

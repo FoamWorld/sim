@@ -99,13 +99,26 @@ impl ControlSettings {
     }
 }
 
+#[derive(Component)]
+pub struct MoveDownTimer(pub Timer);
+
 pub struct ControlPlugin;
 
 impl Plugin for ControlPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<ControlSettings>();
+
         app.add_systems(Update, (inputs_move, inputs_wait).in_set(InGameSet::Input));
         app.add_systems(FixedUpdate, change_facing.in_set(InGameSet::PostInput));
+        app.add_systems(
+            FixedUpdate,
+            (|time: Res<Time>, mut timers: Query<&mut MoveDownTimer>| {
+                for mut move_down in timers.iter_mut() {
+                    move_down.0.tick(time.delta());
+                }
+            })
+            .in_set(InGameSet::Logic),
+        );
     }
 }
 
@@ -134,9 +147,14 @@ pub fn change_facing(mut actors: Query<(&mut Actor, &mut Sprite), Changed<Actor>
 pub fn inputs_move(
     keys: Res<ButtonInput<KeyCode>>,
     control_settings: Res<ControlSettings>,
-    mut actors: Query<(&mut Velocity, &mut Actor, &MovementSpeed)>,
+    mut actors: Query<(
+        &mut Velocity,
+        &mut Actor,
+        &MovementSpeed,
+        &mut MoveDownTimer,
+    )>,
 ) {
-    if let Ok((mut velocity, mut actor, movement_speed)) = actors.single_mut() {
+    if let Ok((mut velocity, mut actor, movement_speed, mut move_down)) = actors.single_mut() {
         let to_left = control_settings.check(ControlCode::MoveLeft, &keys);
         let to_right = control_settings.check(ControlCode::MoveRight, &keys);
 
@@ -148,10 +166,15 @@ pub fn inputs_move(
             velocity.linvel.x = movement_speed.0;
         }
 
-        // let yneg = control_settings.check(ControlCode::MoveDown, &keys);
         let jump = control_settings.check(ControlCode::MoveUp, &keys);
         if velocity.linvel.y.abs() < 0.1 && jump {
             velocity.linvel.y = 120.0;
+        }
+
+        let drop = control_settings.check(ControlCode::MoveDown, &keys);
+        if drop {
+            move_down.0.reset();
+            velocity.linvel.y = -120.0;
         }
     }
 }

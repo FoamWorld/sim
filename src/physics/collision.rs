@@ -1,13 +1,11 @@
 use crate::{
     character::Character,
+    control::MoveDownTimer,
     game::mob::health::{Health, HealthClearedEvent},
     message::MessageEvent,
 };
 use bevy::{ecs::system::SystemParam, prelude::*};
 use bevy_rapier2d::prelude::*;
-
-#[derive(Component)]
-pub struct BackgroundLevel;
 
 #[derive(Component)]
 pub struct OneWayPlatform;
@@ -17,6 +15,7 @@ pub struct MyPhysicsHooks<'w, 's> {
     platforms: Query<'w, 's, &'static OneWayPlatform>,
     users: Query<'w, 's, &'static Character>,
     velocities: Query<'w, 's, &'static Velocity>,
+    move_down: Query<'w, 's, &'static MoveDownTimer>,
 }
 
 impl BevyPhysicsHooks for MyPhysicsHooks<'_, '_> {
@@ -24,19 +23,19 @@ impl BevyPhysicsHooks for MyPhysicsHooks<'_, '_> {
         let entity1 = context.collider1();
         let entity2 = context.collider2();
 
-        let (platform_entity, user_entity) =
-            if self.platforms.contains(entity1) && self.users.contains(entity2) {
-                (entity1, entity2)
-            } else if self.platforms.contains(entity2) && self.users.contains(entity1) {
-                (entity2, entity1)
-            } else {
-                return Some(SolverFlags::COMPUTE_IMPULSES);
-            };
+        let user_entity = if self.platforms.contains(entity1) && self.users.contains(entity2) {
+            entity2
+        } else if self.platforms.contains(entity2) && self.users.contains(entity1) {
+            entity1
+        } else {
+            return Some(SolverFlags::COMPUTE_IMPULSES);
+        };
 
         let user_vel = self.velocities.get(user_entity).unwrap();
         let standing = user_vel.linvel.y < 0.0;
+        let timer = self.move_down.get(user_entity).unwrap();
 
-        if standing {
+        if standing && timer.0.finished() {
             Some(SolverFlags::COMPUTE_IMPULSES)
         } else {
             None
@@ -45,20 +44,29 @@ impl BevyPhysicsHooks for MyPhysicsHooks<'_, '_> {
 }
 
 #[derive(Event)]
+pub struct TouchStartedEvent {
+    pub object: Entity,
+}
+
+#[derive(Event)]
 pub struct CrashEvent {
     pub object: Entity,
     pub force: f32,
 }
 
-#[derive(Event)]
-pub struct TouchEvent(pub Entity);
-
 pub fn write_crash(
     query_health: Query<&Health>,
-    // mut collision_events: EventReader<CollisionEvent>,
+    mut collision_events: EventReader<CollisionEvent>,
     mut contact_force_events: EventReader<ContactForceEvent>,
+    mut write_touch: EventWriter<TouchStartedEvent>,
     mut writer_crash: EventWriter<CrashEvent>,
 ) {
+    for event in collision_events.read() {
+        if let CollisionEvent::Started(h1, _, _) = event {
+            write_touch.write(TouchStartedEvent { object: *h1 });
+        }
+    }
+
     for event in contact_force_events.read() {
         if query_health.contains(event.collider1) {
             writer_crash.write(CrashEvent {
@@ -98,12 +106,12 @@ pub fn read_crash(
 pub struct Sign(pub String);
 
 pub fn read_touch_sign(
-    mut reader: EventReader<TouchEvent>,
+    mut reader: EventReader<TouchStartedEvent>,
     mut writer: EventWriter<MessageEvent>,
     query_sign: Query<&Sign>,
 ) {
     for ev in reader.read() {
-        let result = query_sign.get(ev.0);
+        let result = query_sign.get(ev.object);
         if result.is_ok() {
             let sign = result.unwrap();
             writer.write(MessageEvent::info(sign.0.as_str()));
