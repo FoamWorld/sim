@@ -153,10 +153,12 @@ pub fn load_scene_system(
         warn!("Target not supported.");
         return;
     };
-    // todo: add transform
+
     commands
-        .spawn(DynamicSceneRoot(
-            asset_server.load(name.to_owned() + ".scn.ron"),
+        .spawn((
+            DynamicSceneRoot(asset_server.load(name.to_owned() + ".scn.ron")),
+            Visibility::Visible,
+            Transform::from_xyz(0.0, 0.0, 0.0),
         ))
         .observe(
             |_: Trigger<SceneInstanceReady>, mut next_state: ResMut<NextState<ProcessState>>| {
@@ -170,12 +172,11 @@ pub fn save_scene_system(world: &mut World) {
         let mut query = world.query_filtered::<Entity, Or<(With<Eidos>, With<Methexis>)>>();
         let scene_builder = DynamicSceneBuilder::from_world(&world)
             .deny_all()
-            // resource
-            .allow_resource::<SceneBox>()
-            .allow_resource::<CameraMoveConfig>()
             // core
             .allow_component::<Transform>()
             // utils
+            .allow_component::<ChildOf>()
+            .allow_component::<Children>()
             .allow_component::<Methexis>()
             .allow_component::<Eidos>()
             .allow_component::<HoldsConfig>()

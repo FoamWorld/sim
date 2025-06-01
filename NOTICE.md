@@ -20,6 +20,7 @@ My original. (MIT)
 ## Images
 ### My Original
 - `assets/textures/hints.png`
+- `assets/textures/spells.png`
 - `assets/textures/wands.png`
 
 ### OpenGameArt
@@ -29,7 +30,3 @@ My original. (MIT)
 [Dungeon Tileset](https://opengameart.org/content/dungeon-tileset-1) (CC-BY 3.0) (Modified)
 - `assets/textures/character.png`
 - `assets/textures/door.png`
-
-### Noita Wiki (CC BY-NC-SA 3.0)
-[Spells](https://noita.wiki.gg/zh/images/8/8a/Sprite_spells_16x16.png) (Modified)
-- `assets/textures/spells.png`

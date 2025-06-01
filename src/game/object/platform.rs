@@ -16,7 +16,6 @@ pub fn setup_shelf_model(
         commands
             .entity(entity)
             .insert((
-                Visibility::Visible,
                 Sprite::from_color(
                     Color::srgb(0.8, 0.6, 0.6),
                     Vec2::new(2.0 * model.half_x, 1.0),

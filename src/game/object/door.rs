@@ -1,11 +1,6 @@
 use super::*;
 
-pub enum DoorStatus {
-    Open,
-    Closed,
-    Locked,
-    Invalid,
-}
+pub struct Lock(u64);
 
 #[derive(Reflect, Component, Clone, Copy)]
 #[reflect(Component)]
