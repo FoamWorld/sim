@@ -118,5 +118,3 @@ pub fn read_touch_sign(
         }
     }
 }
-
-pub struct Portal;

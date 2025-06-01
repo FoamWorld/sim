@@ -2,6 +2,27 @@ use crate::state::AppState;
 use bevy::{asset::LoadedFolder, image::ImageSampler, prelude::*};
 use std::collections::HashMap;
 
+#[derive(serde::Deserialize, Clone)]
+pub struct ModeConfig {
+    pub title: String,
+    pub entrance: String,
+    pub level: u16,
+}
+
+#[derive(serde::Deserialize, Asset, TypePath)]
+pub struct ModesConfig {
+    pub level: u16,
+    pub modes: Vec<ModeConfig>,
+}
+
+#[derive(Resource)]
+pub struct ModesConfigHandle(pub Handle<ModesConfig>);
+
+pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let modes = ModesConfigHandle(asset_server.load("config/default.modes.toml"));
+    commands.insert_resource(modes);
+}
+
 #[derive(Resource, Clone)]
 pub struct RpgTextures {
     pub folder: Handle<LoadedFolder>,
@@ -67,12 +88,12 @@ impl RpgTextures {
     }
 
     pub fn get_image_handle(&self, name: &str) -> Handle<Image> {
-        let handle = self.named_images.get(name.into()).unwrap();
+        let handle = self.named_images.get(&String::from(name)).unwrap();
         handle.clone_weak()
     }
 
     pub fn get_texture_atlas(&self, name: &str, index: usize) -> TextureAtlas {
-        let handle = self.named_atlases_layout.get(name.into()).unwrap();
+        let handle = self.named_atlases_layout.get(&String::from(name)).unwrap();
         TextureAtlas {
             layout: handle.clone_weak(),
             index,

@@ -7,6 +7,22 @@ use crate::{
 use bevy::{prelude::*, scene::*, tasks::IoTaskPool};
 use std::{fs::File, io::Write};
 
+#[derive(Resource, Default, PartialEq)]
+pub enum PortalTarget {
+    #[default]
+    None,
+    This,
+    Unique(String),
+    Clone(String),
+}
+
+#[derive(Component)]
+pub struct Portal {
+    on: bool,
+    target: PortalTarget,
+    variant: u64,
+}
+
 #[derive(Resource)]
 pub struct GameSave {
     base_path: String,
@@ -54,7 +70,8 @@ pub struct RegisteryPlugin;
 
 impl Plugin for RegisteryPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(GameSave::new());
+        app.insert_resource(GameSave::new())
+            .init_resource::<PortalTarget>();
 
         app.insert_state(ProcessState::None);
 
@@ -126,12 +143,21 @@ impl Plugin for RegisteryPlugin {
 pub fn load_scene_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    target: Res<PortalTarget>,
     mut next_state: ResMut<NextState<ProcessState>>,
 ) {
     next_state.set(ProcessState::LoadScene);
+    let name = if let PortalTarget::Unique(string) = target.into_inner() {
+        string
+    } else {
+        warn!("Target not supported.");
+        return;
+    };
     // todo: add transform
     commands
-        .spawn(DynamicSceneRoot(asset_server.load("scenes/debug.scn.ron")))
+        .spawn(DynamicSceneRoot(
+            asset_server.load(name.to_owned() + ".scn.ron"),
+        ))
         .observe(
             |_: Trigger<SceneInstanceReady>, mut next_state: ResMut<NextState<ProcessState>>| {
                 next_state.set(ProcessState::PostLoadScene);

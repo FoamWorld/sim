@@ -31,7 +31,10 @@ default = [
 	"bevy/serialize",
 
 	# Rapier
-	"bevy_rapier2d/serde-serialize"
+	"bevy_rapier2d/serde-serialize",
+
+	# Bevy Common Assets
+	"bevy_common_assets/toml",
 ]
 
 devtools = ["default"]
@@ -50,5 +53,6 @@ lto = "thin"
 
 [dependencies]
 bevy = { version = "0.16", default-features = false }
+bevy_common_assets = { version = "0.13", default-features = false }
 bevy_rapier2d = "0.30.0"
 serde = "1"

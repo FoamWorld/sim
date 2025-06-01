@@ -1,6 +1,7 @@
 #![allow(dead_code, reason = "developing period")]
 
 extern crate bevy;
+extern crate bevy_common_assets;
 extern crate bevy_rapier2d;
 extern crate serde;
 
@@ -8,6 +9,7 @@ use bevy::{
     prelude::*,
     window::{EnabledButtons, WindowResolution},
 };
+use bevy_common_assets::toml;
 use bevy_rapier2d::prelude::*;
 
 mod assets;
@@ -40,20 +42,37 @@ fn main() {
         decorations: true,
         ..default()
     };
+
+    // Core plugins.
     app.add_plugins((
         DefaultPlugins.set(WindowPlugin {
             primary_window: Some(window),
             ..default()
         }),
-        RapierPhysicsPlugin::<physics::collision::MyPhysicsHooks>::pixels_per_meter(UNIT_PER_METER),
         state::AppStatePlugin,
-        diagnostics::DiagnosticsTextPlugin,
-        control::ControlPlugin,
-        physics::GamePhysicsPlugin,
-        message::MessagePlugin,
-        scene::RegisteryPlugin,
-        statistics::StatisticsPlugin,
-        game::GamePlugin,
     ));
-    app.run();
+
+    // Game necessity.
+    app.add_plugins((
+        control::ControlPlugin,
+        game::GamePlugin,
+        scene::RegisteryPlugin,
+        toml::TomlAssetPlugin::<assets::ModesConfig>::new(&["modes.toml"]),
+    ));
+
+    // Physics.
+    app.add_plugins((
+        RapierPhysicsPlugin::<physics::collision::MyPhysicsHooks>::pixels_per_meter(UNIT_PER_METER),
+        physics::GamePhysicsPlugin,
+    ));
+
+    // Misc.
+    app.add_plugins((
+        message::MessagePlugin,
+        statistics::StatisticsPlugin,
+        diagnostics::DiagnosticsTextPlugin,
+    ));
+
+    // Run.
+    app.add_systems(Startup, assets::setup).run();
 }

@@ -1,4 +1,4 @@
-use crate::{constants::*, scene::*, state::*};
+use crate::{assets::*, constants::*, scene::*, state::*};
 use bevy::{
     prelude::*,
     window::{PrimaryWindow, SystemCursorIcon},
@@ -16,7 +16,7 @@ pub struct UiOnce;
 pub enum ButtonType {
     Start,
     Quit,
-    ToGame,
+    ToGame(String),
     Resume,
     Save,
     BackToMenu,
@@ -27,6 +27,7 @@ pub fn button_system(
     mut next_app_state: ResMut<NextState<AppState>>,
     mut next_game_state: ResMut<NextState<GameState>>,
     mut next_process_state: ResMut<NextState<ProcessState>>,
+    mut target: ResMut<PortalTarget>,
     mut writer_exit: EventWriter<AppExit>,
 ) {
     for (interaction, btn_type) in &query {
@@ -36,7 +37,10 @@ pub fn button_system(
                 ButtonType::Quit => {
                     writer_exit.write(AppExit::Success);
                 }
-                ButtonType::ToGame => next_app_state.set(AppState::InGame),
+                ButtonType::ToGame(string) => {
+                    target.set_if_neq(PortalTarget::Unique(string.to_string()));
+                    next_app_state.set(AppState::InGame);
+                }
                 ButtonType::Resume => next_game_state.set(GameState::Running),
                 ButtonType::Save => next_process_state.set(ProcessState::PreSaveScene),
                 ButtonType::BackToMenu => next_app_state.set(AppState::Menu),
@@ -99,12 +103,17 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
     );
 }
 
-pub fn start_mode_selection(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let mode_list = vec![
-        // "Gallery", // not yet possible
-        #[cfg(feature = "devtools")]
-        "Debug",
-    ];
+pub fn start_mode_selection(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    modes: Res<Assets<ModesConfig>>,
+    modes_id: Res<ModesConfigHandle>,
+) {
+    let table = modes.get(modes_id.0.id()).unwrap();
+    #[cfg(not(feature = "devtools"))]
+    let level = table.level;
+    #[cfg(feature = "devtools")]
+    let level = 0xffffu16;
 
     let font = TextFont {
         font: asset_server.load("fonts/open-sans.regular.ttf"),
@@ -116,8 +125,16 @@ pub fn start_mode_selection(mut commands: Commands, asset_server: Res<AssetServe
         &mut commands,
         UI_CLEAR_COLOR,
         |parent: &mut ChildSpawnerCommands| {
-            for mode in mode_list {
-                add_button(parent, mode, font.clone(), ButtonType::ToGame);
+            for mode in &table.modes {
+                if mode.level > level {
+                    continue;
+                }
+                add_button(
+                    parent,
+                    &mode.title,
+                    font.clone(),
+                    ButtonType::ToGame(mode.entrance.clone()),
+                );
             }
         },
     );

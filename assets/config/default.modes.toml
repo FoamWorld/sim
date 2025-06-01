@@ -1,0 +1,11 @@
+level = 255
+
+[[modes]]
+title = "Main"
+entrance = ""
+level = 0
+
+[[modes]]
+title = "Debug"
+entrance = "scenes/debug"
+level = 65535
