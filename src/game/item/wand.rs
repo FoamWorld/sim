@@ -64,7 +64,7 @@ impl Command for LaunchMagic {
     fn apply(self, world: &mut World) {
         let source = self.source;
         let ray = self.target - source;
-        let unit = ray / ray.length();
+        let unit = ray.normalize_or_zero();
 
         let sprite = {
             let rpg_folder = world.resource::<RpgTextures>();

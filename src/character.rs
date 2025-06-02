@@ -59,14 +59,20 @@ pub fn setup_character(mut commands: Commands, rpg_folder: Res<RpgTextures>) {
         },
         Transform::from_xyz(0.0, 0.0, CHARACTER_LAYER),
         RigidBody::Dynamic,
-        Collider::cuboid(CHARACTER_X_LENGTH * 0.5, CHARACTER_Y_LENGTH * 0.5),
+        Collider::capsule_y(
+            CHARACTER_X_LENGTH * 0.5,
+            (CHARACTER_Y_LENGTH - CHARACTER_X_LENGTH) * 0.5,
+        ),
         ColliderMassProperties::Mass(70.0),
         LockedAxes::ROTATION_LOCKED,
-        MovementSpeed(100.0),
         MoveDownTimer(timer),
-        Velocity::zero(),
         Actor(ActorFacing::Right),
         Character,
+        bevy_tnua::prelude::TnuaController::default(),
+        bevy_tnua_rapier2d::TnuaRapier2dSensorShape(Collider::cuboid(
+            CHARACTER_X_LENGTH * 0.5,
+            1.0,
+        )),
         WillRemove,
     ));
 }

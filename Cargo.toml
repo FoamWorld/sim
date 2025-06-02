@@ -54,5 +54,7 @@ lto = "thin"
 [dependencies]
 bevy = { version = "0.16", default-features = false }
 bevy_common_assets = { version = "0.13", default-features = false }
-bevy_rapier2d = "0.30.0"
+bevy_rapier2d = "0.30"
+bevy-tnua = "0.24"
+bevy-tnua-rapier2d = "0.12"
 serde = "1"

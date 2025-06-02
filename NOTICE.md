@@ -9,6 +9,13 @@
 ## Code
 My original. (MIT)
 
+Crates used:
+- `bevy`
+- `bevy_common_assets`
+- [`bevy_rapier2d`](https://github.com/dimforge/bevy_rapier): Apache-2.0 license
+- `bevy_tnua`
+- `serde`
+
 ## Fonts
 `Open Sans` designed by **Steve Matteson** (Apache v2.0)
 - `assets/fonts/open-sans.regular.ttf`: Normal, Weight: 400, Stretch: 100%

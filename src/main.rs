@@ -3,6 +3,8 @@
 extern crate bevy;
 extern crate bevy_common_assets;
 extern crate bevy_rapier2d;
+extern crate bevy_tnua;
+extern crate bevy_tnua_rapier2d;
 extern crate serde;
 
 use bevy::{
@@ -11,6 +13,8 @@ use bevy::{
 };
 use bevy_common_assets::toml;
 use bevy_rapier2d::prelude::*;
+use bevy_tnua::prelude::*;
+use bevy_tnua_rapier2d::*;
 
 mod assets;
 mod character;
@@ -63,6 +67,8 @@ fn main() {
     // Physics.
     app.add_plugins((
         RapierPhysicsPlugin::<physics::collision::MyPhysicsHooks>::pixels_per_meter(UNIT_PER_METER),
+        TnuaControllerPlugin::new(FixedUpdate),
+        TnuaRapier2dPlugin::new(FixedUpdate),
         physics::GamePhysicsPlugin,
     ));
 
