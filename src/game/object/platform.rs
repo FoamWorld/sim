@@ -22,9 +22,8 @@ pub fn setup_shelf_model(
                 ),
                 RigidBody::Fixed,
                 Collider::cuboid(model.half_x, 0.5),
-                OneWayPlatform,
+                OneWayPlatform(0.5),
                 ActiveHooks::FILTER_CONTACT_PAIRS,
-                ZIndex(-1),
             ))
             .remove::<ShelfModel>();
     }

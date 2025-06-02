@@ -19,7 +19,7 @@ pub fn setup_cloth_model(
         commands
             .entity(entity)
             .insert(children![(
-                Transform::from_xyz(0.0, 0.0, 0.0),
+                Transform::from_xyz(0.0, 0.0, -2.0),
                 Sprite::from_color(
                     Color::srgb(r, g, b),
                     Vec2::new(2.0 * model.h, 2.0 * model.v)
