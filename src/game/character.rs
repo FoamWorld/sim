@@ -1,14 +1,12 @@
 use crate::character::*;
 use bevy::prelude::*;
 
-pub fn update_actor_position(
-    actors: Query<(&Transform, &Actor)>,
-    mut position: ResMut<ActorPosition>,
-) {
+pub fn update_actor_status(actors: Query<(&Transform, &Actor)>, mut status: ResMut<ActorStatus>) {
     if let Ok((transform, actor)) = actors.single() {
-        position.facing_right = actor.0 == ActorFacing::Right;
-        position.center = transform.translation.truncate();
-        position.facing_offset = actor.get_facing_offset();
-        position.primary_hand_offset = actor.get_primary_hand_offset();
+        let facing = actor.0;
+        status.facing = facing;
+        status.center = transform.translation.truncate();
+        status.facing_offset = facing.get_facing_offset();
+        status.primary_hand_offset = facing.get_primary_hand_offset();
     }
 }

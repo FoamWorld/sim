@@ -9,49 +9,53 @@ pub struct Character;
 #[derive(Component)]
 pub struct IsActive;
 
-#[derive(Resource, Default)]
-pub struct ActorPosition {
-    pub facing_right: bool,
-    pub center: Vec2,
-    pub facing_offset: Vec2,
-    pub primary_hand_offset: Vec2,
-    // pub secondary_hand: Vec2,
-}
-
-#[derive(Reflect, PartialEq)]
+#[derive(Reflect, Default, Clone, Copy, PartialEq)]
 pub enum ActorFacing {
     Left,
+    #[default]
     Right,
 }
 
-#[derive(Reflect, Component)]
-#[reflect(Component)]
-pub struct Actor(pub ActorFacing);
-
-impl Actor {
-    pub fn set_facing(&mut self, facing: ActorFacing) {
-        self.0 = facing;
-    }
-
+impl ActorFacing {
     pub fn get_facing_offset(&self) -> Vec2 {
-        match self.0 {
+        match self {
             ActorFacing::Left => Vec2::new(-1.0, 0.0),
             ActorFacing::Right => Vec2::new(1.0, 0.0),
         }
     }
 
     pub fn get_primary_hand_offset(&self) -> Vec2 {
-        match self.0 {
+        match self {
             ActorFacing::Left => Vec2::new(-11.0, -6.0),
             ActorFacing::Right => Vec2::new(11.0, -6.0),
         }
     }
 }
 
-pub fn setup_character(mut commands: Commands, rpg_folder: Res<RpgTextures>) {
+#[derive(Resource, Default)]
+pub struct ActorStatus {
+    pub entity: Option<Entity>,
+    pub facing: ActorFacing,
+    pub center: Vec2,
+    pub facing_offset: Vec2,
+    pub primary_hand_offset: Vec2,
+    // pub secondary_hand: Vec2,
+}
+
+#[derive(Reflect, Component)]
+#[reflect(Component)]
+pub struct Actor(pub ActorFacing);
+
+pub fn setup_character(
+    mut commands: Commands,
+    rpg_folder: Res<RpgTextures>,
+    mut status: ResMut<ActorStatus>,
+) {
+    let mut ec = commands.spawn((Actor(ActorFacing::Right), Character, WillRemove));
+
     let mut timer = Timer::from_seconds(0.1, TimerMode::Once);
     timer.set_elapsed(timer.duration());
-    commands.spawn((
+    ec.insert((
         Sprite {
             image: rpg_folder.get_image_handle("character"),
             custom_size: Some(Vec2::new(CHARACTER_X_LENGTH, CHARACTER_Y_LENGTH)),
@@ -66,14 +70,12 @@ pub fn setup_character(mut commands: Commands, rpg_folder: Res<RpgTextures>) {
         ColliderMassProperties::Mass(70.0),
         LockedAxes::ROTATION_LOCKED,
         MoveDownTimer(timer),
-        Actor(ActorFacing::Right),
-        Character,
         bevy_tnua::prelude::TnuaController::default(),
         bevy_tnua_rapier2d::TnuaRapier2dSensorShape(Collider::cuboid(
             CHARACTER_X_LENGTH * 0.5,
             1.0,
         )),
         bevy_tnua::TnuaGhostSensor::default(),
-        WillRemove,
     ));
+    status.entity = Some(ec.id());
 }

@@ -105,7 +105,7 @@ pub fn update_attached_image(
     inventory: Res<Inventory>,
     actors: Query<Entity, With<Actor>>,
     mut reader: EventReader<InventorySelectedUpdateEvent>,
-    position: Res<ActorPosition>,
+    status: Res<ActorStatus>,
 ) {
     if reader.is_empty() {
         return;
@@ -121,7 +121,7 @@ pub fn update_attached_image(
         let ec = commands.spawn((
             Methexis(item),
             ChildOf(actor),
-            Transform::from_translation(position.primary_hand_offset.extend(1.0)),
+            Transform::from_translation(status.primary_hand_offset.extend(1.0)),
             IsActive,
         ));
 

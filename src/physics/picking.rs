@@ -13,7 +13,7 @@ pub fn physics_hover_detection(
     read_rapier_context: ReadRapierContext,
     coords: Res<CursorCoords>,
     actors: Query<Entity, With<Actor>>,
-    actor_pos: Res<ActorPosition>,
+    actor_pos: Res<ActorStatus>,
     mut hover: ResMut<HoverEntity>,
 ) {
     let rapier_context = read_rapier_context.single().unwrap();

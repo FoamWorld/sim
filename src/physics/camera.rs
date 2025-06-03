@@ -116,7 +116,7 @@ impl RotateWithMouse {
 
 pub fn rotate_with_mouse(
     coords: Res<CursorCoords>,
-    status: Res<ActorPosition>,
+    status: Res<ActorStatus>,
     mut query: Query<(&mut Transform, &RotateWithMouse, &GlobalTransform), With<IsActive>>,
 ) {
     let dest = if let Some(dest) = coords.0 {
@@ -128,7 +128,7 @@ pub fn rotate_with_mouse(
         let start = global_transform.translation().truncate();
         let ray = dest - start;
         let theta = ops::atan2(ray.y, ray.x);
-        let mid = if status.facing_right {
+        let mid = if status.facing == ActorFacing::Right {
             rotate_config.mid
         } else {
             PI - rotate_config.mid

@@ -1,5 +1,8 @@
 use super::*;
-use crate::{assets::RpgTextures, game::summon::elements::*};
+use crate::{
+    assets::RpgTextures,
+    game::{item_control::*, summon::elements::*},
+};
 
 #[derive(Reflect, Component, Clone, Copy)]
 #[reflect(Component)]
@@ -20,13 +23,11 @@ pub fn setup_wand_model(
                     |commands: &mut Commands,
                      world: &World,
                      entity: Entity,
-                     source: Vec2,
-                     target: Vec2| {
+                     pointing: ItemPointing| {
                         if let Some(mode) = world.entity(entity).get::<Mode>() {
                             commands.queue(LaunchMagic {
                                 id: mode.0,
-                                source,
-                                target,
+                                pointing,
                             });
                         }
                     },
@@ -56,15 +57,15 @@ pub fn setup_wand_model(
 
 struct LaunchMagic {
     id: usize,
-    source: Vec2,
-    target: Vec2,
+    pointing: ItemPointing,
 }
 
 impl Command for LaunchMagic {
     fn apply(self, world: &mut World) {
-        let source = self.source;
-        let ray = self.target - source;
-        let unit = ray.normalize_or_zero();
+        let pointing = self.pointing;
+        let source = pointing.source;
+        let (s, c) = ops::sin_cos(pointing.rotation);
+        let unit = Vec2::new(c, s);
 
         let sprite = {
             let rpg_folder = world.resource::<RpgTextures>();

@@ -3,13 +3,65 @@ use crate::character::*;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
+#[derive(Reflect, Component)]
+#[reflect(Component)]
+#[type_path = "sim::utils"]
+pub struct ActivateCommand {
+    func: Box<dyn Fn(&mut Commands, &World, Entity, ItemPointing) + Send + Sync>,
+}
+
+impl ActivateCommand {
+    pub fn new(
+        func: impl Fn(&mut Commands, &World, Entity, ItemPointing) + Send + Sync + 'static,
+    ) -> Self {
+        Self {
+            func: Box::new(func),
+        }
+    }
+
+    pub fn execute(
+        &self,
+        commands: &mut Commands,
+        world: &World,
+        entity: Entity,
+        pointing: ItemPointing,
+    ) {
+        (self.func)(commands, world, entity, pointing);
+    }
+}
+
+#[derive(Reflect, Component)]
+#[reflect(Component)]
+#[type_path = "sim::utils"]
+pub struct ModifyCommand {
+    func: Box<dyn Fn(&mut Commands, Entity) + Send + Sync>,
+}
+
+impl ModifyCommand {
+    pub fn new(func: impl Fn(&mut Commands, Entity) + Send + Sync + 'static) -> Self {
+        Self {
+            func: Box::new(func),
+        }
+    }
+
+    pub fn execute(&self, commands: &mut Commands, entity: Entity) {
+        (self.func)(commands, entity);
+    }
+}
+
+pub struct ItemPointing {
+    pub source: Vec2,
+    pub target: Vec2,
+    pub rotation: f32,
+}
+
 fn reach_inventory_item(world: &World, inv: Entity, index: usize) -> Option<Entity> {
     let storage = world.entity(inv).get::<ItemStorage>().unwrap();
     storage.get_index(index)
 }
 
 fn get_source_target(world: &World) -> (Vec2, Vec2) {
-    let position = world.resource::<ActorPosition>();
+    let position = world.resource::<ActorStatus>();
     let source = position.center + position.primary_hand_offset;
 
     let cursor_coords = world.resource::<crate::physics::camera::CursorCoords>();
@@ -18,15 +70,26 @@ fn get_source_target(world: &World) -> (Vec2, Vec2) {
     (source, target)
 }
 
-pub fn item_use(mut commands: Commands, world: &World, inventory: Res<Inventory>) {
+pub fn item_use(
+    mut commands: Commands,
+    world: &World,
+    inventory: Res<Inventory>,
+    transform: &GlobalTransform,
+) {
     let inv = inventory.bind.unwrap();
     let index = inventory.selected;
 
     let (source, target) = get_source_target(world);
 
     if let Some(item) = reach_inventory_item(world, inv, index) {
+        let rot = transform.rotation();
+        let pointing = ItemPointing {
+            source,
+            target,
+            rotation: ops::atan2(rot.z, rot.w) * 2.0,
+        };
         if let Some(cmd) = world.entity(item).get::<ActivateCommand>() {
-            cmd.execute(&mut commands, world, item, source, target);
+            cmd.execute(&mut commands, world, item, pointing);
         }
     }
 }

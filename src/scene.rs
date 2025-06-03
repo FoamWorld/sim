@@ -71,7 +71,8 @@ pub struct RegisteryPlugin;
 impl Plugin for RegisteryPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(GameSave::new())
-            .init_resource::<PortalTarget>();
+            .init_resource::<PortalTarget>()
+            .init_resource::<ActorStatus>();
 
         app.insert_state(ProcessState::None);
 

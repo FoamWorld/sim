@@ -132,7 +132,7 @@ pub fn inputs_wait(
     }
 }
 
-pub fn change_facing(mut actors: Query<(&mut Actor, &mut Sprite), Changed<Actor>>) {
+pub fn change_facing(mut actors: Query<(&Actor, &mut Sprite), Changed<Actor>>) {
     if let Ok((actor, mut sprite)) = actors.single_mut() {
         sprite.flip_x = match actor.0 {
             ActorFacing::Left => true,
@@ -155,10 +155,10 @@ pub fn inputs_move(
         let mut direction = Vec2::ZERO;
 
         if to_left {
-            actor.set_facing(ActorFacing::Left);
+            actor.0 = ActorFacing::Left;
             direction -= Vec2::X;
         } else if to_right {
-            actor.set_facing(ActorFacing::Right);
+            actor.0 = ActorFacing::Right;
             direction += Vec2::X;
         }
 

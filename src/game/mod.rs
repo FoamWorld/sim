@@ -25,8 +25,7 @@ impl Plugin for GamePlugin {
             size: 0,
             selected: 0,
             bind: None,
-        })
-        .init_resource::<ActorPosition>();
+        });
 
         app.add_event::<InventorySelectedUpdateEvent>()
             .add_event::<mob::health::HealthClearedEvent>();
@@ -70,7 +69,7 @@ impl Plugin for GamePlugin {
         app.add_systems(
             FixedUpdate,
             (
-                update_actor_position,
+                update_actor_status,
                 mob::health::read_health_cleared,
                 |query: Query<(), Changed<ItemStorage>>,
                  mut writer: EventWriter<InventorySelectedUpdateEvent>| {
@@ -95,10 +94,11 @@ fn detect_input_use(
     click: Res<ButtonInput<MouseButton>>,
     control_settings: Res<ControlSettings>,
     inventory: Res<Inventory>,
+    transform: Query<&GlobalTransform, With<IsActive>>,
 ) {
     if click.just_pressed(MouseButton::Left) || control_settings.check(ControlCode::Activate, &keys)
     {
-        item_use(commands, world, inventory);
+        item_use(commands, world, inventory, transform.single().unwrap());
     }
 }
 
