@@ -66,7 +66,7 @@ fn main() {
 
     // Physics.
     app.add_plugins((
-        RapierPhysicsPlugin::<physics::collision::MyPhysicsHooks>::pixels_per_meter(UNIT_PER_METER),
+        RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METER),
         TnuaControllerPlugin::new(FixedUpdate),
         TnuaRapier2dPlugin::new(FixedUpdate),
         physics::GamePhysicsPlugin,

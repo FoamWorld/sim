@@ -1,5 +1,5 @@
 use super::*;
-use crate::physics::collision::OneWayPlatform;
+use bevy_tnua::TnuaGhostPlatform;
 
 #[derive(Reflect, Component, Clone, Copy)]
 #[reflect(Component)]
@@ -21,9 +21,12 @@ pub fn setup_shelf_model(
                     Vec2::new(2.0 * model.half_x, 1.0),
                 ),
                 RigidBody::Fixed,
+                SolverGroups {
+                    memberships: Group::empty(),
+                    filters: Group::empty(),
+                },
                 Collider::cuboid(model.half_x, 0.5),
-                OneWayPlatform(0.5),
-                ActiveHooks::FILTER_CONTACT_PAIRS,
+                TnuaGhostPlatform,
             ))
             .remove::<ShelfModel>();
     }

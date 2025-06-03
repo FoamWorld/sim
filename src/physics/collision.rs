@@ -1,51 +1,23 @@
 use crate::{
-    character::Character,
-    constants::*,
     control::MoveDownTimer,
     game::mob::health::{Health, HealthClearedEvent},
     message::MessageEvent,
 };
-use bevy::{ecs::system::SystemParam, prelude::*};
+use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
+use bevy_tnua::*;
 
-/// One-way platform. Stores height distance between center and upper bound.
-#[derive(Component)]
-pub struct OneWayPlatform(pub Scalar);
-
-#[derive(SystemParam)]
-pub struct MyPhysicsHooks<'w, 's> {
-    platforms: Query<'w, 's, &'static OneWayPlatform>,
-    users: Query<'w, 's, &'static Character>,
-    transforms: Query<'w, 's, &'static GlobalTransform>,
-    move_down: Query<'w, 's, &'static MoveDownTimer>,
-}
-
-impl BevyPhysicsHooks for MyPhysicsHooks<'_, '_> {
-    fn filter_contact_pair(&self, context: PairFilterContextView) -> Option<SolverFlags> {
-        let entity1 = context.collider1();
-        let entity2 = context.collider2();
-
-        let (user_entity, plat_entity) =
-            if self.platforms.contains(entity1) && self.users.contains(entity2) {
-                (entity2, entity1)
-            } else if self.platforms.contains(entity2) && self.users.contains(entity1) {
-                (entity1, entity2)
-            } else {
-                return Some(SolverFlags::COMPUTE_IMPULSES);
-            };
-
-        let user_t = self.transforms.get(user_entity).unwrap();
-        let plat_t = self.transforms.get(plat_entity).unwrap();
-        let h = self.platforms.get(plat_entity).unwrap().0;
-        let standing =
-            user_t.translation().y - CHARACTER_Y_LENGTH * 0.5 > plat_t.translation().y - h - 1e-3;
-        let timer = self.move_down.get(user_entity).unwrap();
-
-        if standing && timer.0.finished() {
-            // Impulses. May fall through this.
-            Some(SolverFlags::COMPUTE_IMPULSES)
-        } else {
-            None
+pub fn apply_tnua_fall_through_controls(
+    mut query: Query<(&mut TnuaProximitySensor, &TnuaGhostSensor, &MoveDownTimer)>,
+) {
+    for (mut proximity_sensor, ghost_sensor, timer) in query.iter_mut() {
+        if timer.0.finished() {
+            for ghost_platform in ghost_sensor.iter() {
+                if 1.0 <= ghost_platform.proximity {
+                    proximity_sensor.output = Some(ghost_platform.clone());
+                    break;
+                }
+            }
         }
     }
 }

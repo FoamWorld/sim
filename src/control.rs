@@ -132,9 +132,6 @@ pub fn inputs_wait(
     }
 }
 
-#[derive(Component)]
-pub struct MovementSpeed(pub Scalar);
-
 pub fn change_facing(mut actors: Query<(&mut Actor, &mut Sprite), Changed<Actor>>) {
     if let Ok((actor, mut sprite)) = actors.single_mut() {
         sprite.flip_x = match actor.0 {
@@ -167,7 +164,7 @@ pub fn inputs_move(
 
         controller.basis(TnuaBuiltinWalk {
             desired_velocity: (direction * 120.0).extend(0.0),
-            float_height: CHARACTER_Y_LENGTH * 0.5 + 0.1,
+            float_height: CHARACTER_Y_LENGTH * 0.5 + 2.0,
             ..default()
         });
 
@@ -176,9 +173,7 @@ pub fn inputs_move(
                 height: 40.0,
                 ..default()
             });
-        }
-
-        if drop {
+        } else if drop {
             move_down.0.reset();
         }
     }

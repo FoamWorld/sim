@@ -42,6 +42,11 @@ impl Plugin for GamePhysicsPlugin {
 
         app.add_systems(
             FixedUpdate,
+            apply_tnua_fall_through_controls.in_set(bevy_tnua::TnuaUserControlsSystemSet),
+        );
+
+        app.add_systems(
+            FixedUpdate,
             (write_crash, read_crash).chain().in_set(InGameSet::Logic),
         );
 

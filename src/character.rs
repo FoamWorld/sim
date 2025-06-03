@@ -49,7 +49,7 @@ impl Actor {
 }
 
 pub fn setup_character(mut commands: Commands, rpg_folder: Res<RpgTextures>) {
-    let mut timer = Timer::from_seconds(0.03, TimerMode::Once);
+    let mut timer = Timer::from_seconds(0.1, TimerMode::Once);
     timer.set_elapsed(timer.duration());
     commands.spawn((
         Sprite {
@@ -73,6 +73,7 @@ pub fn setup_character(mut commands: Commands, rpg_folder: Res<RpgTextures>) {
             CHARACTER_X_LENGTH * 0.5,
             1.0,
         )),
+        bevy_tnua::TnuaGhostSensor::default(),
         WillRemove,
     ));
 }
