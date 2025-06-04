@@ -88,22 +88,35 @@ impl RpgTextures {
     }
 
     pub fn get_image_handle(&self, name: &str) -> Handle<Image> {
-        let handle = self.named_images.get(&String::from(name)).unwrap();
+        let handle = self
+            .named_images
+            .get(&String::from(name))
+            .unwrap_or(self.named_images.get("fallback").unwrap());
         handle.clone_weak()
     }
 
     pub fn get_texture_atlas(&self, name: &str, index: usize) -> TextureAtlas {
-        let handle = self.named_atlases_layout.get(&String::from(name)).unwrap();
-        TextureAtlas {
-            layout: handle.clone_weak(),
-            index,
+        if let Some(handle) = self.named_atlases_layout.get(&String::from(name)) {
+            TextureAtlas {
+                layout: handle.clone_weak(),
+                index,
+            }
+        } else {
+            TextureAtlas {
+                layout: self
+                    .named_atlases_layout
+                    .get("fallback")
+                    .unwrap()
+                    .clone_weak(),
+                index: 0,
+            }
         }
     }
 }
 
 pub fn load_textures(mut commands: Commands, asset_server: Res<AssetServer>) {
     let list: Vec<(String, Option<(u32, u32, u32, u32)>)> = vec![
-        // todo: add "notexture" fallback
+        ("fallback".into(), Some((12, 12, 1, 1))),
         ("character".into(), None),
         ("door".into(), Some((16, 32, 2, 2))),
         ("hints".into(), Some((13, 13, 6, 5))),

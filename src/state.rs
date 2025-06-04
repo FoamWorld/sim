@@ -11,11 +11,10 @@ pub enum AppState {
 
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GameState {
-    /// locked because it's not ready yet
+    /// Locked because it's not ready yet.
     Locked,
     Running,
     Pause,
-    Processing,
 }
 
 #[derive(SystemSet, Debug, Clone, Copy, PartialEq, Eq, Hash)]

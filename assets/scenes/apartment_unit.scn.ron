@@ -1,0 +1,33 @@
+(
+	resources: {
+		"sim::physics::SceneBox": (
+			horizontal: (-180.0, 180.0),
+			vertical: (-120.0, 80.0),
+		),
+		"sim::physics::CameraMoveConfig": (
+			stop_horizontal_border: false,
+			stop_vertical_border: false,
+			follow_actor: false,
+			follow_cursor: false,
+		)
+	},
+	entities: {
+		4294967296: (components: {
+        	"bevy_transform::components::transform::Transform": (
+          		translation: (0.0, 0.0, 0.0),
+          		rotation: (0.0, 0.0, -0.0, 1.0),
+          		scale: (1.0, 1.0, 1.0),
+        	),
+			"sim::model::PlatformRoomModel": (
+				h: 200.0,
+				v: 100.0,
+				r: 20.0,
+			),
+			"sim::model::ClothModel": (
+				h: 200.0,
+				v: 100.0,
+				c: (0.3, 0.3, 0.3),
+			),
+		}),
+	}
+)

@@ -94,7 +94,7 @@ pub fn move_outline(
         if grid.0 == inventory.selected {
             outline.color = Color::WHITE;
         } else {
-            outline.color = Color::BLACK;
+            outline.color = Color::srgb(0.25, 0.25, 0.25);
         }
     }
 }
