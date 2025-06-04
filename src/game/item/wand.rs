@@ -4,21 +4,30 @@ use crate::{
     game::{item_control::*, summon::elements::*},
 };
 
-#[derive(Reflect, Component, Clone, Copy)]
+#[derive(Reflect, Clone, Copy)]
 #[reflect(Component)]
 #[type_path = "sim::model"]
 pub struct WandModel {
     pub mode: usize,
 }
 
-pub fn setup_wand_model(
-    mut commands: Commands,
-    query: Query<(Entity, &WandModel), Added<WandModel>>,
-) {
-    for (entity, model) in &query {
-        commands
-            .entity(entity)
-            .insert((
+impl Component for WandModel {
+    const STORAGE_TYPE: StorageType = StorageType::SparseSet;
+
+    type Mutability = Immutable;
+
+    fn on_add() -> Option<ComponentHook> {
+        Some(|mut world, context| {
+            let id = {
+                world
+                    .entity(context.entity)
+                    .get::<WandModel>()
+                    .unwrap()
+                    .mode
+            };
+            let mut binding = world.commands();
+            let mut commands = binding.entity(context.entity);
+            commands.insert((
                 ActivateCommand::new(
                     |commands: &mut Commands,
                      world: &World,
@@ -43,15 +52,16 @@ pub fn setup_wand_model(
                 HoldsConfig::Wand,
                 IconImage {
                     sheet: "wands".to_string(),
-                    index: Some(0),
+                    index: Some(id),
                 },
-                Mode(model.mode),
+                Mode(0),
                 PhysicsConfig {
                     mass: 0.5,
                     shape: Vec2 { x: 7.0, y: 1.0 },
                 },
-            ))
-            .remove::<WandModel>();
+            ));
+            commands.remove::<WandModel>();
+        })
     }
 }
 
