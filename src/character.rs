@@ -1,4 +1,4 @@
-use crate::{assets::RpgTextures, constants::*, control::*, state::WillRemove};
+use crate::{assets::MyTextures, constants::*, control::*, state::WillRemove};
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
@@ -48,7 +48,7 @@ pub struct Actor(pub ActorFacing);
 
 pub fn setup_character(
     mut commands: Commands,
-    rpg_folder: Res<RpgTextures>,
+    textures: Res<MyTextures>,
     mut status: ResMut<ActorStatus>,
 ) {
     let mut ec = commands.spawn((Actor(ActorFacing::Right), Character, WillRemove));
@@ -57,7 +57,7 @@ pub fn setup_character(
     timer.set_elapsed(timer.duration());
     ec.insert((
         Sprite {
-            image: rpg_folder.get_image_handle("character"),
+            image: textures.get_image_handle("character"),
             custom_size: Some(Vec2::new(CHARACTER_X_LENGTH, CHARACTER_Y_LENGTH)),
             ..default()
         },

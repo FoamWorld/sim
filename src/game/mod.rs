@@ -86,7 +86,9 @@ fn detect_input_use(
 ) {
     if click.just_pressed(MouseButton::Left) || control_settings.check(ControlCode::Activate, &keys)
     {
-        item_use(commands, world, inventory, transform.single().unwrap());
+        if let Ok(transform) = transform.single() {
+            item_use(commands, world, inventory, transform);
+        }
     }
 }
 
@@ -110,9 +112,12 @@ fn detect_input_throw(
     keys: Res<ButtonInput<KeyCode>>,
     control_settings: Res<ControlSettings>,
     inventory: Res<Inventory>,
+    transform: Query<&GlobalTransform, With<IsActive>>,
 ) {
     if control_settings.check(ControlCode::Throw, &keys) {
-        item_throw(commands, world, inventory);
+        if let Ok(transform) = transform.single() {
+            item_throw(commands, world, inventory, transform);
+        }
     }
 }
 

@@ -1,5 +1,5 @@
 use super::{ecs::*, item::wand::WandModel, item_storage::*};
-use crate::{assets::RpgTextures, character::*, constants::*, state::WillRemove};
+use crate::{assets::MyTextures, character::*, constants::*, state::WillRemove};
 use bevy::prelude::*;
 
 #[derive(Resource)]
@@ -73,8 +73,8 @@ pub fn update_grid_images(
         for (entity, grid) in query {
             let image_node = if let Some(item) = storage.storage[grid.0] {
                 if let Some(icon) = world.entity(item).get::<IconImage>() {
-                    let rpg_folder = world.resource::<RpgTextures>();
-                    icon.image_node(rpg_folder)
+                    let textures = world.resource::<MyTextures>();
+                    icon.image_node(textures)
                 } else {
                     ImageNode::solid_color(Color::BLACK)
                 }

@@ -24,14 +24,14 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 #[derive(Resource, Clone)]
-pub struct RpgTextures {
+pub struct MyTextures {
     pub folder: Handle<LoadedFolder>,
     pub dictionary: HashMap<String, Option<(u32, u32, u32, u32)>>,
     pub named_images: HashMap<String, Handle<Image>>,
     pub named_atlases_layout: HashMap<String, Handle<TextureAtlasLayout>>,
 }
 
-impl RpgTextures {
+impl MyTextures {
     fn new(
         folder: Handle<LoadedFolder>,
         dictionary: HashMap<String, Option<(u32, u32, u32, u32)>>,
@@ -124,7 +124,7 @@ pub fn load_textures(mut commands: Commands, asset_server: Res<AssetServer>) {
         ("sign".into(), Some((32, 32, 3, 5))),
         ("spells".into(), Some((15, 15, 2, 1))),
     ];
-    commands.insert_resource(RpgTextures::new(
+    commands.insert_resource(MyTextures::new(
         asset_server.load_folder("textures"),
         list.into_iter().collect(),
     ));
@@ -132,7 +132,7 @@ pub fn load_textures(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 pub fn check_textures(
     mut next_state: ResMut<NextState<AppState>>,
-    mut texture_folder: ResMut<RpgTextures>,
+    mut texture_folder: ResMut<MyTextures>,
     texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
     loaded_folders: Res<Assets<LoadedFolder>>,
     textures: ResMut<Assets<Image>>,

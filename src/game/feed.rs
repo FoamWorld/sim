@@ -1,5 +1,5 @@
 use super::ecs::*;
-use crate::assets::RpgTextures;
+use crate::assets::MyTextures;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
@@ -7,8 +7,8 @@ pub fn feed_to_concrete(eidos: Entity, world: &World, mut ec: EntityCommands) {
     let entity_ref = world.entity(eidos);
 
     if let Some(icon) = entity_ref.get::<IconImage>() {
-        let rpg_folder = world.resource::<RpgTextures>();
-        ec.insert(icon.sprite(rpg_folder));
+        let textures = world.resource::<MyTextures>();
+        ec.insert(icon.sprite(textures));
     }
 
     if let Some(physics) = entity_ref.get::<PhysicsConfig>() {
@@ -34,8 +34,8 @@ pub fn feed_to_attach(eidos: Entity, world: &World, mut ec: EntityCommands) {
     }
 
     if let Some(icon) = entity_ref.get::<IconImage>() {
-        let rpg_folder = world.resource::<RpgTextures>();
-        let mut sprite = icon.sprite(rpg_folder);
+        let textures = world.resource::<MyTextures>();
+        let mut sprite = icon.sprite(textures);
         sprite.anchor = anchor;
         ec.insert(sprite);
     }

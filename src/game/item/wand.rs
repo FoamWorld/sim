@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    assets::RpgTextures,
+    assets::MyTextures,
     game::{item_control::*, summon::elements::*},
 };
 
@@ -78,10 +78,10 @@ impl Command for LaunchMagic {
         let unit = Vec2::new(c, s);
 
         let sprite = {
-            let rpg_folder = world.resource::<RpgTextures>();
+            let textures = world.resource::<MyTextures>();
             Sprite::from_atlas_image(
-                rpg_folder.get_image_handle("spells"),
-                rpg_folder.get_texture_atlas("spells", self.id),
+                textures.get_image_handle("spells"),
+                textures.get_texture_atlas("spells", self.id),
             )
         };
 

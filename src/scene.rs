@@ -7,20 +7,34 @@ use crate::{
 use bevy::{prelude::*, scene::*, tasks::IoTaskPool};
 use std::{fs::File, io::Write};
 
-#[derive(Resource, Default, PartialEq)]
+#[derive(Reflect, Resource, Default, PartialEq)]
 pub enum PortalTarget {
     #[default]
     None,
-    This,
+
+    /// Current scene.
+    Current,
+
+    /// Jumps to an unique scene (determined by file path).
     Unique(String),
+
+    /// Jumps to a scene (determined by file path) and generates a variant id.
     Clone(String),
+
+    /// Jumps to a specific scene (determined by file path and variant id).
+    Specific(String, bevy::asset::uuid::Uuid),
 }
 
-#[derive(Component)]
+#[derive(Reflect, Component)]
+#[reflect(Component)]
+pub struct PortalAnchor(pub u32);
+
+#[derive(Reflect, Component)]
+#[reflect(Component)]
 pub struct Portal {
     on: bool,
     target: PortalTarget,
-    variant: u64,
+    position: PortalAnchor,
 }
 
 #[derive(Resource)]
@@ -37,7 +51,9 @@ impl GameSave {
         }
     }
 
-    fn initialize(&self) {}
+    fn initialize(&self) {
+        let _ = std::fs::create_dir_all(self.base_path.clone());
+    }
 
     fn get_scene_path(&self, scene_name: &str) -> String {
         self.base_path.clone()
@@ -126,6 +142,7 @@ impl Plugin for RegisteryPlugin {
             .register_type::<cloth::ClothModel>()
             .register_type::<platform::ShelfModel>()
             .register_type::<wand::WandModel>()
+            .register_type::<sign::HintModel>()
             // utils
             .register_type::<Methexis>()
             .register_type::<Eidos>()
@@ -200,6 +217,8 @@ pub fn save_scene_system(world: &mut World) {
     let serialized_scene = scene.serialize(&binding).unwrap();
 
     let info = world.resource::<GameSave>();
+    info.initialize();
+
     let dist = info.get_scene_path("debug");
 
     IoTaskPool::get()

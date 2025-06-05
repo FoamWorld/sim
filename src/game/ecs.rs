@@ -1,4 +1,4 @@
-use crate::assets::RpgTextures;
+use crate::assets::MyTextures;
 use crate::constants::*;
 use bevy::prelude::*;
 
@@ -54,22 +54,22 @@ pub struct IconImage {
 }
 
 impl IconImage {
-    pub fn image_node(&self, rpg_folder: &RpgTextures) -> ImageNode {
+    pub fn image_node(&self, textures: &MyTextures) -> ImageNode {
         ImageNode {
-            image: rpg_folder.get_image_handle(self.sheet.as_str()),
+            image: textures.get_image_handle(self.sheet.as_str()),
             texture_atlas: self
                 .index
-                .and_then(|x| Some(rpg_folder.get_texture_atlas(self.sheet.as_str(), x))),
+                .and_then(|x| Some(textures.get_texture_atlas(self.sheet.as_str(), x))),
             ..default()
         }
     }
 
-    pub fn sprite(&self, rpg_folder: &RpgTextures) -> Sprite {
+    pub fn sprite(&self, textures: &MyTextures) -> Sprite {
         Sprite {
-            image: rpg_folder.get_image_handle(self.sheet.as_str()),
+            image: textures.get_image_handle(self.sheet.as_str()),
             texture_atlas: self
                 .index
-                .and_then(|x| Some(rpg_folder.get_texture_atlas(self.sheet.as_str(), x))),
+                .and_then(|x| Some(textures.get_texture_atlas(self.sheet.as_str(), x))),
             ..default()
         }
     }
