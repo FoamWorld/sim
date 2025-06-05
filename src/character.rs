@@ -76,6 +76,10 @@ pub fn setup_character(
             1.0,
         )),
         bevy_tnua::TnuaGhostSensor::default(),
+        SolverGroups::new(
+            Group::GROUP_1 | Group::GROUP_2,
+            Group::GROUP_1 | Group::GROUP_2,
+        ),
     ));
     status.entity = Some(ec.id());
 }
