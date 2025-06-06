@@ -1,4 +1,4 @@
-use crate::{assets::*, control::*, ui::*};
+use crate::{assets::*, control::*, markers::*, ui::*};
 use bevy::{asset::*, prelude::*};
 
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
@@ -28,11 +28,6 @@ pub enum InGameSet {
     // ui update
     Ui,
 }
-
-#[derive(Component)]
-/// Marks entities that will be removed while exiting [`AppState::InGame`].
-/// Game objects and temporary ui elements are automatically included.
-pub struct WillRemove;
 
 pub struct AppStatePlugin;
 
@@ -109,24 +104,21 @@ fn enter_pause(
 }
 
 fn exit_pause(
-    commands: Commands,
+    mut commands: Commands,
     mut time: ResMut<Time<Virtual>>,
-    query: Query<Entity, With<UiOnce>>,
+    query: Query<(Entity, &UiRoot)>,
 ) {
     time.unpause();
-    finish_ui(commands, query);
+    for (entity, ui_root) in query.iter() {
+        if *ui_root == UiRoot::Menu {
+            commands.entity(entity).despawn();
+        }
+    }
 }
 
 fn remove_all(
     world: &mut World,
-    query: &mut QueryState<
-        Entity,
-        Or<(
-            With<WillRemove>,
-            // With<UiOnce>,
-            With<crate::game::ecs::Eidos>,
-        )>,
-    >,
+    query: &mut QueryState<Entity, Or<(With<ObjRoot>, With<crate::game::ecs::Eidos>)>>,
 ) {
     let mut vec: Vec<Entity> = vec![];
     for entity in query.iter_mut(world) {

@@ -1,5 +1,5 @@
 use super::{ecs::*, item::wand::WandModel, item_storage::*};
-use crate::{assets::MyTextures, character::*, constants::*, state::WillRemove};
+use crate::{assets::MyTextures, character::*, constants::*, markers::UiRoot};
 use bevy::prelude::*;
 
 #[derive(Resource)]
@@ -45,7 +45,7 @@ pub fn setup_inventory_ui(mut commands: Commands, inventory: Res<Inventory>) {
                 flex_direction: FlexDirection::Row,
                 ..default()
             },
-            WillRemove,
+            UiRoot::GameRegular,
         ))
         .id();
     for ind in 0..size {

@@ -21,6 +21,7 @@ mod character;
 mod control;
 mod diagnostics;
 mod game;
+mod markers;
 mod message;
 mod physics;
 mod scene;

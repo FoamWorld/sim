@@ -1,4 +1,4 @@
-use crate::{physics::collision::*, state::*};
+use crate::{markers::*, physics::collision::*, state::*};
 use bevy::prelude::*;
 use std::collections::VecDeque;
 
@@ -47,36 +47,25 @@ impl Plugin for MessagePlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(MessageQueue::new(20));
         app.add_event::<MessageEvent>();
-        app.add_systems(FixedUpdate, read_touch_sign.in_set(InGameSet::Logic));
+
         app.add_systems(
-            Update,
+            FixedUpdate,
             (
-                message_timer.in_set(InGameSet::Logic),
-                read_message_event.in_set(InGameSet::Ui),
-            ),
+                process_despawn_timeout,
+                read_touch_sign,
+                read_message_event,
+                message_timer,
+            )
+                .in_set(InGameSet::Logic),
         );
     }
 }
 
-#[derive(Component)]
-pub struct MessageText(pub Timer);
-
 fn message_timer(
-    time: Res<Time>,
     asset_server: Res<AssetServer>,
     mut queue: ResMut<MessageQueue>,
     mut commands: Commands,
-    mut query: Query<(Entity, &mut MessageText)>,
 ) {
-    if let Ok((entity, mut text)) = query.single_mut() {
-        text.0.tick(time.delta());
-
-        if text.0.finished() {
-            commands.entity(entity).despawn();
-        } else {
-            return;
-        }
-    }
     if let Some(str) = queue.pop() {
         commands.spawn((
             Text::new(str.as_str()),
@@ -93,7 +82,8 @@ fn message_timer(
                 ..default()
             },
             Outline::new(Val::Px(1.0), Val::ZERO, Color::WHITE),
-            MessageText(Timer::from_seconds(1.0, TimerMode::Once)),
+            DespawnTimeout(Timer::from_seconds(1.0, TimerMode::Once)),
+            UiRoot::GameTemporary,
         ));
     }
 }

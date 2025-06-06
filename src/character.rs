@@ -1,4 +1,4 @@
-use crate::{assets::MyTextures, constants::*, control::*, state::WillRemove};
+use crate::{assets::MyTextures, constants::*, control::*, markers::ObjRoot};
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
@@ -51,7 +51,7 @@ pub fn setup_character(
     textures: Res<MyTextures>,
     mut status: ResMut<ActorStatus>,
 ) {
-    let mut ec = commands.spawn((Actor(ActorFacing::Right), Character, WillRemove));
+    let mut ec = commands.spawn((Actor(ActorFacing::Right), Character, ObjRoot));
 
     let mut timer = Timer::from_seconds(0.1, TimerMode::Once);
     timer.set_elapsed(timer.duration());

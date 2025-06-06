@@ -1,4 +1,4 @@
-use crate::{assets::*, constants::*, scene::*, state::*};
+use crate::{assets::*, constants::*, markers::UiRoot, scene::*, state::*};
 use bevy::{
     prelude::*,
     window::{PrimaryWindow, SystemCursorIcon},
@@ -8,9 +8,6 @@ use bevy::{
 const UI_CLEAR_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 const UI_CLOTH_COLOR: Color = Color::srgba(1.0, 1.0, 1.0, 0.75);
 const UI_TEXT_COLOR: Color = Color::srgb(0.73, 0.49, 0.17);
-
-#[derive(Component)]
-pub struct UiOnce;
 
 #[derive(Component)]
 pub enum ButtonType {
@@ -154,7 +151,7 @@ pub fn start_pause(mut commands: Commands, asset_server: Res<AssetServer>) {
     });
 }
 
-pub fn finish_ui(mut commands: Commands, query: Query<Entity, With<UiOnce>>) {
+pub fn finish_ui(mut commands: Commands, query: Query<Entity, With<UiRoot>>) {
     for entity in query.iter() {
         commands.entity(entity).despawn();
     }
@@ -177,7 +174,7 @@ fn with_background(
             },
             BackgroundColor(color),
             ZIndex(1),
-            UiOnce,
+            UiRoot::Menu,
         ))
         .with_children(f);
 }
