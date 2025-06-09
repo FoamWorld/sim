@@ -1,7 +1,7 @@
 use crate::{
     control::MoveDownTimer,
     game::mob::health::{Health, HealthClearedEvent},
-    message::MessageEvent,
+    ui::message::MessageEvent,
 };
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;

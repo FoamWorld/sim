@@ -1,4 +1,4 @@
-use crate::{control::*, physics::camera::*, state::*};
+use crate::{control::*, markers::UiRoot, physics::camera::*, state::*};
 use bevy::{
     diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
     prelude::*,
@@ -62,6 +62,7 @@ fn setup_diagnostics_text(mut commands: Commands, asset_server: Res<AssetServer>
             left: Val::Px(5.0),
             ..default()
         },
+        UiRoot::GameDismissible,
         DiagnosticsText,
     ));
 }

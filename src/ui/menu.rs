@@ -1,9 +1,5 @@
 use crate::{assets::*, constants::*, markers::UiRoot, scene::*, state::*};
-use bevy::{
-    prelude::*,
-    window::{PrimaryWindow, SystemCursorIcon},
-    winit::cursor::CursorIcon,
-};
+use bevy::prelude::*;
 
 const UI_CLEAR_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 const UI_CLOTH_COLOR: Color = Color::srgba(1.0, 1.0, 1.0, 0.75);
@@ -44,17 +40,6 @@ pub fn button_system(
             }
         }
     }
-}
-
-pub fn set_cursor(mut commands: Commands, q_window: Query<Entity, With<PrimaryWindow>>) {
-    let window = if let Ok(window) = q_window.single() {
-        window
-    } else {
-        return;
-    };
-    commands
-        .entity(window)
-        .insert(CursorIcon::System(SystemCursorIcon::Crosshair));
 }
 
 pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {

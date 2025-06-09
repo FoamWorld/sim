@@ -19,10 +19,8 @@ use bevy_tnua_rapier2d::*;
 mod assets;
 mod character;
 mod control;
-mod diagnostics;
 mod game;
 mod markers;
-mod message;
 mod physics;
 mod scene;
 mod state;
@@ -75,9 +73,8 @@ fn main() {
 
     // Misc.
     app.add_plugins((
-        message::MessagePlugin,
+        ui::UiPlugin,
         statistics::StatisticsPlugin,
-        diagnostics::DiagnosticsTextPlugin,
     ));
 
     // Run.

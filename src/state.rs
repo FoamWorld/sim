@@ -1,4 +1,4 @@
-use crate::{assets::*, control::*, markers::*, ui::*};
+use crate::{assets::*, control::*, markers::*, ui::menu::*};
 use bevy::{asset::*, prelude::*};
 
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
@@ -49,10 +49,8 @@ impl Plugin for AppStatePlugin {
                 .run_if(in_state(AppState::InGame)),
         );
 
-        app.add_systems(Update, button_system);
-
         // AppState::Initialize
-        app.add_systems(PostStartup, (load_textures, set_cursor))
+        app.add_systems(PostStartup, load_textures)
             .add_systems(
                 Update,
                 check_textures.run_if(in_state(AppState::Initialize)),
