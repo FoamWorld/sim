@@ -22,15 +22,17 @@ pub enum PortalTarget {
     Clone(String),
 
     /// Jumps to a specific scene (determined by file path and variant id).
-    Specific(String, bevy::asset::uuid::Uuid),
+    Specific(String, u32),
 }
 
 #[derive(Reflect, Component)]
 #[reflect(Component)]
+#[type_path = "sim::scene"]
 pub struct PortalAnchor(pub u32);
 
 #[derive(Reflect, Component)]
 #[reflect(Component)]
+#[type_path = "sim::scene"]
 pub struct Portal {
     on: bool,
     target: PortalTarget,
@@ -138,7 +140,8 @@ impl Plugin for RegisteryPlugin {
             .register_type::<CameraMoveConfig>()
             // model
             .register_type::<barrier::BarrierModel>()
-            .register_type::<barrier::PlatformRoomModel>()
+            .register_type::<barrier::WallModel>()
+            .register_type::<barrier::GroundModel>()
             .register_type::<cloth::ClothModel>()
             .register_type::<platform::ShelfModel>()
             .register_type::<wand::WandModel>()
