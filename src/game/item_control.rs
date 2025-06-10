@@ -141,6 +141,7 @@ pub fn item_throw(
         Methexis(chosen),
         Transform::from_translation(source.extend(0.0)),
         Velocity::linear(target - source),
+        SolverGroups::new(Group::GROUP_2, Group::GROUP_2),
     ));
     super::feed::feed_to_concrete(chosen, world, ec);
 }

@@ -1,15 +1,15 @@
 use super::*;
 use crate::game::mob::health::*;
 
-const COMMON_GROUP: SolverGroups =
-    SolverGroups::new(Group::from_bits_retain(6), Group::from_bits_retain(6));
+const SUMMON_GROUP: SolverGroups =
+    SolverGroups::new(Group::from_bits_retain(2), Group::from_bits_retain(2));
 
 pub fn insert_middle_ball(ec: &mut EntityCommands) {
-    ec.insert((RigidBody::Dynamic, Collider::ball(7.5), COMMON_GROUP));
+    ec.insert((RigidBody::Dynamic, Collider::ball(7.5), SUMMON_GROUP));
 }
 
 pub fn insert_middle_arrow(ec: &mut EntityCommands) {
-    ec.insert((RigidBody::Dynamic, Collider::cuboid(6.5, 0.5), COMMON_GROUP));
+    ec.insert((RigidBody::Dynamic, Collider::cuboid(6.5, 0.5), SUMMON_GROUP));
 }
 
 pub fn insert_fire(ec: &mut EntityCommands) {

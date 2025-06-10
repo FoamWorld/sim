@@ -1,6 +1,9 @@
 use crate::{
     control::MoveDownTimer,
-    game::mob::health::{Health, HealthClearedEvent},
+    game::mob::{
+        dummy::DamageSensor,
+        health::{Health, HealthClearedEvent},
+    },
     ui::message::MessageEvent,
 };
 use bevy::prelude::*;
@@ -66,10 +69,17 @@ pub fn write_crash(
 pub fn read_crash(
     mut reader: EventReader<CrashEvent>,
     mut writer: EventWriter<HealthClearedEvent>,
+    mut writer_event: EventWriter<MessageEvent>,
+    sensing: Query<&DamageSensor>,
     mut q_h: Query<&mut Health>,
 ) {
     for crash in reader.read() {
         let sufferer = crash.object;
+        if sensing.contains(sufferer) {
+            writer_event.write(MessageEvent::info(
+                format!("Damage: {0:.2}", crash.force * 1e-5).as_str(),
+            ));
+        }
         if let Ok(mut health) = q_h.get_mut(sufferer) {
             health.shift(-crash.force);
             if !health.is_alive() {
@@ -81,7 +91,7 @@ pub fn read_crash(
 
 #[derive(Reflect, Component)]
 #[reflect(Component)]
-#[type_path = "sim::utils"]
+#[type_path = "sim::sensor"]
 pub struct Sign(pub String);
 
 pub fn read_touch_sign(

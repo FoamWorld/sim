@@ -47,7 +47,7 @@ impl Plugin for GamePhysicsPlugin {
 
         app.add_systems(
             FixedUpdate,
-            (write_crash, read_crash).chain().in_set(InGameSet::Logic),
+            (write_crash, read_crash, read_touch_sign).chain().in_set(InGameSet::Logic),
         );
 
         app.add_systems(

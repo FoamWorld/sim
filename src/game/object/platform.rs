@@ -25,7 +25,7 @@ impl Component for ShelfModel {
             commands.insert((
                 Sprite::from_color(Color::srgb(0.8, 0.6, 0.6), Vec2::new(2.0 * half_x, 1.0)),
                 RigidBody::Fixed,
-                SolverGroups::new(Group::GROUP_3, Group::GROUP_2 | Group::GROUP_3),
+                SolverGroups::new(Group::GROUP_2, Group::GROUP_2),
                 Collider::cuboid(half_x, 0.5),
                 TnuaGhostPlatform,
             ));

@@ -53,6 +53,10 @@
 			"sim::model::WallModel": (
 				h: (-400.0, 400.0), v: (-200.0, -196.0),
 			),
+			"sim::utils::Health": (
+				value: 1e20, max: 1e20,
+			),
+			"sim::sensor::DamageSensor": (),
 		}),
 		4294967300: (components: {
 			"bevy_transform::components::transform::Transform": (

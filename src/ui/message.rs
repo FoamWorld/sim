@@ -52,7 +52,6 @@ impl Plugin for MessagePlugin {
             FixedUpdate,
             (
                 process_despawn_timeout,
-                read_touch_sign,
                 read_message_event,
                 message_timer,
             )

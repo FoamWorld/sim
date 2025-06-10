@@ -156,6 +156,7 @@ impl Plugin for RegisteryPlugin {
             .register_type::<Actor>()
             .register_type::<ItemStorage>()
             .register_type::<Sign>()
+            .register_type::<dummy::DamageSensor>()
             // mobs
             .register_type::<health::Health>();
     }
