@@ -139,10 +139,12 @@ impl Plugin for RegisteryPlugin {
             .register_type::<SceneBox>()
             .register_type::<CameraMoveConfig>()
             // model
+            .register_type::<Position>()
             .register_type::<barrier::BarrierModel>()
             .register_type::<barrier::WallModel>()
             .register_type::<barrier::GroundModel>()
             .register_type::<cloth::ClothModel>()
+            .register_type::<door::SideDoorModel>()
             .register_type::<platform::ShelfModel>()
             .register_type::<wand::WandModel>()
             .register_type::<sign::HintModel>()
