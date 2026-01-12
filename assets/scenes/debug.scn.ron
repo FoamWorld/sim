@@ -1,22 +1,22 @@
 (
 	resources: {
 		"sim::physics::SceneBox": (
-			horizontal: (-400.0, 400.0),
-			vertical: (-200.0, 200.0),
+			horizontal: (-200.0, 200.0),
+			vertical: (-100.0, 100.0),
 		),
 		"sim::physics::CameraMoveConfig": (
-			stop_horizontal_border: true,
-			stop_vertical_border: true,
+			stop_horizontal_border: false,
+			stop_vertical_border: false,
 			follow_actor: true,
 			follow_cursor: false,
 		)
 	},
 	entities: {
 		4294967296: (components: {
-			"sim::model::Position": (0.0, 0.0, 0.0),
+			"sim::model::Position": (0.0, 0.0, -2.0),
 			"sim::model::ClothModel": (
-				h: 400.0,
-				v: 200.0,
+				h: 200.0,
+				v: 100.0,
 				c: (0.3, 0.3, 0.3),
 			),
 		}),
@@ -27,15 +27,17 @@
 			),
 		}),
 		4294967298: (components: {
-			"sim::model::Position": (0.0, -60.0, -1.0),
+			"sim::model::Position": (-20.0, -60.0, -1.0),
 			"sim::model::ShelfModel": (
 				half_x: 40.0,
 			),
 		}),
 		4294967299: (components: {
-			"sim::model::Position": (0.0, -200.0, -1.0),
-			"sim::model::WallModel": (
-				h: (-400.0, 400.0), v: (-200.0, -196.0),
+			"sim::model::Position": (40.0, -80.0, -1.0),
+			"sim::model::BarrierModel": (
+				half_x: 5.0,
+				half_y: 20.0,
+				color: (0.0, 1.0, 0.0, 1.0),
 			),
 			"sim::utils::Health": (
 				value: 1e20, max: 1e20,
@@ -43,25 +45,25 @@
 			"sim::sensor::DamageSensor": (),
 		}),
 		4294967300: (components: {
-			"sim::model::Position": (0.0, -200.0, -1.0),
+			"sim::model::Position": (0.0, -100.0, 0.0),
 			"sim::model::GroundModel": (
 				norm: (0.0, 1.0),
 			),
 		}),
 		4294967301: (components: {
-			"sim::model::Position": (0.0, 200.0, -1.0),
+			"sim::model::Position": (0.0, 100.0, 0.0),
 			"sim::model::GroundModel": (
 				norm: (0.0, -1.0),
 			),
 		}),
 		4294967302: (components: {
-			"sim::model::Position": (400.0, 0.0, -1.0),
+			"sim::model::Position": (200.0, 0.0, 0.0),
 			"sim::model::GroundModel": (
 				norm: (-1.0, 0.0),
 			),
 		}),
 		4294967303: (components: {
-			"sim::model::Position": (-400.0, 0.0, -1.0),
+			"sim::model::Position": (-200.0, 0.0, 0.0),
 			"sim::model::GroundModel": (
 				norm: (1.0, 0.0),
 			),

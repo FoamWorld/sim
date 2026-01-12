@@ -91,7 +91,7 @@ impl Command for LaunchMagic {
         if self.id == 0 {
             ammo.insert((
                 Transform::from_xyz(source.x + unit.x * 24.0, source.y + unit.y * 24.0, 0.0),
-                Velocity::linear(unit * 120.0),
+                Velocity::linear(unit * 60.0),
             ));
             insert_middle_ball(&mut ammo);
             insert_fire(&mut ammo);

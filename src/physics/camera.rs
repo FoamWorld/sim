@@ -43,13 +43,12 @@ pub fn update_camera_position(
     mut commands: Commands,
     q_camera: Query<Entity, With<PrimaryCamera>>,
 ) {
-    let camera = q_camera.single().unwrap();
-
-    let mut vec3 = if move_config.follow_actor {
-        q_actor.single().unwrap().translation()
-    } else {
+    if !move_config.follow_actor {
         return;
-    };
+    }
+
+    let camera = q_camera.single().unwrap();
+    let mut vec3 = q_actor.single().unwrap().translation();
 
     if move_config.stop_horizontal_border {
         let left_limit = scene_box.horizontal.x + VIEWPORT_WIDTH * 0.5;
