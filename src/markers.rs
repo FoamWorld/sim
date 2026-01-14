@@ -36,7 +36,7 @@ pub fn process_despawn_timeout(
 ) {
     for (entity, mut timer) in timers.iter_mut() {
         timer.0.tick(time.delta());
-        if timer.0.finished() {
+        if timer.0.is_finished() {
             commands.entity(entity).despawn();
         }
     }

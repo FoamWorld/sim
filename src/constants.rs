@@ -15,3 +15,4 @@ pub const PIXELS_PER_METER: Scalar = 64.0;
 pub const CHARACTER_LAYER: Scalar = 10.0;
 pub const CHARACTER_X_LENGTH: Scalar = 24.0;
 pub const CHARACTER_Y_LENGTH: Scalar = 48.0;
+pub const WALK_SPEED: Scalar = 120.0;

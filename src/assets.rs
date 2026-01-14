@@ -92,22 +92,18 @@ impl MyTextures {
             .named_images
             .get(&String::from(name))
             .unwrap_or(self.named_images.get("fallback").unwrap());
-        handle.clone_weak()
+        handle.clone()
     }
 
     pub fn get_texture_atlas(&self, name: &str, index: usize) -> TextureAtlas {
         if let Some(handle) = self.named_atlases_layout.get(&String::from(name)) {
             TextureAtlas {
-                layout: handle.clone_weak(),
+                layout: handle.clone(),
                 index,
             }
         } else {
             TextureAtlas {
-                layout: self
-                    .named_atlases_layout
-                    .get("fallback")
-                    .unwrap()
-                    .clone_weak(),
+                layout: self.named_atlases_layout.get("fallback").unwrap().clone(),
                 index: 0,
             }
         }
@@ -135,7 +131,7 @@ pub fn check_textures(
     texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
     loaded_folders: Res<Assets<LoadedFolder>>,
     textures: ResMut<Assets<Image>>,
-    mut events: EventReader<AssetEvent<LoadedFolder>>,
+    mut events: MessageReader<AssetEvent<LoadedFolder>>,
 ) {
     // Advance the `AppState` once all sprite handles have been loaded by the `AssetServer`
     for event in events.read() {

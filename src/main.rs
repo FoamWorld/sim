@@ -35,7 +35,7 @@ fn main() {
     let mut app = App::new();
     let window = Window {
         title: PROJECT_TITLE.into(),
-        resolution: WindowResolution::new(1000.0, 750.0).with_scale_factor_override(SCALE_FACTOR),
+        resolution: WindowResolution::new(1000, 750).with_scale_factor_override(SCALE_FACTOR),
         enabled_buttons: EnabledButtons {
             minimize: true,
             maximize: false,
@@ -66,16 +66,13 @@ fn main() {
     // Physics.
     app.add_plugins((
         RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(PIXELS_PER_METER),
-        TnuaControllerPlugin::new(FixedUpdate),
+        TnuaControllerPlugin::<control::ControlScheme>::new(FixedUpdate),
         TnuaRapier2dPlugin::new(FixedUpdate),
         physics::GamePhysicsPlugin,
     ));
 
     // Misc.
-    app.add_plugins((
-        ui::UiPlugin,
-        statistics::StatisticsPlugin,
-    ));
+    app.add_plugins((ui::UiPlugin, statistics::StatisticsPlugin));
 
     // Run.
     app.add_systems(Startup, assets::setup).run();

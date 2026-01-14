@@ -9,7 +9,7 @@ pub struct Inventory {
     pub bind: Option<Entity>,
 }
 
-#[derive(Event)]
+#[derive(Message)]
 pub struct InventorySelectedUpdateEvent;
 
 #[derive(Component)]
@@ -104,7 +104,7 @@ pub fn update_attached_image(
     world: &World,
     inventory: Res<Inventory>,
     actors: Query<Entity, With<Actor>>,
-    mut reader: EventReader<InventorySelectedUpdateEvent>,
+    mut reader: MessageReader<InventorySelectedUpdateEvent>,
     status: Res<ActorStatus>,
 ) {
     if reader.is_empty() {

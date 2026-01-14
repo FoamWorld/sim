@@ -27,8 +27,7 @@ impl Plugin for GamePlugin {
             bind: None,
         });
 
-        app.add_event::<InventorySelectedUpdateEvent>()
-            .add_event::<mob::health::HealthClearedEvent>();
+        app.add_message::<InventorySelectedUpdateEvent>();
 
         app.add_systems(
             OnEnter(ProcessState::PreEnterGame),
@@ -58,9 +57,8 @@ impl Plugin for GamePlugin {
             FixedUpdate,
             (
                 update_actor_status,
-                mob::health::read_health_cleared,
                 |query: Query<(), Changed<ItemStorage>>,
-                 mut writer: EventWriter<InventorySelectedUpdateEvent>| {
+                 mut writer: MessageWriter<InventorySelectedUpdateEvent>| {
                     if !query.is_empty() {
                         writer.write(InventorySelectedUpdateEvent);
                     }
@@ -70,6 +68,9 @@ impl Plugin for GamePlugin {
         );
 
         app.add_systems(Update, update_attached_image.in_set(InGameSet::Ui));
+
+        app.world_mut()
+            .add_observer(mob::health::read_health_cleared);
     }
 }
 
@@ -125,7 +126,7 @@ fn detect_input_choose(
     keys: Res<ButtonInput<KeyCode>>,
     scroll: Res<bevy::input::mouse::AccumulatedMouseScroll>,
     mut inventory: ResMut<Inventory>,
-    mut writer: EventWriter<InventorySelectedUpdateEvent>,
+    mut writer: MessageWriter<InventorySelectedUpdateEvent>,
 ) {
     let sz = inventory.size;
     let cu = inventory.selected;

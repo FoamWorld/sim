@@ -21,7 +21,7 @@ pub fn button_system(
     mut next_game_state: ResMut<NextState<GameState>>,
     mut next_process_state: ResMut<NextState<ProcessState>>,
     mut target: ResMut<PortalTarget>,
-    mut writer_exit: EventWriter<AppExit>,
+    mut writer_exit: MessageWriter<AppExit>,
 ) {
     for (interaction, btn_type) in &query {
         if *interaction == Interaction::Pressed {
@@ -172,7 +172,7 @@ fn add_button(parent: &mut ChildSpawnerCommands, name: &str, font: TextFont, but
         font,
         TextColor(UI_TEXT_COLOR),
         TextLayout {
-            justify: JustifyText::Center,
+            justify: Justify::Center,
             ..default()
         },
     ));

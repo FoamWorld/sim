@@ -2,7 +2,7 @@ use crate::{markers::*, state::*};
 use bevy::prelude::*;
 use std::collections::VecDeque;
 
-#[derive(Event)]
+#[derive(Message)]
 pub struct MessageEvent {
     message: String,
 }
@@ -46,16 +46,10 @@ pub struct MessagePlugin;
 impl Plugin for MessagePlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(MessageQueue::new(20));
-        app.add_event::<MessageEvent>();
 
         app.add_systems(
             FixedUpdate,
-            (
-                process_despawn_timeout,
-                read_message_event,
-                message_timer,
-            )
-                .in_set(InGameSet::Logic),
+            (process_despawn_timeout, read_message_event, message_timer).in_set(InGameSet::Logic),
         );
     }
 }
@@ -87,7 +81,7 @@ fn message_timer(
     }
 }
 
-fn read_message_event(mut reader: EventReader<MessageEvent>, mut queue: ResMut<MessageQueue>) {
+fn read_message_event(mut reader: MessageReader<MessageEvent>, mut queue: ResMut<MessageQueue>) {
     for ev in reader.read() {
         queue.push(ev.message.clone());
     }

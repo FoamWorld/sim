@@ -23,20 +23,16 @@ pub fn feed_to_concrete(eidos: Entity, world: &World, mut ec: EntityCommands) {
 pub fn feed_to_attach(eidos: Entity, world: &World, mut ec: EntityCommands) {
     let entity_ref = world.entity(eidos);
 
-    // #18349 not in bevy 0.16?
-    let mut anchor = bevy::sprite::Anchor::Center;
-
-    if let Some(holds) = entity_ref.get::<HoldsConfig>() {
-        anchor = bevy::sprite::Anchor::Custom(holds.get_offset());
-        ec.insert(crate::physics::camera::RotateWithMouse::new(
-            holds.get_rotate_range(),
-        ));
-    }
-
     if let Some(icon) = entity_ref.get::<IconImage>() {
         let textures = world.resource::<MyTextures>();
-        let mut sprite = icon.sprite(textures);
-        sprite.anchor = anchor;
+        let sprite = icon.sprite(textures);
         ec.insert(sprite);
+
+        if let Some(holds) = entity_ref.get::<HoldsConfig>() {
+            ec.insert((
+                bevy::sprite::Anchor(holds.get_offset()),
+                crate::physics::camera::RotateWithMouse::new(holds.get_rotate_range()),
+            ));
+        }
     }
 }

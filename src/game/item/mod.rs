@@ -1,5 +1,6 @@
 use super::ecs::*;
 use bevy::ecs::component::*;
+use bevy::ecs::lifecycle::ComponentHook;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 

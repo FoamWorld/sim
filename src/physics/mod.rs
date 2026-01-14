@@ -25,9 +25,6 @@ impl Plugin for GamePhysicsPlugin {
             .init_resource::<CameraMoveConfig>()
             .init_resource::<HoverEntity>();
 
-        app.add_event::<TouchStartedEvent>()
-            .add_event::<CrashEvent>();
-
         app.add_systems(Startup, |mut commands: Commands| {
             commands.spawn((
                 Camera {
@@ -42,12 +39,14 @@ impl Plugin for GamePhysicsPlugin {
 
         app.add_systems(
             FixedUpdate,
-            apply_tnua_fall_through_controls.in_set(bevy_tnua::TnuaUserControlsSystemSet),
+            apply_tnua_fall_through_controls.in_set(bevy_tnua::TnuaUserControlsSystems),
         );
 
         app.add_systems(
             FixedUpdate,
-            (write_crash, read_crash, read_touch_sign).chain().in_set(InGameSet::Logic),
+            (read_collisions, read_contact_forces)
+                .chain()
+                .in_set(InGameSet::Logic),
         );
 
         app.add_systems(
@@ -60,5 +59,9 @@ impl Plugin for GamePhysicsPlugin {
                 .chain()
                 .in_set(InGameSet::PostInput),
         );
+
+        let world = app.world_mut();
+        world.add_observer(on_touch_start);
+        world.add_observer(on_crash);
     }
 }

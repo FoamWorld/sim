@@ -1,6 +1,7 @@
 use crate::{assets::MyTextures, constants::*, control::*, markers::ObjRoot};
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
+use bevy_tnua::builtins::*;
 
 /// For all entities that interact with physics like the player.
 #[derive(Component)]
@@ -50,6 +51,7 @@ pub fn setup_character(
     mut commands: Commands,
     textures: Res<MyTextures>,
     mut status: ResMut<ActorStatus>,
+    mut control_scheme_configs: ResMut<Assets<ControlSchemeConfig>>,
 ) {
     let mut ec = commands.spawn((Actor(ActorFacing::Right), Character, ObjRoot));
 
@@ -70,11 +72,22 @@ pub fn setup_character(
         ColliderMassProperties::Mass(70.0),
         LockedAxes::ROTATION_LOCKED,
         MoveDownTimer(timer),
-        bevy_tnua::prelude::TnuaController::default(),
-        bevy_tnua_rapier2d::TnuaRapier2dSensorShape(Collider::cuboid(
-            CHARACTER_X_LENGTH * 0.5,
-            1.0,
+        bevy_tnua::prelude::TnuaController::<ControlScheme>::default(),
+        bevy_tnua::prelude::TnuaConfig::<ControlScheme>(control_scheme_configs.add(
+            ControlSchemeConfig {
+                basis: TnuaBuiltinWalkConfig {
+                    float_height: 1.5,
+                    ..default()
+                },
+                jump: TnuaBuiltinJumpConfig {
+                    height: 4.0,
+                    ..Default::default()
+                },
+            },
         )),
+        bevy_tnua_rapier2d::TnuaRapier2dSensorShape(
+            Collider::cuboid(CHARACTER_X_LENGTH * 0.4, CHARACTER_Y_LENGTH * 0.4).raw,
+        ),
         bevy_tnua::TnuaGhostSensor::default(),
         SolverGroups::new(Group::GROUP_1, Group::GROUP_1 | Group::GROUP_2),
     ));

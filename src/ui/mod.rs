@@ -1,7 +1,6 @@
 use bevy::{
     prelude::*,
-    window::{PrimaryWindow, SystemCursorIcon},
-    winit::cursor::CursorIcon,
+    window::{CursorIcon, PrimaryWindow, SystemCursorIcon},
 };
 use menu::*;
 

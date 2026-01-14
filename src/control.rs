@@ -99,6 +99,12 @@ impl ControlSettings {
     }
 }
 
+#[derive(TnuaScheme)]
+#[scheme(basis = TnuaBuiltinWalk)]
+pub enum ControlScheme {
+    Jump(TnuaBuiltinJump),
+}
+
 #[derive(Component)]
 pub struct MoveDownTimer(pub Timer);
 
@@ -144,7 +150,7 @@ pub fn change_facing(mut actors: Query<(&Actor, &mut Sprite), Changed<Actor>>) {
 pub fn inputs_move(
     keys: Res<ButtonInput<KeyCode>>,
     control_settings: Res<ControlSettings>,
-    mut actors: Query<(&mut Actor, &mut TnuaController, &mut MoveDownTimer)>,
+    mut actors: Query<(&mut Actor, &mut TnuaController<ControlScheme>, &mut MoveDownTimer)>,
 ) {
     if let Ok((mut actor, mut controller, mut move_down)) = actors.single_mut() {
         let to_left = control_settings.check(ControlCode::MoveLeft, &keys);
@@ -152,27 +158,24 @@ pub fn inputs_move(
         let jump = control_settings.check(ControlCode::MoveUp, &keys);
         let drop = control_settings.check(ControlCode::MoveDown, &keys);
 
-        let mut direction = Vec2::ZERO;
-
-        if to_left {
+        let direction = if to_left {
             actor.0 = ActorFacing::Left;
-            direction -= Vec2::X;
+            -Vec2::X
         } else if to_right {
             actor.0 = ActorFacing::Right;
-            direction += Vec2::X;
-        }
+            Vec2::X
+        } else {
+            Vec2::ZERO
+        };
 
-        controller.basis(TnuaBuiltinWalk {
-            desired_velocity: (direction * 120.0).extend(0.0),
-            float_height: CHARACTER_Y_LENGTH * 0.5 + 2.0,
+        // Refer to <https://github.com/idanarye/bevy-tnua/blob/main/examples/example.rs>.
+        controller.basis = TnuaBuiltinWalk {
+            desired_motion: (direction * WALK_SPEED).extend(0.0),
             ..default()
-        });
+        };
 
         if jump {
-            controller.action(TnuaBuiltinJump {
-                height: 40.0,
-                ..default()
-            });
+            controller.action(ControlScheme::Jump(TnuaBuiltinJump::default()));
         } else if drop {
             move_down.0.reset();
         }

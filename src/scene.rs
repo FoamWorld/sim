@@ -186,7 +186,7 @@ pub fn load_scene_system(
             Transform::from_xyz(0.0, 0.0, 0.0),
         ))
         .observe(
-            |_: Trigger<SceneInstanceReady>, mut next_state: ResMut<NextState<ProcessState>>| {
+            |_: On<SceneInstanceReady>, mut next_state: ResMut<NextState<ProcessState>>| {
                 next_state.set(ProcessState::PostLoadScene);
             },
         );
