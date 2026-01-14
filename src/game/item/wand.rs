@@ -28,27 +28,6 @@ impl Component for WandModel {
             let mut binding = world.commands();
             let mut commands = binding.entity(context.entity);
             commands.insert((
-                ActivateCommand::new(
-                    |commands: &mut Commands,
-                     world: &World,
-                     entity: Entity,
-                     pointing: ItemPointing| {
-                        if let Some(mode) = world.entity(entity).get::<Mode>() {
-                            commands.queue(LaunchMagic {
-                                id: mode.0,
-                                pointing,
-                            });
-                        }
-                    },
-                ),
-                ModifyCommand::new(|commands: &mut Commands, entity: Entity| {
-                    commands
-                        .entity(entity)
-                        .entry::<Mode>()
-                        .and_modify(|mut mode| {
-                            mode.0 = if mode.0 == 1 { 0 } else { 1 };
-                        });
-                }),
                 HoldsConfig::Wand,
                 IconImage {
                     sheet: "wands".to_string(),
@@ -60,8 +39,28 @@ impl Component for WandModel {
                     shape: Vec2 { x: 7.0, y: 1.0 },
                 },
             ));
+            commands.observe(activate_wand);
+            commands.observe(interact_wand);
+            // TODO: Add another component so that observers can be added when loaded from save.
             commands.remove::<WandModel>();
         })
+    }
+}
+
+fn activate_wand(activate: On<Activation>, mut commands: Commands, world: &World) {
+    if let Some(mode) = world.entity(activate.entity).get::<Mode>() {
+        commands.queue(LaunchMagic {
+            id: mode.0,
+            pointing: activate.pointing,
+        });
+    }
+}
+
+fn interact_wand(interact: On<Communication>, mut commands: Commands, world: &World) {
+    if let Some(mode) = world.entity(interact.0).get::<Mode>() {
+        commands
+            .entity(interact.0)
+            .insert(Mode(if mode.0 == 1 { 0 } else { 1 }));
     }
 }
 

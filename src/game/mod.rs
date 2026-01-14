@@ -101,7 +101,7 @@ fn detect_input_modify(
     control_settings: Res<ControlSettings>,
     inventory: Res<Inventory>,
 ) {
-    if click.just_pressed(MouseButton::Right) || control_settings.check(ControlCode::Modify, &keys)
+    if click.just_pressed(MouseButton::Right) || control_settings.check(ControlCode::Communicate, &keys)
     {
         item_modify(commands, world, inventory);
     }

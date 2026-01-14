@@ -3,52 +3,16 @@ use crate::character::*;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-#[derive(Reflect, Component)]
-#[reflect(Component)]
-#[type_path = "sim::utils"]
-pub struct ActivateCommand {
-    func: Box<dyn Fn(&mut Commands, &World, Entity, ItemPointing) + Send + Sync>,
+#[derive(EntityEvent)]
+pub struct Activation {
+    pub entity: Entity,
+    pub pointing: ItemPointing,
 }
 
-impl ActivateCommand {
-    pub fn new(
-        func: impl Fn(&mut Commands, &World, Entity, ItemPointing) + Send + Sync + 'static,
-    ) -> Self {
-        Self {
-            func: Box::new(func),
-        }
-    }
+#[derive(EntityEvent)]
+pub struct Communication(pub Entity);
 
-    pub fn execute(
-        &self,
-        commands: &mut Commands,
-        world: &World,
-        entity: Entity,
-        pointing: ItemPointing,
-    ) {
-        (self.func)(commands, world, entity, pointing);
-    }
-}
-
-#[derive(Reflect, Component)]
-#[reflect(Component)]
-#[type_path = "sim::utils"]
-pub struct ModifyCommand {
-    func: Box<dyn Fn(&mut Commands, Entity) + Send + Sync>,
-}
-
-impl ModifyCommand {
-    pub fn new(func: impl Fn(&mut Commands, Entity) + Send + Sync + 'static) -> Self {
-        Self {
-            func: Box::new(func),
-        }
-    }
-
-    pub fn execute(&self, commands: &mut Commands, entity: Entity) {
-        (self.func)(commands, entity);
-    }
-}
-
+#[derive(Clone, Copy)]
 pub struct ItemPointing {
     pub source: Vec2,
     pub target: Vec2,
@@ -85,9 +49,10 @@ pub fn item_use(
             target,
             rotation: ops::atan2(rot.z, rot.w) * 2.0,
         };
-        if let Some(cmd) = world.entity(item).get::<ActivateCommand>() {
-            cmd.execute(&mut commands, world, item, pointing);
-        }
+        commands.trigger(Activation {
+            entity: item,
+            pointing: pointing,
+        });
     }
 }
 
@@ -96,9 +61,7 @@ pub fn item_modify(mut commands: Commands, world: &World, inventory: Res<Invento
     let index = inventory.selected;
 
     if let Some(item) = reach_inventory_item(world, inv, index) {
-        if let Some(cmd) = world.entity(item).get::<ModifyCommand>() {
-            cmd.execute(&mut commands, item);
-        }
+        commands.trigger(Communication(item));
     }
 }
 

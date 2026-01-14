@@ -14,7 +14,7 @@ pub enum ControlCode {
     MoveUp,
     MoveDown,
     Activate,
-    Modify,
+    Communicate,
     Throw,
     Pick,
 }
@@ -66,7 +66,7 @@ impl Default for ControlSettings {
                 InputDetectionType::JustPressed(KeyCode::KeyT),
             ),
             (
-                ControlCode::Modify,
+                ControlCode::Communicate,
                 InputDetectionType::JustPressed(KeyCode::KeyI),
             ),
             (
