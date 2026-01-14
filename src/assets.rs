@@ -26,7 +26,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 #[derive(Resource, Clone)]
 pub struct MyTextures {
     pub folder: Handle<LoadedFolder>,
-    pub dictionary: HashMap<String, Option<(u32, u32, u32, u32)>>,
+    pub dictionary: HashMap<String, (u32, u32, u32, u32)>,
     pub named_images: HashMap<String, Handle<Image>>,
     pub named_atlases_layout: HashMap<String, Handle<TextureAtlasLayout>>,
 }
@@ -34,7 +34,7 @@ pub struct MyTextures {
 impl MyTextures {
     fn new(
         folder: Handle<LoadedFolder>,
-        dictionary: HashMap<String, Option<(u32, u32, u32, u32)>>,
+        dictionary: HashMap<String, (u32, u32, u32, u32)>,
     ) -> Self {
         Self {
             folder,
@@ -70,7 +70,7 @@ impl MyTextures {
 
             // Inserts.
             self.named_images.insert(string.clone(), texture);
-            if let Some(tuple) = self.dictionary.get(&string).unwrap() {
+            if let Some(tuple) = self.dictionary.get(&string) {
                 let (width, length, columns, rows) = tuple;
                 let texture_atlas_layout = TextureAtlasLayout::from_grid(
                     UVec2::new(*width, *length),
@@ -115,15 +115,13 @@ impl MyTextures {
 }
 
 pub fn load_textures(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let list: Vec<(String, Option<(u32, u32, u32, u32)>)> = vec![
-        ("fallback".into(), Some((12, 12, 1, 1))),
-        ("character".into(), None),
-        ("background_site_room".into(), None),
-        ("door".into(), Some((16, 32, 2, 2))),
-        ("hints".into(), Some((13, 13, 6, 5))),
-        ("wands".into(), Some((15, 7, 3, 1))),
-        ("sign".into(), Some((32, 32, 3, 5))),
-        ("spells".into(), Some((15, 15, 2, 1))),
+    let list: Vec<(String, (u32, u32, u32, u32))> = vec![
+        ("fallback".into(), (12, 12, 1, 1)),
+        ("door".into(), (16, 32, 2, 2)),
+        ("hints".into(), (13, 13, 6, 5)),
+        ("wands".into(), (15, 7, 3, 1)),
+        ("sign".into(), (32, 32, 3, 5)),
+        ("spells".into(), (15, 15, 2, 1)),
     ];
     commands.insert_resource(MyTextures::new(
         asset_server.load_folder("textures"),

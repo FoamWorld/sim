@@ -7,6 +7,7 @@ pub mod barrier;
 pub mod cloth;
 pub mod door;
 pub mod platform;
+pub mod s216;
 pub mod sign;
 
 #[derive(Reflect, Clone, Copy)]

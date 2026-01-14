@@ -1,0 +1,72 @@
+(
+	resources: {
+		"sim::physics::SceneBox": (
+			horizontal: (-256.0, 256.0),
+			vertical: (-128.0, 128.0),
+		),
+		"sim::physics::CameraMoveConfig": (
+			stop_horizontal_border: false,
+			stop_vertical_border: false,
+			follow_actor: true,
+			follow_cursor: false,
+		)
+	},
+	entities: {
+		4294967296: (components: {
+			"sim::model::Position": (0.0, 0.0, 0.0),
+			"sim::model::ClothModel": (
+				x: 512.0,
+				y: 256.0,
+				bg: "background_site_room",
+			),
+		}),
+		4294967297: (components: {
+			"sim::model::Position": (0.0, -40.0, -1.0),
+			"sim::model::ShelfModel": (
+				half_x: 40.0,
+			),
+		}),
+		4294967298: (components: {
+			"sim::model::Position": (-20.0, -60.0, -1.0),
+			"sim::model::ShelfModel": (
+				half_x: 40.0,
+			),
+		}),
+		4294967299: (components: {
+			"sim::model::Position": (40.0, -108.0, -1.0),
+			"sim::model::BarrierModel": (
+				half_x: 5.0,
+				half_y: 20.0,
+				color: (0.0, 1.0, 0.0, 1.0),
+			),
+			"sim::utils::Health": (
+				value: 1e20, max: 1e20,
+			),
+			"sim::sensor::DamageSensor": (),
+		}),
+		4294967300: (components: {
+			"sim::model::Position": (0.0, -128.0, 0.0),
+			"sim::model::GroundModel": (
+				norm: (0.0, 1.0),
+			),
+		}),
+		4294967301: (components: {
+			"sim::model::Position": (0.0, 128.0, 0.0),
+			"sim::model::GroundModel": (
+				norm: (0.0, -1.0),
+			),
+		}),
+		4294967302: (components: {
+			"sim::model::Position": (256.0, 0.0, 0.0),
+			"sim::model::GroundModel": (
+				norm: (-1.0, 0.0),
+			),
+		}),
+		4294967303: (components: {
+			"sim::model::Position": (-256.0, 0.0, 0.0),
+			"sim::model::GroundModel": (
+				norm: (1.0, 0.0),
+			),
+		}),
+	},
+)

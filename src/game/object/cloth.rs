@@ -6,8 +6,8 @@ use bevy::sprite;
 #[reflect(Component)]
 #[type_path = "sim::model"]
 pub struct ClothModel {
-    pub h: Scalar,
-    pub v: Scalar,
+    pub x: Scalar,
+    pub y: Scalar,
     pub bg: String,
 }
 
@@ -18,14 +18,14 @@ impl Component for ClothModel {
 
     fn on_add() -> Option<ComponentHook> {
         Some(|mut world, context| {
-            let (h, v, bg) = {
+            let (x, y, bg) = {
                 let model = world.entity(context.entity).get::<ClothModel>().unwrap();
-                (model.h, model.v, model.bg.as_str())
+                (model.x, model.y, model.bg.as_str())
             };
             let sprite = if bg != "" {
                 let mut spr =
                     sprite::Sprite::from_image(world.resource::<MyTextures>().get_image_handle(bg));
-                spr.custom_size = Some(Vec2::new(2.0 * h, 2.0 * v));
+                spr.custom_size = Some(Vec2::new(x, y));
                 spr.image_mode = sprite::SpriteImageMode::Tiled {
                     tile_x: true,
                     tile_y: true,
@@ -33,7 +33,7 @@ impl Component for ClothModel {
                 };
                 spr
             } else {
-                sprite::Sprite::from_color(Color::srgb(0.7, 0.7, 0.7), Vec2::new(2.0 * h, 2.0 * v))
+                sprite::Sprite::from_color(Color::srgb(0.7, 0.7, 0.7), Vec2::new(x, y))
             };
             let mut binding = world.commands();
             let mut commands = binding.entity(context.entity);

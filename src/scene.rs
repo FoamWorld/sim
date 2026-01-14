@@ -63,7 +63,7 @@ impl GameSave {
             + self.current_slot.clone().unwrap().as_str()
             + "/scenes/"
             + scene_name
-            + ".scn.ron"
+            + ".ron"
     }
 }
 
@@ -146,6 +146,7 @@ impl Plugin for RegisteryPlugin {
             .register_type::<cloth::ClothModel>()
             .register_type::<door::SideDoorModel>()
             .register_type::<platform::ShelfModel>()
+            .register_type::<s216::S216Model>()
             .register_type::<wand::WandModel>()
             .register_type::<sign::HintModel>()
             // utils
@@ -180,7 +181,7 @@ pub fn load_scene_system(
 
     commands
         .spawn((
-            DynamicSceneRoot(asset_server.load(name.to_owned() + ".scn.ron")),
+            DynamicSceneRoot(asset_server.load(name.to_owned() + ".ron")),
             Visibility::Visible,
             Transform::from_xyz(0.0, 0.0, 0.0),
         ))

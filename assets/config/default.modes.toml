@@ -2,7 +2,7 @@ level = 255
 
 [[modes]]
 title = "Main"
-entrance = "scenes/apartment_unit"
+entrance = "scenes/site/restroom_sp"
 level = 0
 
 [[modes]]
