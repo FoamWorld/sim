@@ -1,8 +1,8 @@
 (
 	resources: {
 		"sim::physics::SceneBox": (
-			horizontal: (-200.0, 200.0),
-			vertical: (-100.0, 100.0),
+			horizontal: (-256.0, 256.0),
+			vertical: (-128.0, 128.0),
 		),
 		"sim::physics::CameraMoveConfig": (
 			stop_horizontal_border: false,
@@ -13,11 +13,11 @@
 	},
 	entities: {
 		4294967296: (components: {
-			"sim::model::Position": (0.0, 0.0, -2.0),
+			"sim::model::Position": (0.0, 0.0, 0.0),
 			"sim::model::ClothModel": (
-				h: 200.0,
-				v: 100.0,
-				c: (0.3, 0.3, 0.3),
+				h: 256.0,
+				v: 128.0,
+				bg: "background_site_room",
 			),
 		}),
 		4294967297: (components: {
@@ -33,7 +33,7 @@
 			),
 		}),
 		4294967299: (components: {
-			"sim::model::Position": (40.0, -80.0, -1.0),
+			"sim::model::Position": (40.0, -108.0, -1.0),
 			"sim::model::BarrierModel": (
 				half_x: 5.0,
 				half_y: 20.0,
@@ -45,25 +45,25 @@
 			"sim::sensor::DamageSensor": (),
 		}),
 		4294967300: (components: {
-			"sim::model::Position": (0.0, -100.0, 0.0),
+			"sim::model::Position": (0.0, -128.0, 0.0),
 			"sim::model::GroundModel": (
 				norm: (0.0, 1.0),
 			),
 		}),
 		4294967301: (components: {
-			"sim::model::Position": (0.0, 100.0, 0.0),
+			"sim::model::Position": (0.0, 128.0, 0.0),
 			"sim::model::GroundModel": (
 				norm: (0.0, -1.0),
 			),
 		}),
 		4294967302: (components: {
-			"sim::model::Position": (200.0, 0.0, 0.0),
+			"sim::model::Position": (256.0, 0.0, 0.0),
 			"sim::model::GroundModel": (
 				norm: (-1.0, 0.0),
 			),
 		}),
 		4294967303: (components: {
-			"sim::model::Position": (-200.0, 0.0, 0.0),
+			"sim::model::Position": (-256.0, 0.0, 0.0),
 			"sim::model::GroundModel": (
 				norm: (1.0, 0.0),
 			),

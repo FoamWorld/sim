@@ -35,7 +35,7 @@ fn main() {
     let mut app = App::new();
     let window = Window {
         title: PROJECT_TITLE.into(),
-        resolution: WindowResolution::new(1000.0, 750.0).with_scale_factor_override(2.0),
+        resolution: WindowResolution::new(1000.0, 750.0).with_scale_factor_override(SCALE_FACTOR),
         enabled_buttons: EnabledButtons {
             minimize: true,
             maximize: false,

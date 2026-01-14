@@ -118,6 +118,7 @@ pub fn load_textures(mut commands: Commands, asset_server: Res<AssetServer>) {
     let list: Vec<(String, Option<(u32, u32, u32, u32)>)> = vec![
         ("fallback".into(), Some((12, 12, 1, 1))),
         ("character".into(), None),
+        ("background_site_room".into(), None),
         ("door".into(), Some((16, 32, 2, 2))),
         ("hints".into(), Some((13, 13, 6, 5))),
         ("wands".into(), Some((15, 7, 3, 1))),
