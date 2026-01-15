@@ -66,8 +66,8 @@ pub fn setup_character(
         Transform::from_xyz(0.0, 0.0, CHARACTER_LAYER),
         RigidBody::Dynamic,
         Collider::capsule_y(
-            CHARACTER_X_LENGTH * 0.5,
             (CHARACTER_Y_LENGTH - CHARACTER_X_LENGTH) * 0.5,
+            CHARACTER_X_LENGTH * 0.5,
         ),
         ColliderMassProperties::Mass(70.0),
         LockedAxes::ROTATION_LOCKED,
@@ -76,17 +76,18 @@ pub fn setup_character(
         bevy_tnua::prelude::TnuaConfig::<ControlScheme>(control_scheme_configs.add(
             ControlSchemeConfig {
                 basis: TnuaBuiltinWalkConfig {
-                    float_height: 1.5,
+                    speed: WALK_SPEED,
+                    float_height: 2.0,
                     ..default()
                 },
                 jump: TnuaBuiltinJumpConfig {
-                    height: 4.0,
+                    height: JUMP_HEIGHT,
                     ..Default::default()
                 },
             },
         )),
         bevy_tnua_rapier2d::TnuaRapier2dSensorShape(
-            Collider::cuboid(CHARACTER_X_LENGTH * 0.4, CHARACTER_Y_LENGTH * 0.4).raw,
+            Collider::cuboid(0.0, CHARACTER_Y_LENGTH * 0.49).raw,
         ),
         bevy_tnua::TnuaGhostSensor::default(),
         SolverGroups::new(Group::GROUP_1, Group::GROUP_1 | Group::GROUP_2),

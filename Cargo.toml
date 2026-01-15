@@ -42,7 +42,7 @@ default = [
 	"bevy_common_assets/toml",
 ]
 
-devtools = ["default"]
+devtools = ["default", "bevy/debug"]
 
 [profile.dev]
 debug = false

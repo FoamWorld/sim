@@ -101,7 +101,8 @@ fn detect_input_modify(
     control_settings: Res<ControlSettings>,
     inventory: Res<Inventory>,
 ) {
-    if click.just_pressed(MouseButton::Right) || control_settings.check(ControlCode::Communicate, &keys)
+    if click.just_pressed(MouseButton::Right)
+        || control_settings.check(ControlCode::Communicate, &keys)
     {
         item_modify(commands, world, inventory);
     }
@@ -179,7 +180,9 @@ fn detect_input_pick(
     hover: Res<HoverEntity>,
     inventory: Res<Inventory>,
 ) {
-    if control_settings.check(ControlCode::Pick, &keys) && hover.is_legal {
-        item_pick(commands, world, hover.closest.unwrap(), inventory);
+    if control_settings.check(ControlCode::Pick, &keys) {
+        if let Some(closest) = hover.closest {
+            item_pick(commands, world, closest, inventory);
+        }
     }
 }

@@ -1,4 +1,4 @@
-use crate::{character::*, constants::*, state::*};
+use crate::{character::*, state::*};
 use bevy::prelude::*;
 use bevy_tnua::prelude::*;
 use std::collections::HashMap;
@@ -114,7 +114,8 @@ impl Plugin for ControlPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<ControlSettings>();
 
-        app.add_systems(Update, (inputs_move, inputs_wait).in_set(InGameSet::Input));
+        app.add_systems(Update, inputs_wait.in_set(InGameSet::Input));
+        app.add_systems(Update, inputs_move.in_set(TnuaUserControlsSystems));
         app.add_systems(FixedUpdate, change_facing.in_set(InGameSet::PostInput));
         app.add_systems(
             FixedUpdate,
@@ -150,7 +151,11 @@ pub fn change_facing(mut actors: Query<(&Actor, &mut Sprite), Changed<Actor>>) {
 pub fn inputs_move(
     keys: Res<ButtonInput<KeyCode>>,
     control_settings: Res<ControlSettings>,
-    mut actors: Query<(&mut Actor, &mut TnuaController<ControlScheme>, &mut MoveDownTimer)>,
+    mut actors: Query<(
+        &mut Actor,
+        &mut TnuaController<ControlScheme>,
+        &mut MoveDownTimer,
+    )>,
 ) {
     if let Ok((mut actor, mut controller, mut move_down)) = actors.single_mut() {
         let to_left = control_settings.check(ControlCode::MoveLeft, &keys);
@@ -169,8 +174,10 @@ pub fn inputs_move(
         };
 
         // Refer to <https://github.com/idanarye/bevy-tnua/blob/main/examples/example.rs>.
+        controller.initiate_action_feeding();
+
         controller.basis = TnuaBuiltinWalk {
-            desired_motion: (direction * WALK_SPEED).extend(0.0),
+            desired_motion: direction.extend(0.0),
             ..default()
         };
 

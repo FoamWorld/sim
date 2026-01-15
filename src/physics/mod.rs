@@ -28,7 +28,6 @@ impl Plugin for GamePhysicsPlugin {
         app.add_systems(Startup, |mut commands: Commands| {
             commands.spawn((
                 Camera {
-                    // hdr: true,
                     clear_color: ClearColorConfig::Custom(Color::srgb(0.0, 0.0, 0.0)),
                     ..default()
                 },
