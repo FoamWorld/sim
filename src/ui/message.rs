@@ -47,6 +47,8 @@ impl Plugin for MessagePlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(MessageQueue::new(20));
 
+        app.add_message::<MessageEvent>();
+
         app.add_systems(
             FixedUpdate,
             (process_despawn_timeout, read_message_event, message_timer).in_set(InGameSet::Logic),

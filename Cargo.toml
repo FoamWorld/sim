@@ -13,6 +13,10 @@ default = [
 	# ref: https://docs.rs/bevy/latest/bevy/#cargo-features
 	# Default Features
 	"bevy/bevy_asset",
+	"bevy/bevy_camera",
+	"bevy/bevy_color",
+	"bevy/bevy_core_pipeline",
+	"bevy/bevy_image",
 	"bevy/bevy_log",
 	"bevy/bevy_picking",
 	"bevy/bevy_render",
@@ -21,6 +25,7 @@ default = [
 	"bevy/bevy_state",
 	"bevy/bevy_text",
 	"bevy/bevy_ui",
+	"bevy/bevy_ui_render",
 	"bevy/bevy_window",
 	"bevy/bevy_winit",
 	"bevy/multi_threaded", # not known whether it's worth it

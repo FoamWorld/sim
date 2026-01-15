@@ -3,6 +3,9 @@ use bevy::prelude::*;
 
 const UI_CLEAR_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 const UI_CLOTH_COLOR: Color = Color::srgba(1.0, 1.0, 1.0, 0.75);
+
+const UI_TITLE_COLOR: Color = Color::BLACK;
+const UI_SUBTITLE_COLOR: Color = Color::srgb(0.64, 0.64, 0.64);
 const UI_TEXT_COLOR: Color = Color::srgb(0.73, 0.49, 0.17);
 
 #[derive(Component)]
@@ -60,7 +63,7 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                     font_size: 25.0,
                     ..default()
                 },
-                TextColor(Color::BLACK),
+                TextColor(UI_TITLE_COLOR),
                 Node {
                     padding: UiRect::bottom(Val::Px(10.0)),
                     ..default()
@@ -73,7 +76,7 @@ pub fn start_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                     font_size: 16.0,
                     ..default()
                 },
-                TextColor(Color::srgb_u8(0xb0, 0xb0, 0xb0)),
+                TextColor(UI_SUBTITLE_COLOR),
                 Node {
                     padding: UiRect::bottom(Val::Px(48.0)),
                     ..default()

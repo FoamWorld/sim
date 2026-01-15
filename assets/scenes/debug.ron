@@ -12,7 +12,7 @@
 		)
 	},
 	entities: {
-		4294967296: (components: {
+		4294967295: (components: {
 			"sim::model::Position": (0.0, 0.0, 0.0),
 			"sim::model::ClothModel": (
 				x: 512.0,
@@ -20,19 +20,43 @@
 				bg: "background_site_room",
 			),
 		}),
-		4294967297: (components: {
+		4294967200: (components: {
+			"sim::model::Position": (0.0, -128.0, 0.0),
+			"sim::model::GroundModel": (
+				norm: (0.0, 1.0),
+			),
+		}),
+		4294967201: (components: {
+			"sim::model::Position": (0.0, 128.0, 0.0),
+			"sim::model::GroundModel": (
+				norm: (0.0, -1.0),
+			),
+		}),
+		4294967202: (components: {
+			"sim::model::Position": (256.0, 0.0, 0.0),
+			"sim::model::GroundModel": (
+				norm: (-1.0, 0.0),
+			),
+		}),
+		4294967203: (components: {
+			"sim::model::Position": (-256.0, 0.0, 0.0),
+			"sim::model::GroundModel": (
+				norm: (1.0, 0.0),
+			),
+		}),
+		4294967100: (components: {
 			"sim::model::Position": (0.0, -40.0, -1.0),
 			"sim::model::ShelfModel": (
 				half_x: 40.0,
 			),
 		}),
-		4294967298: (components: {
+		4294967101: (components: {
 			"sim::model::Position": (-20.0, -60.0, -1.0),
 			"sim::model::ShelfModel": (
 				half_x: 40.0,
 			),
 		}),
-		4294967299: (components: {
+		4294967000: (components: {
 			"sim::model::Position": (40.0, -108.0, -1.0),
 			"sim::model::BarrierModel": (
 				half_x: 5.0,
@@ -43,30 +67,6 @@
 				value: 1e20, max: 1e20,
 			),
 			"sim::sensor::DamageSensor": (),
-		}),
-		4294967300: (components: {
-			"sim::model::Position": (0.0, -128.0, 0.0),
-			"sim::model::GroundModel": (
-				norm: (0.0, 1.0),
-			),
-		}),
-		4294967301: (components: {
-			"sim::model::Position": (0.0, 128.0, 0.0),
-			"sim::model::GroundModel": (
-				norm: (0.0, -1.0),
-			),
-		}),
-		4294967302: (components: {
-			"sim::model::Position": (256.0, 0.0, 0.0),
-			"sim::model::GroundModel": (
-				norm: (-1.0, 0.0),
-			),
-		}),
-		4294967303: (components: {
-			"sim::model::Position": (-256.0, 0.0, 0.0),
-			"sim::model::GroundModel": (
-				norm: (1.0, 0.0),
-			),
 		}),
 	},
 )
